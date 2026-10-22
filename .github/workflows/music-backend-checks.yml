@@ -38,6 +38,6 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
       - name: Unit tests
-        run: npm run test:unit -- test/unit/music-backend/musicBackendTransport.test.ts test/unit/music-backend/musicBackendProxy.test.ts
+        run: npm run test:unit -- test/unit/music-backend/musicBackendTransport.test.ts test/unit/music-backend/musicBackendProxy.test.ts test/unit/onlineMusic/omniArchitecture.test.ts
       - name: Build
         run: npm run build
