@@ -1,0 +1,72 @@
+name: Deploy private music gateway to Baota server
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy through a verified SSH host
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: music-server-production
+    env:
+      DEPLOY_HOST: $${ secrets.MUSIC_SERVER_HOST }
+      DEPLOY_USER: $${ secrets.MUSIC_SERVER_USER }
+      DEPLOY_PORT: $${ secrets.MUSIC_SERVER_PORT }
+      DEPLOY_KEY: $${ secrets.MUSIC_SERVER_SSH_KEY }
+      DEPLOY_KNOWN_HOSTS: $${ secrets.MUSIC_SERVER_KNOWN_HOSTS }
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Check SSH configuration without logging secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for item in DEPLOY_HOST DEPLOY_USER DEPLOY_KEY DEPLOY_KNOWN_HOSTS; do
+            if [[ -z "$${!item:-}" ]]; then
+              echo "::error::Missing server SSH configuration: $item"
+              exit 1
+            fi
+          done
+          test "$${DEPLOY_PORT:-22}" -gt 0
+      - name: Prepare strict SSH host-key verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/tongsheng_deploy
+          chmod 600 ~/.ssh/tongsheng_deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+      - name: Upload server sources without sending production .env
+        shell: bash
+        run: |
+          set -euo pipefail
+          port="$${DEPLOY_PORT:-22}"
+          options=(-i ~/.ssh/tongsheng_deploy -p "$port" -o BatchMode=yes -o StrictHostKeyChecking=yes)
+          ssh "$${options[@]}" "$DEPLOY_USER@$DEPLOY_HOST" 'mkdir -p "$HOME/tongsheng-gateway"'
+          scp -r -i ~/.ssh/tongsheng_deploy -P "$port" -o BatchMode=yes -o StrictHostKeyChecking=yes deploy/music-backend-gateway/. "$DEPLOY_USER@$DEPLOY_HOST:~/tongsheng-gateway/"
+      - name: Start private containers and verify health
+        shell: bash
+        run: |
+          set -euo pipefail
+          port="$${DEPLOY_PORT:-22}"
+          ssh -i ~/.ssh/tongsheng_deploy -p "$port" -o BatchMode=yes -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" 'bash -se' <<'REMOTE'
+          set -euo pipefail
+          cd "$HOME/tongsheng-gateway"
+          if [[ ! -f .env ]]; then
+            echo "Server .env is missing. Create from .env.example on the server and set a private token."
+            exit 2
+          fi
+          if [[ ! -f cookies.json ]]; then
+            printf '{}' > cookies.json
+            chmod 600 cookies.json
+          fi
+          docker compose config --quiet
+          docker compose up -d --build
+          curl --fail --silent --show-error http://127.0.0.1:8090/healthz
+          REMOTE
