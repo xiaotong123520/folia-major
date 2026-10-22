@@ -25,7 +25,22 @@ export default {
     "playSong": "Putar {{song}}",
     "footer": "Pemutaran ditangani oleh Apple MusicKit dan tidak melewati batasan langganan atau wilayah. Token otorisasi hanya berada di memori halaman dan tidak disimpan permanen."
   },
-    "musicLink": {
+    "musicImport": {
+    "queue": "Daftar putar audio impor",
+    "clear": "Hapus semua lagu impor",
+    "tapPlay": "Ketuk Putar pada kontrol audio untuk melanjutkan.",
+    "audioError": "Audio tidak dapat diputar. Periksa format, respons server, HTTPS, dan batasan lintas-origin.",
+    "previous": "Lagu sebelumnya",
+    "next": "Lagu berikutnya",
+    "browserPlayback": "File lokal hanya tersedia selama halaman ini terbuka",
+    "remove": "Hapus"
+  },
+  "musicLink": {
+    "chooseFiles": "Pilih berkas musik dari perangkat",
+    "fileHint": "Impor beberapa berkas audio seperti MP3, M4A, AAC, WAV, atau FLAC. Ketuk Putar pada pemutar bawah. Berkas tidak diunggah.",
+    "invalidFiles": "Tidak ada berkas audio yang didukung. Pilih MP3, M4A, atau audio lain.",
+    "httpsRequired": "Gunakan URL audio HTTPS yang valid. GitHub Pages tidak dapat memutar media HTTP tidak aman.",
+    "addAudioUrl": "Tambahkan ke daftar putar",
     "openOfficialAuth": "Buka otorisasi Apple Music resmi",
     "title": "Impor tautan musik",
     "close": "Tutup",
