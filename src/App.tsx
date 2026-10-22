@@ -2882,6 +2882,7 @@ export default function App() {
                 onOpenAppleMusic={() => setIsAppleMusicOpen(true)}
                 onAddFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
                 onAddAudioUrl={url => importedAudioPlayerRef.current?.addUrl(url) ?? false}
+                onAddPointSong={request => importedAudioPlayerRef.current?.addPointSong(request) ?? false}
             />}
             {!isElectronWindow && <ImportedAudioPlayer
                 ref={importedAudioPlayerRef}
