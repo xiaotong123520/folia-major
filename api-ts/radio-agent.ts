@@ -17,7 +17,7 @@ function parseBrief(value: unknown, message: string) {
   if (!root || typeof root !== "object") return fallback(message);
   const cleanText = (item: unknown, maxLength: number): string | null => {
     if (typeof item !== "string") return null;
-    const cleaned = item.replace(/[\\u0000-\\u001f\\u007f]/g, " ").trim().slice(0, maxLength);
+    const cleaned = item.replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, maxLength);
     return cleaned || null;
   };
   const genres = Array.isArray(root.genres)
