@@ -6,6 +6,7 @@ import { omni } from '../../services/onlineMusic/omni';
 import { getNavidromeConfig, isNavidromeEnabled, navidromeApi } from '../../services/navidromeService';
 import { buildUnifiedNavidromeSong } from '../../services/playbackAdapters';
 
+// src/components/app/RadioAgent.tsx — mood-based radio creation, search, and playback handoff.
 type RadioBrief = {
     title: string;
     mood: string;
@@ -66,7 +67,7 @@ const isBrief = (value: unknown): value is RadioBrief => {
 };
 
 const localLabel = (song: LocalSong) => song.title || song.fileName.replace(/\.[^.]+$/, '');
-const localArtist = (song: LocalSong) => song.onlineMetadata?.artists?.map((artist) => typeof artist === 'string' ? artist : artist.name).filter(Boolean).join(', ') || song.importedMetadata?.artistNames?.join(', ') || '本地曲库';
+const localArtist = (song: LocalSong, fallback: string) => song.onlineMetadata?.artists?.map((artist) => typeof artist === 'string' ? artist : artist.name).filter(Boolean).join(', ') || song.importedMetadata?.artistNames?.join(', ') || fallback;
 
 export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, onPlayLocal }: Props) {
     const { t } = useTranslation();
@@ -85,10 +86,10 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
         const words = [brief.mood, ...brief.genres, ...brief.searchTerms].join(' ').toLocaleLowerCase();
         const tokens = words.split(/[\s,，。!！?？、]+/).filter(token => token.length > 1);
         return localSongs.filter(song => {
-            const haystack = [song.title, song.fileName, song.folderName, localArtist(song)].join(' ').toLocaleLowerCase();
+            const haystack = [song.title, song.fileName, song.folderName, localArtist(song, t('radioAgent.localLibraryFallback'))].join(' ').toLocaleLowerCase();
             return tokens.some(token => haystack.includes(token));
         }).slice(0, 8);
-    }, [brief, localSongs]);
+    }, [brief, localSongs, t]);
 
     useEffect(() => {
         const speechWindow = window as SpeechWindow;
@@ -259,7 +260,7 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                             <div className="flex items-center justify-between gap-2 border-t border-white/10 pt-3">
                                 <div className="flex gap-1.5">
                                     {voiceSupported && <button type="button" onClick={voiceListening ? () => recognitionRef.current?.stop() : startVoice} aria-label={voiceListening ? t('radioAgent.stopListening') : t('radioAgent.voiceInput')} className={`rounded-xl p-2.5 transition ${voiceListening ? 'bg-rose-400/15 text-rose-200' : 'text-white/60 hover:bg-white/10'}`}><Mic size={17} /></button>}
-                                    <button type="button" onClick={() => setNarrationEnabled(value => !value)} aria-pressed={narrationEnabled} title={t('radioAgent.narrationToggle')} className={`rounded-xl p-2.5 transition ${narrationEnabled ? 'bg-violet-300/15 text-violet-100' : 'text-white/60 hover:bg-white/10'}`}>{narrationEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button>
+                                    <button type="button" onClick={() => setNarrationEnabled(value => { const next = !value; if (!next && 'speechSynthesis' in window) { window.speechSynthesis.cancel(); setPlayingIntro(false); } return next; })} aria-pressed={narrationEnabled} title={t('radioAgent.narrationToggle')} className={`rounded-xl p-2.5 transition ${narrationEnabled ? 'bg-violet-300/15 text-violet-100' : 'text-white/60 hover:bg-white/10'}`}>{narrationEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button>
                                 </div>
                                 <button type="submit" disabled={!message.trim() || loading} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-40">{loading ? <LoaderCircle size={16} className="animate-spin" /> : <Send size={16} />}{loading ? t('radioAgent.working') : t('radioAgent.makeStation')}</button>
                             </div>
@@ -286,7 +287,7 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                         <div className="space-y-2">
                             {localMatches.map((song, index) => <div key={song.id} className="group flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 transition hover:border-white/15 hover:bg-white/[0.05]">
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-200/10 text-emerald-100/70"><Music2 size={17} /></div>
-                                <div className="min-w-0 flex-1"><p className="truncate text-sm text-white/90">{localLabel(song)}</p><p className="mt-1 truncate text-xs text-white/40">{localArtist(song)} · {t('radioAgent.localSource')}</p></div>
+                                <div className="min-w-0 flex-1"><p className="truncate text-sm text-white/90">{localLabel(song)}</p><p className="mt-1 truncate text-xs text-white/40">{localArtist(song, t('radioAgent.localLibraryFallback'))} · {t('radioAgent.localSource')}</p></div>
                                 <span className="hidden text-[10px] text-white/25 sm:inline">{String(index + 1).padStart(2, '0')}</span>
                                 <button type="button" onClick={() => onPlayLocal(song)} aria-label={t('radioAgent.play')} className="rounded-full border border-white/10 p-2.5 text-white/70 hover:bg-white/10 hover:text-white"><Play size={15} /></button>
                             </div>)}
