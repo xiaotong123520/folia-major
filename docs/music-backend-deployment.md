@@ -29,7 +29,8 @@ This branch contains an optional Folia provider adapter, a bounded HTTP client, 
 
 The browser adapter uses the same-origin Vercel proxy when `VITE_MUSIC_BACKEND_BASE_URL` points at `/api/music-backend`. Set these server-side Vercel environment variables:
 
-- `MUSIC_BACKEND_UPSTREAM_URL`: URL of the private, hardened music API. Prefer an internal/private address; the proxy accepts remote HTTPS URLs only.
+- `MUSIC_BACKEND_UPSTREAM_URL`: URL of the private, hardened music API. The proxy accepts remote HTTPS URLs only.
+- `MUSIC_BACKEND_UPSTREAM_API_KEY`: optional server-only bearer token for an upstream gateway that supports it; never expose it in browser variables.
 - `FOLIA_ALLOWED_ORIGINS`: comma-separated exact origin(s), e.g. `https://your-folia-domain.example`.
 
 Do not prefix either server variable with `VITE_`. The proxy is read-only and has a best-effort per-IP rate limit, but in-memory limits are not a substitute for a durable edge/WAF rate limit. Before production use, the upstream must be configured so public requests cannot read or alter platform cookies, initiate QR login, or access administrative configuration.
