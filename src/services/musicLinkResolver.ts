@@ -36,9 +36,8 @@ export function resolveMusicLink(input: string): MusicLinkResolution {
   const host = url.hostname.toLowerCase().replace(/^www\./, '');
   // Some NetEase share links put their resource ID inside the URL fragment.
   const hashQuery = new URLSearchParams(url.hash.replace(/^#\/?/, '').replace(/^.*?\?/, ''));
-  const normalized = new URL(url.toString());
-  normalized.hash = '';
-  const normalizedUrl = normalized.toString();
+  // Keep fragments: NetEase share routes commonly encode the resource ID in #/song?id=...
+  const normalizedUrl = url.toString();
 
   const make = (
     platform: MusicLinkPlatform, kind: MusicLinkKind, access: MusicLinkAccess, note: string,
@@ -89,6 +88,13 @@ export function resolveMusicLink(input: string): MusicLinkResolution {
   }
   return make('unknown', 'unknown', 'unsupported', '暂不支持此域名；请粘贴平台标准分享链接或使用服务器音乐库。', undefined, false, false);
 }
+/** True only if this resolver says Folia has a playback route for the URL. */
 export function isSupportedMusicLink(input: string): boolean {
+  const result = resolveMusicLink(input);
+  return result.platform !== 'unknown' && result.access !== 'unsupported' && result.canPlayInFolia;
+}
+
+/** True when a known provider owns the URL, whether or not playback is implemented. */
+export function isRecognizedMusicLink(input: string): boolean {
   return resolveMusicLink(input).platform !== 'unknown';
 }
