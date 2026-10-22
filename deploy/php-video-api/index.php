@@ -226,7 +226,7 @@ function appendIndex(string $root, array $entry): bool
     rewind($handle);
     $raw = stream_get_contents($handle);
     $rows = $raw === '' ? [] : json_decode($raw ?: '', true);
-    if (!is_array($rows) || !array_keys($rows) === array_keys(array_values($rows))) { flock($handle, LOCK_UN); fclose($handle); return false; }
+    if (!is_array($rows) || array_keys($rows) !== array_keys(array_values($rows))) { flock($handle, LOCK_UN); fclose($handle); return false; }
     $rows[] = $entry;
     $encoded = json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     $ok = is_string($encoded) && rewind($handle) && fwrite($handle, $encoded) === strlen($encoded) && ftruncate($handle, strlen($encoded)) && fflush($handle);
