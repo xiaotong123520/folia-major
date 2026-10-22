@@ -7,6 +7,7 @@ import { resolveMusicLink, type MusicLinkResolution } from '../../services/music
 import { isPlayableAudioFile } from '../../services/importedAudio';
 import { findSharedMusicSong } from '../../services/musicLinkPlayback';
 import { createPointSongImport, type PointSongImport, type PointSongSource } from '../../services/directPointSong';
+import { audiusStreamUrl, searchAudiusMusic, type OpenCatalogTrack } from '../../services/openCatalogAudius';
 
 // Importing a shared link never starts playback without an explicit user action.
 // Existing Omni adapters remain responsible for song identity, access and playable audio.
@@ -27,6 +28,9 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [pointSongTitle, setPointSongTitle] = useState('');
+    const [openQuery, setOpenQuery] = useState('');
+    const [openTracks, setOpenTracks] = useState<OpenCatalogTrack[]>([]);
+    const [openLoading, setOpenLoading] = useState(false);
     const [serverQuery, setServerQuery] = useState('');
     const [serverSongs, setServerSongs] = useState<UnifiedSong[]>([]);
     const hasServer = omni.getProviderSummaries().some(item => item.providerId === 'music-backend' && item.availability.configured);
@@ -85,6 +89,35 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
             return;
         }
         setError('');
+        onClose();
+    };
+
+    const searchOpenCatalog = async () => {
+        if (openLoading || !openQuery.trim()) return;
+        setOpenLoading(true);
+        setOpenTracks([]);
+        setError('');
+        try {
+            const result = await searchAudiusMusic(openQuery);
+            setOpenTracks(result);
+            if (!result.length) setError('Audius 没有找到相关开放音乐，请尝试其他歌曲名。');
+        } catch {
+            setError('Audius 搜索暂时不可用。可能是网络、跨域或接口限流，请稍后重试。');
+        } finally {
+            setOpenLoading(false);
+        }
+    };
+
+    const addOpenTrack = (track: OpenCatalogTrack) => {
+        const url = audiusStreamUrl(track.id);
+        if (!url || !onAddPointSong({
+            name: track.artist ? `${track.title} · ${track.artist}` : track.title,
+            url,
+            fallbackUrls: [],
+        })) {
+            setError('无法添加开放音乐，请重试。');
+            return;
+        }
         onClose();
     };
 
@@ -162,6 +195,32 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
                             <button type="button" disabled={!pointSongTitle.trim()} onClick={() => playPointSong('qq-backup')} className="min-h-11 rounded-xl border border-white/15 px-3 text-sm text-white/90 disabled:opacity-50">QQ 备用接口</button>
                         </div>
                         <p className="text-xs leading-5 text-amber-100/75">浏览器支持直接音频、音频重定向及允许跨域读取（CORS）的 JSON 音频地址。若接口拒绝跨域读取、返回 HTML 或歌曲无授权，GitHub Pages 无法代替服务端解析，播放器会提示失败。</p>
+                    </section>
+                    <section className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+                        <div className="flex items-center justify-between gap-2">
+                            <h3 className="text-sm font-medium">Audius · 开放音乐</h3>
+                            <span className="rounded-full border border-emerald-200/25 px-2 py-1 text-[10px] text-emerald-100">官方只读 API</span>
+                        </div>
+                        <p className="text-xs leading-5 text-white/60">与上面的国内平台点歌不同：这里搜索的是 Audius 自有曲库，并使用平台公开的歌曲 ID 播放，不冒充其他平台的同名录音。</p>
+                        <form onSubmit={event => { event.preventDefault(); void searchOpenCatalog(); }} className="flex gap-2">
+                            <input value={openQuery} onChange={event => setOpenQuery(event.target.value)} maxLength={100}
+                                aria-label="Audius 音乐搜索" placeholder="搜索开放音乐／歌手"
+                                className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-base sm:text-sm" />
+                            <button type="submit" disabled={openLoading || !openQuery.trim()}
+                                className="min-h-11 shrink-0 rounded-xl bg-emerald-200 px-4 text-sm font-medium text-black disabled:opacity-50">
+                                {openLoading ? '搜索中' : '搜索'}
+                            </button>
+                        </form>
+                        {openTracks.length > 0 && <div className="max-h-64 space-y-2 overflow-y-auto">
+                            {openTracks.map(track => <button key={track.id} type="button" onClick={() => addOpenTrack(track)}
+                                className="flex min-h-12 w-full items-center gap-3 rounded-xl bg-white/5 px-3 py-2 text-left text-sm hover:bg-white/10">
+                                <Play size={16} className="shrink-0 text-emerald-200" />
+                                <span className="min-w-0"><span className="block truncate">{track.title}</span>
+                                    <span className="block truncate text-xs text-white/50">{track.artist || 'Audius'}</span>
+                                </span>
+                            </button>)}
+                        </div>}
+                        <p className="text-[11px] leading-5 text-white/40">仅播放开放且允许流媒体访问的 Audius 曲目；接口状态仍受网络与平台规则影响。</p>
                     </section>
                     <section className="space-y-3 rounded-2xl border border-white/10 p-4">
                         <h3 className="text-sm font-medium">{t('personal.serverMusic')}</h3>
