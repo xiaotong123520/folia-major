@@ -29,6 +29,8 @@ export interface PlatformNamePlace {
 }
 
 export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
+    'src/services/musicLinkResolver.ts': { n: { netease: 3, qq: 3, kugou: 3, ytm: 4 }, kind: 'question', why: 'explicit cross-provider share-link recognition; each link is routed to the existing provider or official page' },
+    'src/services/onlineMusic/music-backend/musicBackendProvider.ts': { n: { netease: 1, qq: 1, kugou: 1 }, kind: 'question', why: 'explicit multi-source adapter preserves the upstream source id when normalizing results' },
     'api-ts/lyric-proxy.ts': { n: { qq: 2, kugou: 1 }, kind: 'main', why: 'the hosts the lyric relay may reach' },
     'api-ts/qq.ts': { n: { qq: 10 }, kind: 'main', why: 'the serverless entry of the QQ backend; the host finds it by path' },
     'api/lyric-proxy.js': { n: { qq: 2, kugou: 1 }, kind: 'main', why: 'the built copy of api-ts/lyric-proxy.ts' },
