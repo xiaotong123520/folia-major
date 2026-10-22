@@ -102,7 +102,10 @@ export default async function handler(req: Request): Promise<Response> {
   const allowedOrigins = (process.env.FOLIA_ALLOWED_ORIGINS || "")
     .split(",").map((origin) => origin.trim()).filter(Boolean);
   const requestOrigin = req.headers.get("origin");
-  if (allowedOrigins.length && requestOrigin && !allowedOrigins.includes(requestOrigin)) {
+  if (allowedOrigins.length === 0) {
+    return json(503, { error: "FOLIA_ALLOWED_ORIGINS is not configured" });
+  }
+  if (requestOrigin && !allowedOrigins.includes(requestOrigin)) {
     return json(403, { error: "Origin not allowed" });
   }
 
