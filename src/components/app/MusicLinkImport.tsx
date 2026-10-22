@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link2, LoaderCircle, Music2, Play, ExternalLink, Upload, X } from 'lucide-react';
+import { Link2, LoaderCircle, Music2, Play, ExternalLink, Upload, Server, X } from 'lucide-react';
+import FoliaServerSettings from './FoliaServerSettings';
+import { getFoliaServerBase } from '../../services/foliaServerFallback';
 import type { UnifiedSong } from '../../types';
 import { omni } from '../../services/onlineMusic/omni';
 import { resolveMusicLink, type MusicLinkResolution } from '../../services/musicLinkResolver';
@@ -19,6 +21,8 @@ type Props = {
 export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusic, onAddFiles, onAddAudioUrl }: Props) {
     const { t } = useTranslation();
     const [input, setInput] = useState('');
+    const [showServerSettings, setShowServerSettings] = useState(false);
+    const activeServer = getFoliaServerBase();
     const [resolution, setResolution] = useState<MusicLinkResolution | null>(null);
     const [song, setSong] = useState<UnifiedSong | null>(null);
     const [loading, setLoading] = useState(false);
@@ -91,6 +95,15 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
                         </label>
                         <p className="mt-2 text-xs leading-5 text-white/60">{t('musicLink.fileHint')}</p>
                     </div>
+                    <button type="button"
+                        onClick={() => setShowServerSettings(true)}
+                        className="flex min-h-12 w-full items-center gap-3 rounded-xl border border-white/15 bg-white/[0.035] px-4 py-3 text-left text-sm hover:border-emerald-200/40 hover:bg-white/[0.08]">
+                        <Server size={18} className="shrink-0 text-emerald-200" />
+                        <span className="min-w-0 flex-1">
+                            <span className="block font-medium">我的服务器音乐解析</span>
+                            <span className="block truncate text-xs text-white/50">{activeServer ?? '未连接服务器 · 点击配置宝塔 HTTPS 网关'}</span>
+                        </span>
+                    </button>
                     <form onSubmit={event => { event.preventDefault(); inspect(); }} className="flex gap-2">
                         <input value={input} onChange={event => setInput(event.target.value)} placeholder={t('musicLink.placeholder')} aria-label={t('musicLink.inputLabel')} className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm outline-none focus:border-violet-300/50" />
                         <button type="submit" disabled={!input.trim()} className="rounded-xl bg-violet-200 px-4 text-sm font-medium text-black disabled:opacity-50">{t('musicLink.inspect')}</button>
@@ -116,6 +129,7 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
                     <p className="text-xs leading-5 text-white/40">{t('musicLink.disclaimer')}</p>
                 </div>
             </section>
+            {showServerSettings && <FoliaServerSettings onClose={() => setShowServerSettings(false)} />}
         </div>
     );
 }
