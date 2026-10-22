@@ -20,8 +20,8 @@
 
 - `.github/workflows/deploy-github-pages.yml`：main 更新后执行类型检查、音乐功能单测、网关测试、生产构建与 Pages 发布。
 - GitHub Pages 使用 Actions 作为来源，`folia-pages-preview` 环境只允许 main 部署。
-- `.github/workflows/sync-upstream.yml`：每天北京时间 10:00 检查 Folia 上游，合并到专用 review 分支并创建更新 PR。不会直接覆盖个人主分支；冲突会停止并在 Actions 摘要列出文件。合并经过检查的 PR 后自动发布双端网站。
-- 需在 Settings → Actions → General 允许 GitHub Actions 创建 pull request。机器人 PR 不会自动触发 GitHub 的 pull_request CI，请在合并前运行检查；也可手动触发该更新工作流。
+- `.github/workflows/sync-upstream.yml`：每天北京时间 10:00 检查上游，将可合并更新同步到按上游提交命名的待审查分支，不执行上游代码，不修改 main，不直接发布。已有同名审查分支不会被覆盖；合并冲突会在 Actions 摘要列出文件。
+- 无需放宽机器人创建/批准 PR 的权限。打开 Actions 运行摘要中的比较链接创建 PR，通过检查和审查后合并，现有 Pages 流程会统一更新手机和电脑网站。
 
 ## 自有服务器解析兜底
 
