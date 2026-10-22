@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import {
     audioDisplayName,
     isPlayableAudioFile,
+    normalizeImportedAudioFile,
+    describeAudioPlaybackFailure,
     validatePlayableUrl,
     type ImportedAudioTrack,
 } from '../../services/importedAudio';
@@ -69,7 +71,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
 
         useImperativeHandle(ref, () => ({
             addFiles(files) {
-                const accepted = files.filter(isPlayableAudioFile);
+                const accepted = files.filter(isPlayableAudioFile).map(normalizeImportedAudioFile);
                 if (!accepted.length) return 0;
                 const additions = accepted.map(file => {
                     const url = URL.createObjectURL(file);
@@ -82,8 +84,11 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                     };
                 });
                 setTracks(current => [...current, ...additions]);
-                setSelectedId(current => current ?? additions[0].id);
-                setError('');
+                audioRef.current?.pause();
+                setSelectedId(additions[0].id);
+                setFallbackRetry(null);
+                setMobileExpanded(false);
+                setError('本地音乐已导入，点击播放器上的「播放」即可收听。');
                 void writeImportedAudio(() => importedAudioDatabase.tracks.bulkPut(additions.map((track, index) => ({
                     id: track.id, name: track.name, file: accepted[index], createdAt: Date.now() + index,
                 })))).catch(storageError);
@@ -139,13 +144,25 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                 if (shouldPlay) void audioRef.current?.play().catch(() => setError(t('musicImport.tapPlay')));
                 return;
             }
-            audioRef.current?.pause();
+            const next = tracks.find(track => track.id === id);
+            if (!next) return;
+            const audio = audioRef.current;
+            audio?.pause();
             setPlaying(false);
             playWasStartedRef.current = false;
             setFallbackRetry(null);
-            playAfterSelectionRef.current = shouldPlay;
+            playAfterSelectionRef.current = false;
             setSelectedId(id);
             setError('');
+            // Keep one audio element. Start playback directly inside the tap/click event;
+            // deferring play() to a React effect loses transient iOS Safari user activation.
+            if (audio) {
+                audio.src = next.url;
+                audio.load();
+                if (shouldPlay) {
+                    void audio.play().catch(() => setError('点击播放按钮开始收听；部分手机会限制自动切歌。'));
+                }
+            }
         };
 
         useEffect(() => {
@@ -225,7 +242,6 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                 </div>}
                 <div className={mobileExpanded ? 'block' : 'hidden sm:block'}>
                 <audio
-                    key={activeTrack.id}
                     ref={audioRef}
                     className="mt-2 w-full"
                     controls
@@ -234,6 +250,12 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                     onPlay={() => { playWasStartedRef.current = true; setPlaying(true); setError(''); onStartPlayback(); }}
                     onPause={() => { setPlaying(false); if (!audioRef.current?.error) playWasStartedRef.current = false; }}
                     onError={() => {
+                        if (activeTrack.temporary) {
+                            setPlaying(false);
+                            playWasStartedRef.current = false;
+                            setError(describeAudioPlaybackFailure(audioRef.current?.error?.code, true));
+                            return;
+                        }
                         const failedUrl = fallbackRetry?.id === activeTrack.id ? fallbackRetry.url : activeTrack.url;
                         const tryFallback = () => {
                             const attempt = fallbackAttemptsRef.current.get(activeTrack.id) ?? 0;
@@ -245,7 +267,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                                 setError('当前接口无法播放，正在尝试 QQ 备用接口');
                             } else {
                                 playWasStartedRef.current = false;
-                                setError(t('musicImport.audioError') + '；接口可能返回 JSON、禁止跨域读取或无播放权限');
+                                setError(describeAudioPlaybackFailure(audioRef.current?.error?.code));
                             }
                         };
                         // Some endpoints respond with a JSON {data:{url}}. This is only readable if
