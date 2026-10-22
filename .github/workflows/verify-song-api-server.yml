@@ -30,3 +30,9 @@ jobs:
           MUSIC_BACKEND_API_KEY: ci-only-not-a-real-secret
           MUSIC_PUBLIC_ORIGINS: https://xiaotong123520.github.io
         run: docker compose -f deploy/music-backend-gateway/docker-compose.yml config --quiet
+
+      - name: Build the private music containers
+        env:
+          MUSIC_BACKEND_API_KEY: ci-only-not-a-real-secret
+          MUSIC_PUBLIC_ORIGINS: https://xiaotong123520.github.io
+        run: docker compose -f deploy/music-backend-gateway/docker-compose.yml build music-source-fallback music-backend-gateway
