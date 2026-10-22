@@ -25,7 +25,22 @@ export default {
     "playSong": "播放 {{song}}",
     "footer": "播放由 Apple MusicKit 处理，不会绕过订阅或地区限制。授权令牌只保存在当前页面内存中；关闭页面后不持久化。"
   },
-    "musicLink": {
+    "musicImport": {
+    "queue": "导入音乐播放列表",
+    "clear": "清空导入列表",
+    "tapPlay": "请点播放器的播放按钮继续。",
+    "audioError": "音频无法播放。请确认文件格式受浏览器支持，或服务器返回的是可播放的音频而不是网页；HTTPS 与跨域限制也可能导致失败。",
+    "previous": "上一首",
+    "next": "下一首",
+    "browserPlayback": "本地文件仅在当前页面有效",
+    "remove": "移除"
+  },
+  "musicLink": {
+    "chooseFiles": "从手机或电脑选择音乐文件",
+    "fileHint": "支持多选 MP3、M4A、AAC、WAV、FLAC 等音频。导入后在页面下方的播放器点播放，不上传到服务器。",
+    "invalidFiles": "没有选择有效音频文件，请选择 MP3、M4A 等音频。",
+    "httpsRequired": "请使用有效的 HTTPS 音频地址。GitHub Pages 无法播放 HTTP 混合内容。",
+    "addAudioUrl": "加入播放列表",
     "openOfficialAuth": "打开 Apple Music 官方授权",
     "title": "导入音乐链接",
     "close": "关闭",
