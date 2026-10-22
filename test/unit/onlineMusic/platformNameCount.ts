@@ -32,6 +32,7 @@ export const PLATFORM_NAMES = {
     bodian: /bodian|波点/i,
     ytm: /ytm|youtube/i,
     spotify: /spotify/i,
+    'music-backend': /music-backend/i,
 } as const;
 
 export type CountedPlatform = keyof typeof PLATFORM_NAMES;
