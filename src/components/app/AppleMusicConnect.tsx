@@ -1,3 +1,4 @@
+import { foliaBackendApiUrl } from '../../services/foliaServerFallback';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Apple, CheckCircle2, LoaderCircle, Music2, Play, Search, ShieldCheck, X } from 'lucide-react';
@@ -61,7 +62,7 @@ export default function AppleMusicConnect({ onClose }: Props) {
         setError('');
         setNotice('');
         try {
-            const response = await fetch('/api/apple-music-token', { cache: 'no-store' });
+            const response = await fetch(foliaBackendApiUrl('/api/apple-music-token'), { cache: 'no-store' });
             const data = await response.json() as { token?: string; error?: string };
             if (!response.ok || !data.token) throw new Error(data.error || t('appleMusic.tokenUnavailable'));
             const kit = await loadMusicKit();
