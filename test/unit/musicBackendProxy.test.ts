@@ -14,6 +14,7 @@ describe('music backend proxy', () => {
 
     it('returns 503 when the upstream is not configured', async () => {
         vi.stubEnv('MUSIC_BACKEND_UPSTREAM_URL', '');
+        vi.stubEnv('FOLIA_ALLOWED_ORIGINS', 'https://folia.example');
         const response = await handler(request('/api/v1/music/search', '&q=hello'));
         expect(response.status).toBe(503);
         await expect(response.json()).resolves.toMatchObject({ code: 'MUSIC_BACKEND_NOT_CONFIGURED' });
@@ -21,6 +22,7 @@ describe('music backend proxy', () => {
 
     it('rejects administrative and unlisted endpoints', async () => {
         vi.stubEnv('MUSIC_BACKEND_UPSTREAM_URL', 'https://backend.example');
+        vi.stubEnv('FOLIA_ALLOWED_ORIGINS', 'https://folia.example');
         const response = await handler(request('/api/v1/system/cookies'));
         expect(response.status).toBe(404);
     });
@@ -70,6 +72,7 @@ describe('music backend proxy', () => {
 
     it('rejects unapproved query parameters', async () => {
         vi.stubEnv('MUSIC_BACKEND_UPSTREAM_URL', 'https://backend.example');
+        vi.stubEnv('FOLIA_ALLOWED_ORIGINS', 'https://folia.example');
         const response = await handler(request('/api/v1/music/search', '&q=hello&dangerous=1'));
         expect(response.status).toBe(400);
     });
