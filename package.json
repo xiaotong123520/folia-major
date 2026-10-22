@@ -4,7 +4,8 @@
   "desktopName": "folia-major.desktop",
   "description": "桐声音乐 · 手机与电脑共用的音乐空间",
   "author": {
-    "name": "xiaotong123520"
+    "name": "xiaotong123520",
+    "email": "174346993+xiaotong123520@users.noreply.github.com"
   },
   "private": true,
   "version": "0.7.21",
@@ -205,6 +206,7 @@
       "include": "build/installer.nsh"
     },
     "linux": {
+      "maintainer": "xiaotong123520 <174346993+xiaotong123520@users.noreply.github.com>",
       "artifactName": "${name}-${version}-linux-${arch}.${ext}",
       "target": [
         "tar.gz",
