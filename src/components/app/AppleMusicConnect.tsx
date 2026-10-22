@@ -75,7 +75,7 @@ export default function AppleMusicConnect({ onClose }: Props) {
         } finally {
             setBusy(false);
         }
-    }, []);
+    }, [t]);
 
     const search = useCallback(async () => {
         if (!music || !query.trim()) return;
@@ -91,7 +91,7 @@ export default function AppleMusicConnect({ onClose }: Props) {
         } finally {
             setBusy(false);
         }
-    }, [music, query]);
+    }, [music, query, t]);
 
     const play = useCallback(async (song: MusicKitSong) => {
         if (!music) return;
@@ -106,7 +106,7 @@ export default function AppleMusicConnect({ onClose }: Props) {
         } finally {
             setBusy(false);
         }
-    }, [music]);
+    }, [music, t]);
 
     const signOut = useCallback(async () => {
         setBusy(true);
@@ -117,7 +117,7 @@ export default function AppleMusicConnect({ onClose }: Props) {
         setPlayingId('');
         setNotice(t('appleMusic.signedOut'));
         setBusy(false);
-    }, [music]);
+    }, [music, t]);
 
     return (
         <div className="fixed inset-0 z-[140] flex items-end justify-center bg-black/75 p-0 backdrop-blur-xl sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="folia-apple-music-title">
@@ -125,22 +125,22 @@ export default function AppleMusicConnect({ onClose }: Props) {
                 <header className="flex items-center justify-between border-b border-white/10 px-5 py-4">
                     <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-pink-500/15 text-pink-200"><Apple size={21} /></div>
-                        <div><h2 id="folia-apple-music-title" className="font-medium">Apple Music</h2><p className="text-xs text-white/45">官方账号授权 · Folia</p></div>
+                        <div><h2 id="folia-apple-music-title" className="font-medium">{t('appleMusic.name')}</h2><p className="text-xs text-white/45">{t('appleMusic.subtitle')}</p></div>
                     </div>
-                    <button type="button" onClick={onClose} aria-label="关闭" className="rounded-full border border-white/10 p-2 text-white/65 hover:bg-white/10"><X size={18} /></button>
+                    <button type="button" onClick={onClose} aria-label={t('appleMusic.close')} className="rounded-full border border-white/10 p-2 text-white/65 hover:bg-white/10"><X size={18} /></button>
                 </header>
                 <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
                     {!authorized ? <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-                        <div className="mb-3 flex items-center gap-2 text-emerald-200"><ShieldCheck size={18} /><span className="text-sm font-medium">使用苹果官方授权登录</span></div>
-                        <p className="mb-4 text-sm leading-6 text-white/55">Folia 不会收集或保存你的 Apple ID 密码。点击后将加载 Apple Music 官方授权流程。若尚未配置服务端开发者凭据，页面会明确提示。</p>
+                        <div className="mb-3 flex items-center gap-2 text-emerald-200"><ShieldCheck size={18} /><span className="text-sm font-medium">{t('appleMusic.signInHeading')}</span></div>
+                        <p className="mb-4 text-sm leading-6 text-white/55">{t('appleMusic.signInDescription')}</p>
                         <button type="button" onClick={() => void signIn()} disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-medium text-black hover:bg-pink-50 disabled:opacity-50">{busy ? <LoaderCircle size={17} className="animate-spin" /> : <Apple size={17} />}{busy ? t('appleMusic.connecting') : t('appleMusic.signIn')}</button>
                     </div> : <div className="flex items-center justify-between rounded-2xl border border-emerald-200/20 bg-emerald-200/5 p-4">
-                        <div className="flex items-center gap-2 text-emerald-100"><CheckCircle2 size={18} /><span className="text-sm">Apple Music 已授权</span></div>
-                        <button type="button" onClick={() => void signOut()} disabled={busy} className="rounded-lg border border-white/10 px-3 py-2 text-xs text-white/65 hover:bg-white/10">退出授权</button>
+                        <div className="flex items-center gap-2 text-emerald-100"><CheckCircle2 size={18} /><span className="text-sm">{t('appleMusic.authorized')}</span></div>
+                        <button type="button" onClick={() => void signOut()} disabled={busy} className="rounded-lg border border-white/10 px-3 py-2 text-xs text-white/65 hover:bg-white/10">{t('appleMusic.signOut')}</button>
                     </div>}
                     {authorized && <form onSubmit={event => { event.preventDefault(); void search(); }} className="flex gap-2">
-                        <label htmlFor="folia-apple-music-search" className="sr-only">搜索 Apple Music 歌曲</label>
-                        <input id="folia-apple-music-search" value={query} onChange={event => setQuery(event.target.value)} placeholder="搜索歌曲、歌手或专辑" className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm outline-none focus:border-pink-200/40" />
+                        <label htmlFor="folia-apple-music-search" className="sr-only">{t('appleMusic.searchLabel')}</label>
+                        <input id="folia-apple-music-search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t('appleMusic.searchPlaceholder')} className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm outline-none focus:border-pink-200/40" />
                         <button type="submit" disabled={busy || !query.trim()} className="rounded-xl bg-pink-200 px-4 text-black disabled:opacity-50"><Search size={18} /></button>
                     </form>}
                     {notice && <p role="status" className="rounded-xl border border-emerald-200/15 bg-emerald-200/5 p-3 text-xs leading-5 text-emerald-100/80">{notice}</p>}
@@ -152,7 +152,7 @@ export default function AppleMusicConnect({ onClose }: Props) {
                             <button type="button" onClick={() => void play(song)} disabled={busy} aria-label={t('appleMusic.playSong', { song: song.attributes?.name || t('appleMusic.song') })} className="rounded-full border border-white/10 p-2.5 text-white/75 hover:bg-white/10 disabled:opacity-40">{playingId === song.id ? <CheckCircle2 size={15} /> : <Play size={15} />}</button>
                         </div>)}
                     </div>
-                    <p className="text-[11px] leading-5 text-white/35">播放由 Apple MusicKit 处理，不会绕过订阅或地区限制。授权令牌只保存在当前页面内存中；关闭页面后不持久化。</p>
+                    <p className="text-[11px] leading-5 text-white/35">{t('appleMusic.footer')}</p>
                 </div>
             </section>
         </div>
