@@ -7,6 +7,8 @@ This first stage adds deterministic, network-free classification of music share 
 Entry point: `src/services/musicLinkResolver.ts`
 Unit tests: `test/unit/musicLinkResolver.test.ts`
 
+This module is a standalone classification stage, not yet connected to the paste-link UI or playback queue. `isRecognizedMusicLink` answers whether a provider is known; `isSupportedMusicLink` answers whether this resolver reports an available playback route. Neither function proves that a specific song is playable.
+
 ## Recognized sources
 
 | Source | Recognition | Playback route |
@@ -33,11 +35,19 @@ A recognized link does not prove Folia can play it. A provider can still reject 
 - Never commit cookies, private keys, developer tokens, or passwords.
 - Existing local music and Navidrome data must remain untouched.
 
+## Current fixes
+
+- NetEase `#/song?id=...` fragments are preserved in `normalizedUrl`, so the canonicalized link retains the song ID.
+- Apple Music album and artist IDs are read from the final numeric path segment when no `i` track parameter exists.
+- Recognition and playback support are separate predicates: a Kuwo URL is recognized but is not advertised as playable until a provider is implemented.
+- Unit tests cover the preserved NetEase fragment and the recognition-versus-playback distinction.
+
 ## Next integration stages
 
-1. Wire this resolver into a paste-link UI with platform and availability status.
-2. Use existing NetEase/QQ/Kugou provider methods instead of duplicating provider logic.
-3. Implement and test Kuwo only after confirming API/auth requirements and permitted playback.
-4. Complete Apple Music using official MusicKit and server-side token signing.
-5. Verify official YouTube/SoundCloud playback on iOS Safari and desktop.
-6. Run unit tests, typecheck, and production build in CI before merge.
+1. Resolve the architecture review before merge: provider-specific rules must remain in provider adapters or be exposed as Omni capabilities, not create a shared platform-specific exception.
+2. Wire the resolver into a paste-link UI with platform and availability status.
+3. Use existing NetEase/QQ/Kugou provider methods instead of duplicating provider logic.
+4. Implement and test Kuwo only after confirming API/auth requirements and permitted playback.
+5. Complete Apple Music using official MusicKit and server-side token signing.
+6. Verify official YouTube/SoundCloud playback on iOS Safari and desktop.
+7. Run unit tests, typecheck, and production build in CI before merge.
