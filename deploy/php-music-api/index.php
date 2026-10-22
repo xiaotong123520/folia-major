@@ -10,16 +10,19 @@ header('X-Content-Type-Options: nosniff');
 header('Cache-Control: private, no-store');
 
 $origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
+// CORS is not authorization: trusted browsers may use a separate read-only token.
 $allowed = array_filter(array_map('trim', explode(',', (string) (getenv('MUSIC_PUBLIC_ORIGINS') ?: ''))));
-if ($origin !== '' && in_array($origin, $allowed, true)) {
+$browserOrigins = array_filter(array_map('trim', explode(',', (string) (getenv('MUSIC_BROWSER_ORIGINS') ?: ''))));
+$corsAllowed = array_unique(array_merge($allowed, $browserOrigins));
+if ($origin !== '' && in_array($origin, $corsAllowed, true)) {
     header('Access-Control-Allow-Origin: ' . $origin);
     header('Access-Control-Allow-Methods: GET, HEAD, OPTIONS');
-    header('Access-Control-Allow-Headers: Range, Accept');
+    header('Access-Control-Allow-Headers: Authorization, Range, Accept');
     header('Access-Control-Expose-Headers: Content-Range, Content-Length, Accept-Ranges');
     header('Vary: Origin');
 }
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code($origin !== '' && in_array($origin, $allowed, true) ? 204 : 403);
+    http_response_code($origin !== '' && in_array($origin, $corsAllowed, true) ? 204 : 403);
     exit;
 }
 if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
@@ -27,13 +30,30 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
 }
 
 $apiKey = (string) (getenv('MUSIC_BACKEND_API_KEY') ?: '');
+$readKey = (string) (getenv('MUSIC_BROWSER_READ_TOKEN') ?: '');
+$signingKey = (string) (getenv('MUSIC_STREAM_SIGNING_KEY') ?: '');
 $provided = (string) ($_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '');
 $hasBearer = $apiKey !== '' && str_starts_with($provided, 'Bearer ')
     && hash_equals($apiKey, substr($provided, 7));
+$hasReadBearer = strlen($readKey) >= 32 && str_starts_with($provided, 'Bearer ')
+    && hash_equals($readKey, substr($provided, 7));
 // Public-origin mode is only for files you are legally allowed to serve to everyone.
 // A forged Origin can bypass CORS restrictions; do not use this mode for private libraries.
 $publicRead = $origin !== '' && in_array($origin, $allowed, true);
-if (!$hasBearer && !$publicRead && parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH) !== '/healthz') {
+$path = parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+$signedStream = false;
+if ($path === '/api/v1/music/stream' && strlen($signingKey) >= 32) {
+    $signedId = (string) ($_GET['id'] ?? '');
+    $expires = (string) ($_GET['expires'] ?? '');
+    $sig = (string) ($_GET['sig'] ?? '');
+    $signedStream = preg_match('/^[a-f0-9]{24}$/D', $signedId) === 1
+        && preg_match('/^\\d{10}$/D', $expires) === 1
+        && preg_match('/^[a-f0-9]{64}$/D', $sig) === 1
+        && (int) $expires >= time()
+        && (int) $expires <= time() + 7200 + 60
+        && hash_equals(hash_hmac('sha256', $signedId . ':' . $expires, $signingKey), $sig);
+}
+if (!$hasBearer && !$hasReadBearer && !$publicRead && !$signedStream && $path !== '/healthz') {
     reply(401, ['code' => 401, 'msg' => 'Unauthorized']);
 }
 
@@ -67,14 +87,30 @@ switch ($path) {
             return $q === '' || stripos((string) $track['name'], $q) !== false
                 || stripos((string) ($track['artist'] ?? ''), $q) !== false;
         }));
-        $songs = array_map(static fn ($track): array => [
-            'id' => $track['id'],
-            'source' => 'local',
-            'name' => $track['name'],
-            'artist' => $track['artist'] ?? '',
-            'album' => $track['album'] ?? '',
-            'durationMs' => 0,
-        ], array_slice($matches, $offset, $limit));
+        $songs = array_map(static function (array $track) use ($signingKey, $publicRead): array {
+            $streamUrl = '';
+            $id = (string) $track['id'];
+            if (strlen($signingKey) >= 32) {
+                $expires = time() + 7200;
+                $sig = hash_hmac('sha256', $id . ':' . $expires, $signingKey);
+                $streamUrl = '/api/v1/music/stream?' . http_build_query([
+                    'source' => 'local', 'id' => $id, 'expires' => $expires, 'sig' => $sig,
+                ], '', '&', PHP_QUERY_RFC3986);
+            } elseif ($publicRead) {
+                $streamUrl = '/api/v1/music/stream?' . http_build_query([
+                    'source' => 'local', 'id' => $id,
+                ], '', '&', PHP_QUERY_RFC3986);
+            }
+            return [
+                'id' => $id,
+                'source' => 'local',
+                'name' => $track['name'],
+                'artist' => $track['artist'] ?? '',
+                'album' => $track['album'] ?? '',
+                'durationMs' => 0,
+                'streamUrl' => $streamUrl,
+            ];
+        }, array_slice($matches, $offset, $limit));
         reply(200, ['code' => 200, 'data' => ['songs' => $songs, 'total' => count($matches)]]);
     case '/api/v1/music/lyric':
         reply(200, ['code' => 200, 'data' => ['lyric' => '']]);
