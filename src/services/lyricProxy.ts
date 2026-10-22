@@ -16,11 +16,13 @@
  * caller's own choice; this file only names the two relay routes.
  */
 
+import { foliaBackendApiUrl } from './foliaServerFallback';
+
 type LyricProxyBridge = NonNullable<Window['electron']>['fetchLyricProxy'];
 
 /** The relay's address on the web for one target URL. */
 export const lyricProxyWebUrl = (targetUrl: string): string => (
-    `/api/lyric-proxy?url=${encodeURIComponent(targetUrl)}`
+    `${foliaBackendApiUrl('/api/lyric-proxy')}?url=${encodeURIComponent(targetUrl)}`
 );
 
 /**
