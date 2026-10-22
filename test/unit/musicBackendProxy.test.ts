@@ -57,7 +57,7 @@ describe('music backend proxy', () => {
         vi.stubEnv('FOLIA_ALLOWED_ORIGINS', 'https://folia.example');
         const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
             expect(new Headers(init?.headers).get('range')).toBe('bytes=0-1023');
-            return new Response(new Uint8Array([1, 2, 3]), {
+            return new Response(new Uint8Array([1, 2, 3]).buffer, {
                 status: 206,
                 headers: { 'Content-Type': 'audio/mpeg', 'Content-Range': 'bytes 0-2/100', 'Accept-Ranges': 'bytes' },
             });
