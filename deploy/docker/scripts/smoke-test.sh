@@ -34,7 +34,12 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-compose up -d --wait
+if ! compose up -d --wait; then
+  echo 'Docker Compose startup failed; gateway diagnostics:' >&2
+  compose ps >&2 || true
+  compose logs --tail=150 gateway backend >&2 || true
+  exit 1
+fi
 curl --fail --silent --show-error "http://127.0.0.1:$FOLIA_HTTP_PORT/healthz" >/dev/null
 curl --fail --silent --show-error "http://127.0.0.1:$FOLIA_HTTP_PORT/api/healthz" >/dev/null
 # GitHub Pages cross-origin calls must be accepted only from the configured origin.
