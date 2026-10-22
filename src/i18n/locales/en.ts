@@ -25,7 +25,22 @@ export default {
     "playSong": "Play {{song}}",
     "footer": "Playback is handled by Apple MusicKit and does not bypass subscription or regional restrictions. The authorization token stays in page memory and is not persisted."
   },
-    "musicLink": {
+    "musicImport": {
+    "queue": "Imported audio queue",
+    "clear": "Clear imported tracks",
+    "tapPlay": "Tap Play in the audio controls to continue.",
+    "audioError": "Audio could not play. Check the browser's codec support, server media response, HTTPS and cross-origin restrictions.",
+    "previous": "Previous track",
+    "next": "Next track",
+    "browserPlayback": "Local files last only while this page stays open",
+    "remove": "Remove"
+  },
+  "musicLink": {
+    "chooseFiles": "Choose music files from your device",
+    "fileHint": "Import multiple MP3, M4A, AAC, WAV, FLAC, and other audio files. Tap Play in the bottom player. Files are not uploaded.",
+    "invalidFiles": "No supported audio files selected. Choose MP3, M4A, or other audio files.",
+    "httpsRequired": "Use a valid HTTPS audio URL. GitHub Pages cannot load insecure HTTP media.",
+    "addAudioUrl": "Add to playback queue",
     "openOfficialAuth": "Open Apple Music official authorization",
     "title": "Import music link",
     "close": "Close",
