@@ -25,7 +25,22 @@ export default {
     "playSong": "播放 {{song}}",
     "footer": "播放由 Apple MusicKit 处理，不会绕过订阅或地区限制。授权令牌只保存在当前页面内存中；关闭页面后不持久化。"
   },
-    "radioAgent": {
+    "musicLink": {
+    "title": "导入音乐链接",
+    "close": "关闭",
+    "placeholder": "粘贴歌曲或音乐平台分享链接",
+    "inputLabel": "音乐分享链接",
+    "inspect": "识别",
+    "resourceId": "资源 ID",
+    "fetchSong": "获取歌曲信息",
+    "openOriginal": "打开原始链接",
+    "unknownArtist": "未知歌手",
+    "playExisting": "使用现有播放器播放",
+    "noSong": "当前音乐服务未返回这首歌的信息。请检查平台登录状态或改用站内搜索。",
+    "lookupFailed": "获取歌曲失败。该来源可能需要登录、配置音乐 API 或检查网络。",
+    "disclaimer": "仅使用已有音乐服务与官方授权接口。链接识别不会解锁 VIP 曲目或生成未经授权的播放地址。服务器音乐请在现有服务器曲库中配置。"
+  },
+  "radioAgent": {
     "shareTitle": "解析音乐分享链接",
     "sharePlaceholder": "粘贴音乐平台分享链接（HTTPS）",
     "shareResolve": "解析",
