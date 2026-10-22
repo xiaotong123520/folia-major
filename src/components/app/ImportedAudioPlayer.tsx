@@ -248,7 +248,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                 <div>
                 <audio
                     ref={audioRef}
-                    className={mobileExpanded ? "mt-2 w-full" : "pointer-events-none absolute h-px w-px opacity-0 sm:pointer-events-auto sm:static sm:mt-2 sm:h-auto sm:w-full sm:opacity-100"}
+                    className={mobileExpanded ? "mt-2 h-12 w-full" : "pointer-events-none absolute h-px w-px opacity-0 sm:pointer-events-auto sm:static sm:mt-2 sm:h-12 sm:w-full sm:opacity-100"}
                     controls
                     preload="metadata"
                     src={fallbackRetry?.id === activeTrack.id ? fallbackRetry.url : activeTrack.url}
