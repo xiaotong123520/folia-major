@@ -24,6 +24,11 @@ export const navigationCommands: CommandPaletteCommand[] = [
         { isAvailable: context => !context || Boolean(context.shared.currentSong) }),
     createToggleCommand('navigate-home', 'navigation', 'Go home', 'Return to home view', ['home', '首页', '主页'], context => context.navigation.navigateToHome()),
     createToggleCommand('navigate-player', 'navigation', 'Go player', 'Return to player view', ['player', '播放页', '播放器'], context => context.navigation.navigateToPlayer()),
+    {
+        id: 'open-ai-radio-agent', group: 'navigation', title: 'Open AI Radio', description: 'Create a mood-based personal radio station',
+        keywords: ['ai radio', 'personal radio', 'mood radio', 'AI 电台', '音乐电台', '心情电台'],
+        execute: () => { window.dispatchEvent(new CustomEvent('folia:open-radio-agent')); return true; },
+    },
     createToggleCommand('navigate-lattice', 'navigation', 'Lattice open', 'Show the play queue as a queue collage', ['lattice', 'queue collage', 'song wall', 'poster wall', '队列拼贴', '歌曲墙', '海报墙'], context => context.navigation.navigateToLattice(),
         // Already on the wall it is a no-op, and the wall renders the same control slots as the
         // main bar — a slot bound to it would otherwise sit there offering to go nowhere.
