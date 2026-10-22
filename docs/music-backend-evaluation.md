@@ -84,4 +84,12 @@ Before coding the adapter, the following mapping must be verified against the co
 
 ## Immediate engineering gate
 
-A thin adapter and mocked transport tests have now been added on the isolated development branch. The backend itself must still be hardened in a separate deployment/configuration review, and the adapter has not yet passed repository typecheck/build or real browser playback tests. If no authorized, stable stream is available for a result, Folia must show unavailable/restricted and offer the official provider page rather than claiming playback works.
+An optional adapter, bounded transport client, same-origin read-only proxy, focused unit tests, and CI workflow have been added on the isolated branch `feature/music-backend-evaluation` (PR #3). At commit `aee10b57fb0a2fddac40dd32a5e262ced9d52bdd`, the adapter workflow's typecheck, unit tests, and build all passed. A later change makes aggregated results' media IDs source-qualified; its CI run is still being checked. This is not a production-ready deployment: the upstream has not been deployed or hardened, the Vercel preview cannot currently be verified due to team-scope authorization, and real browser/iOS playback has not been tested. If no authorized, stable stream is available, Folia must show unavailable/restricted and offer the official provider page rather than claiming playback works.
+
+
+## Additional deployment gate
+
+- The optional adapter and proxy are in PR #3; do not merge or point production at them until the latest commit CI passes.
+- The proxy exposes only allowlisted read-only music endpoints, not cookie or QR-login administration. Configure server-only `MUSIC_BACKEND_UPSTREAM_URL` and exact `FOLIA_ALLOWED_ORIGINS` in Vercel; keep the upstream private or independently hardened.
+- Vercel preview access is currently blocked by a 403 team-scope authorization response, so no successful deployment is claimed.
+- The candidate `go-music-api` is AGPL-3.0. Confirm license obligations for the intended hosted/modified use before deployment.
