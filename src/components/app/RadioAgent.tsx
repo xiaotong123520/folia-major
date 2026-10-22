@@ -5,6 +5,7 @@ import type { LocalSong, UnifiedSong } from '../../types';
 import { omni } from '../../services/onlineMusic/omni';
 import { getNavidromeConfig, isNavidromeEnabled, navidromeApi } from '../../services/navidromeService';
 import { buildUnifiedNavidromeSong } from '../../services/playbackAdapters';
+import { resolveMusicLink, type MusicLinkResolution } from '../../services/musicLinkResolver';
 
 // src/components/app/RadioAgent.tsx — mood-based radio creation, search, and playback handoff.
 type RadioBrief = {
@@ -80,6 +81,10 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
     const [voiceListening, setVoiceListening] = useState(false);
     const [voiceSupported, setVoiceSupported] = useState(false);
     const [playingIntro, setPlayingIntro] = useState(false);
+    const [shareUrl, setShareUrl] = useState('');
+    const [shareResolution, setShareResolution] = useState<MusicLinkResolution | null>(null);
+    const [shareBusy, setShareBusy] = useState(false);
+    const [shareError, setShareError] = useState('');
     const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
     const localMatches = useMemo(() => {
         if (!brief) return [];
@@ -214,6 +219,35 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
         }
     }, [t]);
 
+    const resolveSharedSong = useCallback(async (rawUrl: string) => {
+        const result = resolveMusicLink(rawUrl);
+        setShareResolution(result);
+        setShareError('');
+        if (result.platform === 'unknown') {
+            setShareError(t('radioAgent.shareUnsupported'));
+            return;
+        }
+        // Recognition never grants playback rights; use the existing Folia provider.
+        const providerId = result.platform;
+        if (!result.resourceId || result.kind !== 'track' || !['netease', 'qq', 'kugou'].includes(providerId)) return;
+        setShareBusy(true);
+        try {
+            const song = await omni.getSongDetail(providerId, result.resourceId);
+            if (!song) {
+                setShareError(t('radioAgent.shareNoMetadata'));
+                return;
+            }
+            setOnlineSongs(current => {
+                const key = JSON.stringify(song.sourceRef ?? {}) + ':' + String(song.id);
+                return [song, ...current.filter(item => JSON.stringify(item.sourceRef ?? {}) + ':' + String(item.id) !== key)];
+            });
+        } catch {
+            setShareError(t('radioAgent.shareProviderUnavailable'));
+        } finally {
+            setShareBusy(false);
+        }
+    }, [t]);
+
     const speakIntro = useCallback(() => {
         if (!brief?.narration || !('speechSynthesis' in window)) {
             setError(t('radioAgent.narrationUnavailable'));
@@ -264,6 +298,16 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                                 </div>
                                 <button type="submit" disabled={!message.trim() || loading} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-40">{loading ? <LoaderCircle size={16} className="animate-spin" /> : <Send size={16} />}{loading ? t('radioAgent.working') : t('radioAgent.makeStation')}</button>
                             </div>
+                        </form>
+                        <form onSubmit={event => { event.preventDefault(); void resolveSharedSong(shareUrl); }} className="mt-4 space-y-2 rounded-2xl border border-white/10 bg-white/[0.035] p-3">
+                            <label htmlFor="radio-share-link" className="block text-xs text-white/65">{t('radioAgent.shareTitle')}</label>
+                            <div className="flex items-center gap-2">
+                                <input id="radio-share-link" type="url" value={shareUrl} onChange={event => setShareUrl(event.target.value)} maxLength={4096} placeholder={t('radioAgent.sharePlaceholder')} className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/20 p-2 text-xs text-white outline-none focus:border-violet-300/40" />
+                                <button type="submit" disabled={shareBusy || !shareUrl.trim()} className="rounded-lg border border-white/15 px-3 py-2 text-xs text-white/85 disabled:opacity-40">{shareBusy ? t('radioAgent.searching') : t('radioAgent.shareResolve')}</button>
+                            </div>
+                            {shareResolution && <p role="status" className="text-xs leading-5 text-white/65">{shareResolution.platform}: {shareResolution.note}</p>}
+                            {shareError && <p role="alert" className="text-xs text-amber-200">{shareError}</p>}
+                            {shareResolution?.access === 'official-embed' && shareResolution.normalizedUrl && <a href={shareResolution.normalizedUrl} target="_blank" rel="noopener noreferrer" className="inline-block text-xs text-violet-200 underline">{t('radioAgent.shareOfficialLink')}</a>}
                         </form>
                         {voiceListening && <p className="mt-2 flex items-center gap-2 text-xs text-rose-200"><span className="h-2 w-2 animate-pulse rounded-full bg-rose-300" />{t('radioAgent.listening')}</p>}
                         {error && <p role="status" className="mt-3 rounded-xl border border-amber-200/15 bg-amber-200/5 px-3 py-2 text-xs leading-5 text-amber-100/80">{error}</p>}
