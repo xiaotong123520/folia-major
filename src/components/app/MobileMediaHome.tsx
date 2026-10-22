@@ -1,3 +1,4 @@
+import type { PointSongImport } from '../../services/directPointSong';
 import { lazy, Suspense, useState } from 'react';
 import { AudioLines, ChevronRight, Disc3, Film, Home, Link2, ListMusic, Music2, Radio, Server, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -6,10 +7,12 @@ import MobilePlatformLibrary, { type MobileLibraryActions } from './MobilePlatfo
 import MobilePlatformAccess from './MobilePlatformAccess';
 
 // A real phone landing screen replaces the cropped desktop lattice on narrow viewports.
+const HearttraceLibrary = lazy(() => import('./hearttraceLibrary/HearttraceLibrary'));
 const ServerAudioLibrary = lazy(() => import('./ServerAudioLibrary'));
 type Tab = 'home' | 'music' | 'server' | 'more';
 
-export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, onImportFiles, mobileActions }: {
+export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, onImportFiles, mobileActions, onAddServerTrack }: {
+    onAddServerTrack: (track: PointSongImport) => boolean;
     mobileActions: MobileLibraryActions;
     onImport: () => void;
     onRadio: () => void;
@@ -127,7 +130,13 @@ export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, 
                     <div className={tab === 'server' ? 'space-y-4' : 'hidden'}>
                         <button type="button" onClick={() => setTab('music')} className="flex min-h-11 items-center gap-2 text-sm text-violet-200"><ChevronRight size={17} className="rotate-180"/> 返回我的音乐</button>
                         {serverVisited && <Suspense fallback={<p role="status" className="text-sm text-white/60">{t('mobileAccess.loading')}</p>}>
-                            <ServerAudioLibrary />
+                            <div className="space-y-8">
+                                <HearttraceLibrary onAddTrack={onAddServerTrack} />
+                                <details className="rounded-2xl border border-white/10 p-4">
+                                    <summary className="min-h-11 cursor-pointer text-sm text-violet-200">{t('hearttraceLibrary.otherServer')}</summary>
+                                    <ServerAudioLibrary />
+                                </details>
+                            </div>
                         </Suspense>}
                     </div>
                     {tab === 'more' && <>

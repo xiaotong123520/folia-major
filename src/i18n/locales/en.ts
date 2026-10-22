@@ -1,6 +1,20 @@
 
 
 export default {
+  "hearttraceLibrary": {
+    "title": "Existing server music",
+    "description": "{{count}} tracks, streamed from your original website.",
+    "search": "Search songs or albums",
+    "results": "{{count}} tracks found",
+    "add": "Add to queue",
+    "addNamed": "Add {{name}} to the queue",
+    "added": "Added to the player queue below. Tap Play to listen.",
+    "failed": "Could not add this track. Try again.",
+    "more": "Load more",
+    "original": "Open the original music library",
+    "snapshot": "This public catalog is a snapshot taken during setup. See the original library for new additions. Website access rules and audio availability still apply.",
+    "otherServer": "Connect another music server"
+  },
   "mobileAccess": {
     "title": "Accounts and full features",
     "accounts": "Accounts",
