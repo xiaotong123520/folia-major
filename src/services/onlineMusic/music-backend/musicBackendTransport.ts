@@ -7,8 +7,6 @@
  */
 export interface MusicBackendClientOptions {
     baseUrl: string;
-    /** Optional server-side secret. Do not pass a VITE_* value or bundle this into browser code. */
-    serverApiKey?: string;
     timeoutMs?: number;
     maxResponseBytes?: number;
     fetchImpl?: typeof fetch;
@@ -81,7 +79,6 @@ export class MusicBackendClient {
 
         try {
             const headers: Record<string, string> = { Accept: 'application/json' };
-            if (this.options.serverApiKey) headers.Authorization = `Bearer ${this.options.serverApiKey}`;
             const response = await this.fetchImpl(url.toString(), {
                 method: 'GET',
                 headers,
