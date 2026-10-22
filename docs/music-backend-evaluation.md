@@ -55,3 +55,33 @@ Folia 已有 provider registry 和统一的在线音乐接口，当前注册网�
 ## 下一步
 
 优先审查 go-music-api 的依赖、容器端口暴露、Cookie 文件权限、管理接口和流代理的 SSRF/Range 行为；同时核对 Folia provider 接口后再写最小 adapter。候选项目未通过安全审查前不应绑定生产站点。
+
+
+## Folia adapter contract checked against current source
+
+The main-branch provider registry currently registers `netease`, `kugou`, `qq`, `bodian`, `ytm`, and `spotify`. It exposes `registerOnlineMusicProvider` and provider contracts through `src/types/onlineMusic.ts`. A new backend should therefore be integrated behind an `OnlineMusicProvider`, not by letting components call arbitrary third-party endpoints.
+
+Before coding the adapter, the following mapping must be verified against the complete `OnlineMusicProvider` methods and `SongResult/UnifiedSong` constructors:
+
+| Folia capability | Candidate backend endpoint | Required behavior |
+| --- | --- | --- |
+| Search | `GET /api/v1/music/search` | Normalize IDs, provider source, artist, album, duration and artwork; reject malformed results |
+| Playback | `GET /api/v1/music/stream` or `/url` | Prefer stream proxy for expiring URLs; preserve Range/206 and content headers; never store a user cookie in a public URL |
+| Lyrics | `GET /api/v1/music/lyric` | Normalize lyric format and return null for missing lyrics |
+| Album / playlist | `/api/v1/album/detail`, `/api/v1/playlist/detail` | Preserve source and stable resource IDs; handle empty or partial collections |
+| Availability | `/api/v1/music/inspect` | Treat transient errors and permission restrictions as unknown, not permanently removed |
+| Fallback | `/api/v1/music/switch` | Use only when matching identity (title/artist/duration) is sufficiently confident; never silently substitute a different recording |
+
+### Adapter design constraints
+
+- Use a new provider ID such as `music-backend` only after confirming the ID type and persistence/migration behavior accept it safely.
+- Read the API base URL from a server-controlled environment/configuration boundary. A Vite `VITE_*` variable is public and must never contain an API secret.
+- If the backend requires an API key, keep it server-side and proxy Folia requests through a same-origin server route; do not expose the key in browser bundles.
+- Treat every returned audio URL as untrusted: only allow approved HTTPS origins or the configured backend origin; avoid fetching arbitrary user-supplied URLs.
+- Add request timeouts, cancellation, bounded response size, safe error messages, and tests for 401/403/404/429/5xx, expired audio URLs, Range requests, and empty results.
+- Do not automatically enable cookie/QR-login management endpoints from Folia. Account binding is a separate security and UX decision.
+- Before any runtime registration, verify the provider's `search`, `playback`, and `lyrics` interfaces and how `normalizeSong` assigns playback source references. A partial implementation must declare unsupported capabilities as false.
+
+## Immediate engineering gate
+
+The next code change should be a thin adapter with mocked transport tests, not a live third-party integration. The backend itself must first be hardened in a separate deployment/configuration review. If no authorized, stable stream is available for a result, Folia must show unavailable/restricted and offer the official provider page rather than claiming playback works.
