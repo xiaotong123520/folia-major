@@ -23,7 +23,7 @@ const loadMusicKit = async (): Promise<NonNullable<MusicKitWindow['MusicKit']>> 
         const existing = document.querySelector<HTMLScriptElement>('script[data-folia-musickit]');
         if (existing) {
             existing.addEventListener('load', () => resolve(), { once: true });
-            existing.addEventListener('error', () => reject(new Error('Apple MusicKit could not be loaded.')), { once: true });
+            existing.addEventListener('error', () => { existing.remove(); reject(new Error('Apple MusicKit could not be loaded.')); }, { once: true });
             if (musicWindow.MusicKit) resolve();
             return;
         }
@@ -32,7 +32,7 @@ const loadMusicKit = async (): Promise<NonNullable<MusicKitWindow['MusicKit']>> 
         script.async = true;
         script.dataset.foliaMusickit = 'true';
         script.onload = () => resolve();
-        script.onerror = () => reject(new Error('Apple MusicKit could not be loaded. Check your network and try again.'));
+        script.onerror = () => { script.remove(); reject(new Error('Apple MusicKit could not be loaded. Check your network and try again.')); };
         document.head.appendChild(script);
     });
     const loaded = (window as MusicKitWindow).MusicKit;
