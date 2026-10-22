@@ -96,10 +96,33 @@ export class MusicBackendClient {
             if (declaredLength > this.maxResponseBytes) {
                 throw new MusicBackendHttpError('Music backend response exceeds the configured size limit');
             }
-            const text = await response.text();
-            if (new TextEncoder().encode(text).byteLength > this.maxResponseBytes) {
-                throw new MusicBackendHttpError('Music backend response exceeds the configured size limit');
+            if (!response.body) {
+                throw new MusicBackendHttpError('Music backend response body is empty');
             }
+            const reader = response.body.getReader();
+            const chunks: Uint8Array[] = [];
+            let receivedBytes = 0;
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    receivedBytes += value.byteLength;
+                    if (receivedBytes > this.maxResponseBytes) {
+                        await reader.cancel();
+                        throw new MusicBackendHttpError('Music backend response exceeds the configured size limit');
+                    }
+                    chunks.push(value);
+                }
+            } finally {
+                reader.releaseLock();
+            }
+            const bytes = new Uint8Array(receivedBytes);
+            let offset = 0;
+            for (const chunk of chunks) {
+                bytes.set(chunk, offset);
+                offset += chunk.byteLength;
+            }
+            const text = new TextDecoder().decode(bytes);
             try {
                 return JSON.parse(text) as T;
             } catch {
