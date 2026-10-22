@@ -217,7 +217,7 @@ function readIndex(string $root): array
     if (!is_file($index)) return [];
     $contents = file_get_contents($index);
     $data = $contents === false ? null : json_decode($contents, true);
-    return is_array($data) && array_is_list($data) ? $data : [];
+    return is_array($data) && array_keys($data) === array_keys(array_values($data)) ? $data : [];
 }
 function appendIndex(string $root, array $entry): bool
 {
@@ -226,7 +226,7 @@ function appendIndex(string $root, array $entry): bool
     rewind($handle);
     $raw = stream_get_contents($handle);
     $rows = $raw === '' ? [] : json_decode($raw ?: '', true);
-    if (!is_array($rows) || !array_is_list($rows)) { flock($handle, LOCK_UN); fclose($handle); return false; }
+    if (!is_array($rows) || !array_keys($rows) === array_keys(array_values($rows))) { flock($handle, LOCK_UN); fclose($handle); return false; }
     $rows[] = $entry;
     $encoded = json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     $ok = is_string($encoded) && rewind($handle) && fwrite($handle, $encoded) === strlen($encoded) && ftruncate($handle, strlen($encoded)) && fflush($handle);
