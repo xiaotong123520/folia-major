@@ -26,6 +26,7 @@ export default {
     "footer": "Playback is handled by Apple MusicKit and does not bypass subscription or regional restrictions. The authorization token stays in page memory and is not persisted."
   },
     "musicLink": {
+    "openOfficialAuth": "Open Apple Music official authorization",
     "title": "Import music link",
     "close": "Close",
     "placeholder": "Paste a song or music sharing link",
