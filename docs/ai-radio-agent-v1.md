@@ -109,3 +109,15 @@ Not yet verified: production build, typecheck, unit tests, Vercel preview, runti
 - Narration is off unless the user enables it.
 - All new UI text is localized in the three required locale files.
 - No secrets are shipped to the browser, no guessed server paths are used, and all claimed checks have actually run.
+
+## Deployment checklist (phone-friendly)
+
+1. Open the pull request: https://github.com/xiaotong123520/folia-major/pull/1
+2. Before merging, inspect the "Files changed" tab and wait for checks. The repository workflow is configured to run unit tests and typechecks on non-draft PRs, but the current PR head has not yet produced check runs.
+3. In Vercel, open the existing project connected to this repository and inspect Deployments for a Preview built from `feature/ai-radio-agent-v1`. Do not change the Production domain yet.
+4. In Vercel Project Settings → Environment Variables, configure either `GEMINI_API_KEY` (recommended first path) or `OPENAI_API_KEY`; optionally configure `GEMINI_MODEL` or `OPENAI_API_MODEL`. Keep keys server-side; never use a `VITE_...` secret variable. Redeploy the Preview after adding variables.
+5. Verify the deployed endpoint with a POST request to `/api/radio-agent` and a JSON body such as `{"message":"雨夜想听温柔民谣"}`. Expect a JSON station brief, not a track URL.
+6. On the Preview site, test the AI Radio launcher on a phone, text prompt, voice permission where supported, opt-in narration, online song play, and configured Navidrome song play.
+
+Important hosting distinction: GitHub Pages is static hosting and cannot run the `api/radio-agent` server endpoint. The Vercel Preview (or another server runtime that supports the compiled `api/radio-agent.js`) is required for AI-backed curation. If Vercel is not the production host, the UI safely falls back to local rules but will not have server-side AI until the endpoint is deployed.
+
