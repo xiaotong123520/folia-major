@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Music2, SkipBack, SkipForward, Trash2, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, Music2, Pause, Play, SkipBack, SkipForward, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     audioDisplayName,
@@ -28,6 +28,8 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
         const [tracks, setTracks] = useState<ImportedAudioTrack[]>([]);
         const [selectedId, setSelectedId] = useState<string | null>(null);
         const [error, setError] = useState('');
+        const [mobileExpanded, setMobileExpanded] = useState(false);
+        const [playing, setPlaying] = useState(false);
         const [fallbackRetry, setFallbackRetry] = useState<{ id: string; url: string } | null>(null);
         const fallbackAttemptsRef = useRef(new Map<string, number>());
         const resolvingUrlRef = useRef<string | null>(null);
@@ -138,6 +140,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                 return;
             }
             audioRef.current?.pause();
+            setPlaying(false);
             playWasStartedRef.current = false;
             setFallbackRetry(null);
             playAfterSelectionRef.current = shouldPlay;
@@ -174,6 +177,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
         const clear = () => {
             restoreVersionRef.current += 1;
             audioRef.current?.pause();
+            setPlaying(false);
             for (const url of ownedUrlsRef.current) URL.revokeObjectURL(url);
             ownedUrlsRef.current.clear();
             playAfterSelectionRef.current = false;
@@ -191,16 +195,35 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
         return (
             <section
                 aria-label={t('musicImport.queue')}
-                className="fixed bottom-[max(12px,env(safe-area-inset-bottom))] left-[max(12px,env(safe-area-inset-left))] z-[95] max-h-[70dvh] w-[calc(100%-1.5rem)] max-w-sm overflow-y-auto rounded-2xl border border-white/20 bg-[#17151f]/95 p-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl sm:bottom-5 sm:left-5"
+                className={`fixed bottom-[max(12px,env(safe-area-inset-bottom))] left-[max(12px,env(safe-area-inset-left))] z-[95] w-[calc(100%-1.5rem)] max-w-sm overflow-y-auto rounded-2xl border border-white/20 bg-[#17151f]/95 p-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl sm:bottom-5 sm:left-5 sm:max-h-[70dvh] ${mobileExpanded ? "max-h-[85dvh]" : "max-h-28"}`}
             >
                 <div className="flex items-center gap-2">
                     <Music2 size={18} className="shrink-0 text-violet-200" />
                     <p className="min-w-0 flex-1 truncate text-sm font-medium">{activeTrack.name}</p>
+                    <button type="button" className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-white/10 sm:hidden"
+                        aria-label={mobileExpanded ? '收起播放器' : '展开播放器'} aria-expanded={mobileExpanded}
+                        onClick={() => setMobileExpanded(value => !value)}>
+                        {mobileExpanded ? <ChevronDown size={19}/> : <ChevronUp size={19}/>}
+                    </button>
                     <span className="text-xs text-white/50">{activeIndex + 1}/{tracks.length}</span>
-                    <button type="button" className="rounded-lg p-2 text-white/65 hover:bg-white/10" title={t('musicImport.clear')} aria-label={t('musicImport.clear')} onClick={clear}>
+                    <button type="button" className="hidden rounded-lg p-2 text-white/65 hover:bg-white/10 sm:inline-flex" title={t('musicImport.clear')} aria-label={t('musicImport.clear')} onClick={clear}>
                         <Trash2 size={16} />
                     </button>
                 </div>
+                {!mobileExpanded && <div className="mt-2 flex items-center justify-between gap-2 sm:hidden">
+                    <button type="button" aria-label="上一首" disabled={activeIndex <= 0} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl disabled:opacity-30" onClick={() => switchTo(tracks[activeIndex - 1].id, true)}><SkipBack size={19}/></button>
+                    <button type="button" aria-label={playing ? '暂停播放' : '播放歌曲'} className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-violet-200 text-sm font-semibold text-black"
+                        onClick={() => {
+                            if (!audioRef.current) return;
+                            if (audioRef.current.paused) void audioRef.current.play().catch(() => setError(t('musicImport.tapPlay')));
+                            else audioRef.current.pause();
+                        }}>
+                        {playing ? <Pause size={17} fill="currentColor"/> : <Play size={17} fill="currentColor"/>}
+                        {playing ? '暂停' : '播放'}
+                    </button>
+                    <button type="button" aria-label="下一首" disabled={activeIndex >= tracks.length - 1} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl disabled:opacity-30" onClick={() => switchTo(tracks[activeIndex + 1].id, true)}><SkipForward size={19}/></button>
+                </div>}
+                <div className={mobileExpanded ? 'block' : 'hidden sm:block'}>
                 <audio
                     key={activeTrack.id}
                     ref={audioRef}
@@ -208,8 +231,8 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                     controls
                     preload="metadata"
                     src={fallbackRetry?.id === activeTrack.id ? fallbackRetry.url : activeTrack.url}
-                    onPlay={() => { playWasStartedRef.current = true; setError(''); onStartPlayback(); }}
-                    onPause={() => { if (!audioRef.current?.error) playWasStartedRef.current = false; }}
+                    onPlay={() => { playWasStartedRef.current = true; setPlaying(true); setError(''); onStartPlayback(); }}
+                    onPause={() => { setPlaying(false); if (!audioRef.current?.error) playWasStartedRef.current = false; }}
                     onError={() => {
                         const failedUrl = fallbackRetry?.id === activeTrack.id ? fallbackRetry.url : activeTrack.url;
                         const tryFallback = () => {
@@ -264,6 +287,10 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                         <button type="button" aria-label={t('musicImport.remove')} onClick={() => remove(track.id)} className="rounded-lg p-1.5 text-white/50 hover:bg-white/10"><X size={14} /></button>
                     </div>)}
                 </div>}
+                <button type="button" className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/15 text-sm text-white/70 sm:hidden" onClick={clear}>
+                    <Trash2 size={16}/> 清空播放队列
+                </button>
+                </div>
                 {error && <p role="alert" className="mt-2 text-xs text-amber-200">{error}</p>}
             </section>
         );
