@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     expose:
       - "8080"
+    volumes:
+      - ./cookies.json:/home/appuser/cookies.json:ro
     networks:
       - music-private
     # No host port is published. Cookie/QR-login administration is not exposed through the gateway.
