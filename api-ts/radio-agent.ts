@@ -12,7 +12,7 @@ function fallback(message: string) {
   return { title: rain ? "雨夜慢行电台" : low ? "温柔陪伴电台" : focus ? "安静专注电台" : "深夜陪伴电台", mood: rain ? "潮湿、安静、带一点回忆" : low ? "柔和、克制、慢慢舒展" : focus ? "稳定、轻盈、不打扰" : "安静、温暖、适合独处", genres, searchTerms: [...new Set([message.slice(0, 48), ...genres])].slice(0, 4), energy: "low", narration: "把这一刻留给音乐，慢一点也没关系。" };
 }
 
-function parseBrief(value: unknown, message: string) {
+export function parseBrief(value: unknown, message: string) {
   const root = value as { title?: unknown; mood?: unknown; genres?: unknown; searchTerms?: unknown; energy?: unknown; narration?: unknown } | null;
   if (!root || typeof root !== "object") return fallback(message);
   const cleanText = (item: unknown, maxLength: number): string | null => {
