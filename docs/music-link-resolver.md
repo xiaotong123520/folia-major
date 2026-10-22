@@ -7,7 +7,7 @@ This first stage adds deterministic, network-free classification of music share 
 Entry point: `src/services/musicLinkResolver.ts`
 Unit tests: `test/unit/musicLinkResolver.test.ts`
 
-This module is a standalone classification stage, not yet connected to the paste-link UI or playback queue. `isRecognizedMusicLink` answers whether a provider is known; `isSupportedMusicLink` answers whether this resolver reports an available playback route. Neither function proves that a specific song is playable.
+This module classifies share links for the paste-link UI. Classification does not itself supply audio; imported files and direct audio URLs use a separate browser-native playback queue. `isRecognizedMusicLink` answers whether a provider is known; `isSupportedMusicLink` answers whether this resolver reports an available playback route. Neither function proves that a specific song is playable.
 
 ## Recognized sources
 
@@ -45,7 +45,7 @@ A recognized link does not prove Folia can play it. A provider can still reject 
 ## Next integration stages
 
 1. Resolve the architecture review before merge: provider-specific rules must remain in provider adapters or be exposed as Omni capabilities, not create a shared platform-specific exception.
-2. Wire the resolver into a paste-link UI with platform and availability status.
+2. Improve provider adapter playback on deployment targets with a separately configured authorized HTTPS backend.
 3. Use existing NetEase/QQ/Kugou provider methods instead of duplicating provider logic.
 4. Implement and test Kuwo only after confirming API/auth requirements and permitted playback.
 5. Complete Apple Music using official MusicKit and server-side token signing.
@@ -59,3 +59,13 @@ A recognized link does not prove Folia can play it. A provider can still reject 
 - Platform links without an implemented adapter open the official source page. This import UI does **not** extract paid streams, automatically unlock subscriptions, support shortlinks requiring network redirect, or guarantee playable media.
 - Apple Music requires valid MusicKit developer credentials for playback. Other providers require their configured account and API access.
 - Tests in `test/unit/musicLinkResolver.test.ts` verify known patterns and blocked schemes.
+
+## Browser playback fix (GitHub Pages)
+
+- `src/components/app/MusicLinkImport.tsx` now supports choosing multiple audio files directly from the device and adding HTTPS audio URLs to a persistent queue. An HTTPS URL without a file extension can be tested as a stream, but the server must return playable bytes.
+- `src/components/app/ImportedAudioPlayer.tsx` uses browser-native `<audio controls>`, including seek, pause/resume, previous/next track selection, and a visible playback failure message. Closing the import dialog **does not stop** the browser queue.
+- `src/services/importedAudio.ts` enforces allowed URL schemes and validates file extensions/MIME types. Blob URLs for chosen local files are revoked on removal, clearing, or page teardown.
+- Local file data stays on the listener's device and is **not uploaded to GitHub**. The imported queue is temporary: reloading or closing the tab requires selecting those local files again.
+- Signed HTTPS streams and self-hosted MP3/M4A files are supported only when the browser can fetch and decode them. For reliable seek, configure the media server to support byte-range requests (`Range`, HTTP 206); mixed HTTP content is blocked on GitHub Pages HTTPS.
+- **Recognized provider links are not automatically full-length music URLs.** Existing provider metadata calls may fail without a deployed API and valid user authorization. GitHub Pages runs static assets only; it cannot run Node.js API endpoints or unlock subscription-only music.
+- GitHub Pages CI also executes `test/unit/importedAudio.test.ts`.
