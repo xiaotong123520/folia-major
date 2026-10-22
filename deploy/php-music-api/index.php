@@ -36,7 +36,7 @@ if ($raw === false || strlen($raw) > 10_000_000) {
     reply(503, ['code' => 503, 'msg' => 'Music index is unavailable']);
 }
 $items = json_decode($raw, true);
-if (!is_array($items) || !array_is_list($items)) {
+if (!is_array($items) || array_keys($items) !== array_keys(array_values($items))) {
     reply(503, ['code' => 503, 'msg' => 'Music index is invalid']);
 }
 $path = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
@@ -136,7 +136,6 @@ switch ($path) {
             if ($chunk === false || $chunk === '') break;
             echo $chunk;
             $remaining -= strlen($chunk);
-            if (function_exists('fastcgi_finish_request')) { /* Do not call: streaming must continue. */ }
             flush();
         }
         fclose($handle);
@@ -145,7 +144,7 @@ switch ($path) {
         reply(404, ['code' => 404, 'msg' => 'Route not found']);
 }
 
-function reply(int $status, array $body): never
+function reply(int $status, array $body): void
 {
     http_response_code($status);
     header('Content-Type: application/json; charset=utf-8');
