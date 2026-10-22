@@ -195,6 +195,7 @@ exports[`command palette registry contract > keeps the registered command order 
   "locate-playing-song",
   "navigate-home",
   "navigate-player",
+  "open-ai-radio-agent",
   "navigate-lattice",
   "browser-fullscreen",
   "home-playlist",

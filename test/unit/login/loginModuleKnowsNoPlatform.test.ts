@@ -33,7 +33,7 @@ describe('the sign-in window names no platform', () => {
 
 describe('what each platform declares for the sign-in window', () => {
     it('its mark: one letter and one colour', () => {
-        const marks = Object.fromEntries(listOnlineMusicProviders().map(provider => [provider.id, omni.getProviderMark(provider.id)]));
+        const marks = Object.fromEntries(listOnlineMusicProviders().filter(provider => provider.capabilities.auth).map(provider => [provider.id, omni.getProviderMark(provider.id)]));
         expect(marks).toEqual({
             netease: { letter: '云', color: '#dc2626' },
             kugou: { letter: 'K', color: '#2563eb' },
@@ -46,7 +46,7 @@ describe('what each platform declares for the sign-in window', () => {
 
     it('its title and note, as text keys', () => {
         // The second lines a platform declares for single cases are pinned in loginView.test.ts.
-        const texts = Object.fromEntries(listOnlineMusicProviders().map(provider => {
+        const texts = Object.fromEntries(listOnlineMusicProviders().filter(provider => provider.capabilities.auth).map(provider => {
             const { title, note } = omni.getLoginTexts(provider.id)!;
             return [provider.id, { title, note }];
         }));

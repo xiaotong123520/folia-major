@@ -2,6 +2,11 @@ import { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } fro
 import { AnimatePresence, motion, useMotionValueEvent } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
+import RadioAgent from './components/app/RadioAgent';
+import PersonalMusicTools from './components/app/PersonalMusicTools';
+import AppleMusicConnect from './components/app/AppleMusicConnect';
+import MusicLinkImport from './components/app/MusicLinkImport';
+import ImportedAudioPlayer, { type ImportedAudioPlayerHandle } from './components/app/ImportedAudioPlayer';
 import { loadCachedOrFetchCover } from './services/coverCache';
 import VisualizerRenderer from './components/visualizer/VisualizerRenderer';
 import CommandPalette from './components/command-palette/CommandPalette';
@@ -188,6 +193,15 @@ const NEXT_UP_LEAD_SEC = 5;
 export default function App() {
     countRender('App');
     const { t } = useTranslation();
+    const [isRadioAgentOpen, setIsRadioAgentOpen] = useState(false);
+    const [isMusicLinkImportOpen, setIsMusicLinkImportOpen] = useState(false);
+    const importedAudioPlayerRef = useRef<ImportedAudioPlayerHandle | null>(null);
+    useEffect(() => {
+        const openRadioAgent = () => setIsRadioAgentOpen(true);
+        window.addEventListener('folia:open-radio-agent', openRadioAgent);
+        return () => window.removeEventListener('folia:open-radio-agent', openRadioAgent);
+    }, []);
+    const [isAppleMusicOpen, setIsAppleMusicOpen] = useState(false);
     const {
         navidromeEnabled, setNavidromeEnabledState,
         starredNavidromeSongIds, setStarredNavidromeSongIds,
@@ -2848,6 +2862,35 @@ export default function App() {
             {/* 思索教程。常驻的只有悬停探测和提示胶囊；教程层自己走 React.lazy，
                 animejs 不进 bootstrap chunk。 */}
             <PonderHost theme={theme} isDaylight={isDaylight} />
+
+            {!isElectronWindow && <PersonalMusicTools
+                onImport={() => setIsMusicLinkImportOpen(true)}
+                onRadio={() => setIsRadioAgentOpen(true)}
+                onApple={() => setIsAppleMusicOpen(true)}
+            />}
+            {!isElectronWindow && <RadioAgent
+                open={isRadioAgentOpen}
+                onClose={() => setIsRadioAgentOpen(false)}
+                localSongs={localSongs}
+                onPlayOnline={handleSearchResultPlay}
+                onPlayLocal={onPlayLocalSong}
+            />}
+            {!isElectronWindow && isAppleMusicOpen && <AppleMusicConnect onClose={() => setIsAppleMusicOpen(false)} />}
+            {!isElectronWindow && isMusicLinkImportOpen && <MusicLinkImport
+                onClose={() => setIsMusicLinkImportOpen(false)}
+                onPlayOnline={handleSearchResultPlay}
+                onOpenAppleMusic={() => setIsAppleMusicOpen(true)}
+                onAddFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
+                onAddAudioUrl={url => importedAudioPlayerRef.current?.addUrl(url) ?? false}
+            />}
+            {!isElectronWindow && <ImportedAudioPlayer
+                ref={importedAudioPlayerRef}
+                pauseForMainPlayback={playerState === PlayerState.PLAYING}
+                onStartPlayback={() => {
+                    audioRef.current?.pause();
+                    setPlayerState(PlayerState.PAUSED);
+                }}
+            />}
 
             {currentView === 'player' && !(isLyricMatchOpen && isLocalPlaybackSong(currentSong)) && (
                 <PlayerPanel model={playerPanelModel} />

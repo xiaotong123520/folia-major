@@ -29,6 +29,8 @@ export interface PlatformNamePlace {
 }
 
 export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
+    'src/services/musicLinkResolver.ts': { n: { netease: 4, qq: 3, kugou: 3, ytm: 4 }, kind: 'stored', why: 'recognized URL domains, external share-link identifiers and user-facing descriptions; no provider transport or entitlement logic' },
+    'src/services/musicResolver.ts': { n: { netease: 2, qq: 2, kugou: 2 }, kind: 'stored', why: 'generated external music URL mappings for provider-host identity, not playback or provider transport logic' },
     'api-ts/lyric-proxy.ts': { n: { qq: 2, kugou: 1 }, kind: 'main', why: 'the hosts the lyric relay may reach' },
     'api-ts/qq.ts': { n: { qq: 10 }, kind: 'main', why: 'the serverless entry of the QQ backend; the host finds it by path' },
     'api/lyric-proxy.js': { n: { qq: 2, kugou: 1 }, kind: 'main', why: 'the built copy of api-ts/lyric-proxy.ts' },
@@ -59,7 +61,7 @@ export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
     'src/components/modal/lyric-match/LocalSongLyricMatch.tsx': { n: { netease: 1 }, kind: 'lyric' },
     'src/components/modal/lyric-match/navidromeSongMatch.ts': { n: { netease: 1 }, kind: 'lyric' },
     'src/components/modal/newFeaturesRelease.ts': { n: { qq: 1 }, kind: 'stored', why: 'the id of a release note entry, also its i18n key; raised by the upstream merge 2026-10-17' },
-    'src/components/modal/settings/pages/HelpPage.tsx': { n: { qq: 5 }, kind: 'namesake', why: 'the QQ chat app\'s community group, not QQ Music: its number and its i18n key' },
+    'src/components/modal/settings/pages/HelpPage.tsx': { n: { qq: 1 }, kind: 'namesake', why: 'the QQ chat app\'s community group, not QQ Music: its number and its i18n key' },
     'src/components/modal/settings/pages/IntegrationPage.tsx': { n: { netease: 4 }, kind: 'stored', why: 'the stored setting neteaseScrobbleEnabled and its i18n keys' },
     'src/components/modal/settings/pages/LyricsPage.tsx': { n: { spotify: 1 }, kind: 'lyric', why: 'which of two hand-written descriptions of the lyric sources is shown' },
     'src/components/modal/settings/pages/integration/options.ts': { n: { netease: 1 }, kind: 'stored', why: 'an i18n key' },
@@ -99,6 +101,7 @@ export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
     'src/services/onlineMusic/loginSelfCheck.ts': { n: { netease: 1 }, kind: 'doc' },
     'src/services/onlineMusic/omni.ts': { n: { netease: 5, kugou: 2 }, kind: 'doc' },
     'src/services/onlineMusic/providerAccountCache.ts': { n: { kugou: 1 }, kind: 'doc' },
+    'src/services/onlineMusic/music-backend/musicBackendProvider.ts': { n: { netease: 1, qq: 1, kugou: 1 }, kind: 'list', why: 'the self-hosted aggregate backend contract allowlists its supported source identifiers' },
     'src/services/onlineMusic/providerRegistry.ts': { n: { netease: 2, qq: 2, kugou: 2, bodian: 2, ytm: 2, spotify: 4 }, kind: 'list' },
     'src/services/onlineMusic/qq/qqProvider.ts': { n: { kugou: 1 }, kind: 'doc' },
     'src/services/onlineMusic/qq/qqTransport.ts': { n: { netease: 1 }, kind: 'doc' },

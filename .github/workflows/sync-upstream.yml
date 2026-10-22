@@ -1,0 +1,49 @@
+name: Review Folia upstream updates
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: sync-folia-upstream
+  cancel-in-progress: false
+jobs:
+  propose-update:
+    if: github.repository == 'xiaotong123520/folia-major'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Merge upstream into a review branch
+        id: sync
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git remote add upstream https://github.com/chthollyphile/folia-major.git
+          git fetch upstream main
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git fetch origin sync/folia-upstream || true
+          git switch -c sync/folia-upstream
+          if ! git merge upstream/main --no-edit; then
+            git diff --name-only --diff-filter=U >> "$GITHUB_STEP_SUMMARY"
+            echo 'Upstream conflicts need manual resolution. Personal changes were not overwritten.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          git push --force-with-lease origin sync/folia-upstream
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Open or update review PR
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh pr list --head sync/folia-upstream --base main --json number --jq '.[0].number' | grep -q '[0-9]'; then
+            gh pr create --head sync/folia-upstream --base main --title 'Update Folia upstream while preserving Tongsheng changes' --body 'Daily upstream synchronization. Review branding, audio imports and mobile layout; run CI before merging. Merging to main publishes the shared mobile/desktop website.'
+          fi
