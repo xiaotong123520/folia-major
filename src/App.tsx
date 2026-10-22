@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { AnimatePresence, motion, useMotionValueEvent } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Radio as RadioIcon } from 'lucide-react';
+import RadioAgent from './components/app/RadioAgent';
 import { loadCachedOrFetchCover } from './services/coverCache';
 import VisualizerRenderer from './components/visualizer/VisualizerRenderer';
 import CommandPalette from './components/command-palette/CommandPalette';
@@ -188,6 +189,7 @@ const NEXT_UP_LEAD_SEC = 5;
 export default function App() {
     countRender('App');
     const { t } = useTranslation();
+    const [isRadioAgentOpen, setIsRadioAgentOpen] = useState(false);
     const {
         navidromeEnabled, setNavidromeEnabledState,
         starredNavidromeSongIds, setStarredNavidromeSongIds,
@@ -2848,6 +2850,24 @@ export default function App() {
             {/* 思索教程。常驻的只有悬停探测和提示胶囊；教程层自己走 React.lazy，
                 animejs 不进 bootstrap chunk。 */}
             <PonderHost theme={theme} isDaylight={isDaylight} />
+
+            <button
+                type="button"
+                onClick={() => setIsRadioAgentOpen(true)}
+                aria-label={t('radioAgent.open')}
+                title={t('radioAgent.open')}
+                className="fixed bottom-24 right-4 z-[80] inline-flex h-12 items-center gap-2 rounded-full border border-violet-200/20 bg-[#17151f]/90 px-4 text-sm text-white shadow-xl shadow-black/30 backdrop-blur-xl transition hover:border-violet-200/40 hover:bg-[#211c2d] sm:bottom-7 sm:right-7"
+            >
+                <RadioIcon size={17} className="text-violet-200" />
+                <span>{t('radioAgent.open')}</span>
+            </button>
+            <RadioAgent
+                open={isRadioAgentOpen}
+                onClose={() => setIsRadioAgentOpen(false)}
+                localSongs={localSongs}
+                onPlayOnline={handleSearchResultPlay}
+                onPlayLocal={onPlayLocalSong}
+            />
 
             {currentView === 'player' && !(isLyricMatchOpen && isLocalPlaybackSong(currentSong)) && (
                 <PlayerPanel model={playerPanelModel} />
