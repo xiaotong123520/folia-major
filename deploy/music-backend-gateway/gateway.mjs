@@ -1,4 +1,5 @@
 import http from 'node:http';
+import https from 'node:https';
 import { timingSafeEqual } from 'node:crypto';
 
 const upstream = process.env.MUSIC_BACKEND_INTERNAL_URL || 'http://go-music-api:8080';
@@ -85,7 +86,8 @@ const server = http.createServer((req, res) => {
 
   const headers = { accept: req.headers.accept || 'application/json' };
   if (parsed.pathname === '/api/v1/music/stream' && req.headers.range) headers.range = req.headers.range;
-  const upstreamReq = http.request(target, { method: req.method, headers, timeout: 25_000 }, upstreamRes => {
+  const requestImpl = target.protocol === 'https:' ? https.request : http.request;
+  const upstreamReq = requestImpl(target, { method: req.method, headers, timeout: 25_000 }, upstreamRes => {
     const responseHeaders = {
       'cache-control': parsed.pathname === '/api/v1/music/stream' ? 'private, no-store' : 'no-store',
       'x-content-type-options': 'nosniff',
@@ -93,28 +95,34 @@ const server = http.createServer((req, res) => {
     for (const name of ['content-type', 'content-length', 'content-range', 'accept-ranges', 'etag', 'last-modified']) {
       if (upstreamRes.headers[name]) responseHeaders[name] = upstreamRes.headers[name];
     }
-    res.writeHead(upstreamRes.statusCode || 502, responseHeaders);
     if (req.method === 'HEAD' || parsed.pathname === '/api/v1/music/stream') {
+      res.writeHead(upstreamRes.statusCode || 502, responseHeaders);
       upstreamRes.pipe(res);
       return;
     }
     let size = 0;
     const chunks = [];
+    let tooLarge = false;
     upstreamRes.on('data', chunk => {
+      if (tooLarge) return;
       size += chunk.length;
       if (size > maxJsonBytes) {
+        tooLarge = true;
         upstreamRes.destroy();
-        if (!res.headersSent) json(res, 502, { error: 'Upstream response exceeds 2 MB limit' });
-        else res.destroy();
         return;
       }
       chunks.push(chunk);
     });
     upstreamRes.on('end', () => {
       if (res.destroyed) return;
+      if (tooLarge) return json(res, 502, { error: 'Upstream response exceeds 2 MB limit' });
+      res.writeHead(upstreamRes.statusCode || 502, responseHeaders);
       res.end(Buffer.concat(chunks));
     });
-    upstreamRes.on('error', () => { if (!res.headersSent) json(res, 502, { error: 'Upstream request failed' }); else res.destroy(); });
+    upstreamRes.on('error', () => {
+      if (!res.headersSent) json(res, 502, { error: 'Upstream request failed' });
+      else res.destroy();
+    });
   });
   upstreamReq.on('timeout', () => upstreamReq.destroy(new Error('upstream timeout')));
   upstreamReq.on('error', () => { if (!res.headersSent) json(res, 502, { error: 'Upstream request failed' }); else res.destroy(); });
