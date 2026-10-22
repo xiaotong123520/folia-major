@@ -14,6 +14,7 @@ on:
       - ".github/workflows/music-backend-checks.yml"
       - "package.json"
       - "package-lock.json"
+      - "deploy/music-backend-gateway/**"
   push:
     branches:
       - feature/music-backend-evaluation
@@ -39,5 +40,9 @@ jobs:
         run: npm run typecheck
       - name: Unit tests
         run: npm run test:unit -- test/unit/music-backend/musicBackendTransport.test.ts test/unit/music-backend/musicBackendProxy.test.ts test/unit/onlineMusic/omniArchitecture.test.ts
-      - name: Build
+      - name: Build frontend
         run: npm run build
+      - name: Check gateway syntax
+        run: node --check deploy/music-backend-gateway/gateway.mjs
+      - name: Build gateway image
+        run: docker build -t folia-music-backend-gateway:test deploy/music-backend-gateway
