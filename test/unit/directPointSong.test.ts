@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createPointSongImport } from '../../src/services/directPointSong';
+import { createPointSongImport, parsePointSongMediaUrl, resolvePointSongMediaUrl } from '../../src/services/directPointSong';
 
 describe('static GitHub Pages point-song sources', () => {
     it('encodes QQ first with the supplied vendor parameters and a fallback', () => {
@@ -38,4 +38,28 @@ describe('static GitHub Pages point-song sources', () => {
         expect(createPointSongImport('Hello\nWorld', 'qq-primary')).toBeNull();
         expect(createPointSongImport('x'.repeat(81), 'qq-primary')).toBeNull();
     });
+    it('parses CORS-readable nested JSON audio links when supplied by a vendor', async () => {
+        const fetchImpl = async () => new Response(JSON.stringify({
+            data: { url: 'https://audio.example.com/song.mp3?expires=123' },
+        }), { headers: { 'content-type': 'application/json' } });
+        await expect(resolvePointSongMediaUrl(
+            createPointSongImport('晴天', 'qq-primary')!.url,
+            fetchImpl as typeof fetch,
+        )).resolves.toBe('https://audio.example.com/song.mp3?expires=123');
+    });
+
+    it('refuses unsafe, private and non-browser-playable audio URLs', () => {
+        expect(parsePointSongMediaUrl({ data: { url: 'http://127.0.0.1/private' } })).toBeNull();
+        expect(parsePointSongMediaUrl({ url: 'javascript:alert(1)' })).toBeNull();
+        expect(parsePointSongMediaUrl({ url: 'https://user:secret@example.com/song.mp3' })).toBeNull();
+    });
+
+    it('does not parse arbitrary third-party endpoints or HTML', async () => {
+        let contacted = false;
+        const mock = async () => { contacted = true; return new Response('<html>no audio</html>', { headers: { 'content-type': 'text/html' } }); };
+        await expect(resolvePointSongMediaUrl('https://private.example.com/secret', mock as typeof fetch)).resolves.toBeNull();
+        expect(contacted).toBe(false);
+        await expect(resolvePointSongMediaUrl(createPointSongImport('晴天', 'netease')!.url, mock as typeof fetch)).resolves.toBeNull();
+    });
+
 });
