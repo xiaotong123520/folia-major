@@ -10,9 +10,10 @@ import { resolveMusicLink, type MusicLinkResolution } from '../../services/music
 type Props = {
     onClose: () => void;
     onPlayOnline: (song: UnifiedSong) => void;
+    onOpenAppleMusic: () => void;
 };
 
-export default function MusicLinkImport({ onClose, onPlayOnline }: Props) {
+export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusic }: Props) {
     const { t } = useTranslation();
     const [input, setInput] = useState('');
     const [resolution, setResolution] = useState<MusicLinkResolution | null>(null);
@@ -63,6 +64,8 @@ export default function MusicLinkImport({ onClose, onPlayOnline }: Props) {
                         {resolution.resourceId && <p className="break-all text-xs text-white/40">{t('musicLink.resourceId')}: {resolution.resourceId}</p>}
                         {resolution.access === 'existing-provider-adapter' && resolution.kind === 'track' && resolution.resourceId && !song &&
                             <button type="button" onClick={() => void findTrack()} disabled={loading} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-black disabled:opacity-50">{loading && <LoaderCircle size={15} className="animate-spin"/>}{t('musicLink.fetchSong')}</button>}
+                        {resolution.access === 'official-embed' && resolution.requiresUserEntitlement &&
+                            <button type="button" onClick={() => { onClose(); onOpenAppleMusic(); }} className="inline-flex items-center gap-2 rounded-xl border border-pink-200/25 bg-pink-200/10 px-4 py-2.5 text-sm text-pink-100 hover:bg-pink-200/20">{t('musicLink.openOfficialAuth')}</button>}
                         {resolution.normalizedUrl && <a href={resolution.normalizedUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-4 py-2.5 text-sm text-white/80 hover:bg-white/10"><ExternalLink size={15}/>{t('musicLink.openOriginal')}</a>}
                     </div>}
                     {song && <div className="flex items-center gap-3 rounded-xl border border-emerald-200/20 bg-emerald-200/5 p-3">
