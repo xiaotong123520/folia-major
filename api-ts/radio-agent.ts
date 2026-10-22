@@ -59,7 +59,6 @@ export default async function handler(req: Request) {
     }
     return new Response(JSON.stringify(parseBrief(raw, message)), { status: 200, headers: jsonHeaders });
   } catch (error) {
-    const detail = error instanceof Error ? error.message : "Unknown error";
     console.error("[RadioAgent] request failed:", error);
     return new Response(JSON.stringify({ error: "Radio Agent could not reach the configured AI service" }), { status: 502, headers: jsonHeaders });
   }
