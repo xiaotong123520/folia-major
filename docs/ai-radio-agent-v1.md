@@ -69,11 +69,14 @@ The AI must not invent playable URLs or track IDs. It returns a listening brief;
 The first vertical slice is now present on `feature/ai-radio-agent-v1`:
 - `src/components/app/RadioAgent.tsx`: mobile-first overlay, text prompt, browser speech recognition where supported, optional speech synthesis, station brief and track candidates.
 - `api-ts/radio-agent.ts`: server-side JSON brief endpoint for Gemini or OpenAI-compatible configuration; secrets stay on the server.
+- `worker/radio-agent.ts` and `worker/index.ts`: Cloudflare Worker adapter for the same-origin AI radio endpoint.
+- `worker/apple-music-token.ts` and `worker/index.ts`: Cloudflare Worker ES256 developer-token signer; the private key is read only from Worker secrets.
+- `deploy/docker/backend/server.mjs`: mounts both AI Radio and Apple Music token handlers for Docker deployments.
 - `src/App.tsx`: floating launcher and callbacks to Folia's existing local-song and online/Navidrome playback handlers.
 - Locale entries added for Chinese, English and Indonesian.
 - Online discovery uses `omni.searchSongs`; configured Navidrome/Subsonic discovery uses `navidromeApi.search`; local library matching uses existing `localSongs`.
 
-Not yet verified: production build, typecheck, unit tests, Vercel preview, runtime AI credentials, and real server/provider playback. GitHub currently reports no check runs for the pull request head. Do not merge or claim deployment success until these are checked. The first slice also does not yet persist Agent preferences or use long-term personalized listening memory.
+Review fixes now include Docker provider selection (`AI_PROVIDER`), bounded/cleaned AI response fields, preserving server error objects in logs, stopping speech immediately when narration is disabled, localized local-library fallback, a command-palette action for AI Radio, retryable MusicKit script loading, Apple Music UI localization, and Cloudflare/Docker route adapters. These changes remain unverified until the current GitHub Actions typecheck, unit tests, Docker stack check, and a real preview run finish. Electron still needs a supported main/preload bridge or a clearly gated UI for these server-only routes; do not claim desktop support or merge until that gap and test results are resolved. The first slice also does not yet persist Agent preferences or use long-term personalized listening memory.
 
 ## Delivery phases
 
