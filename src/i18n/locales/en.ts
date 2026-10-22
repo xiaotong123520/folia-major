@@ -1,6 +1,17 @@
 
 
 export default {
+  "mobileAccess": {
+    "title": "Accounts and full features",
+    "accounts": "Accounts",
+    "signIn": "Sign in / QR code",
+    "signInHint": "Use the shared sign-in window for NetEase, QQ Music and other platforms. Choose an available sign-in method.",
+    "settings": "Settings",
+    "settingsHint": "Audio quality, lyrics, appearance, playback and connections.",
+    "workspace": "Open full music workspace",
+    "workspaceHint": "Open the original interface for search, playlists, queue and lyrics.",
+    "loading": "Loading server library…"
+  },
   "mobileLibrary": {
     "platforms": "Music platforms",
     "login": "Sign in / QR code",

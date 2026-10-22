@@ -1,6 +1,17 @@
 
 
 export default {
+  "mobileAccess": {
+    "title": "平台与完整功能",
+    "accounts": "平台账号",
+    "signIn": "统一登录 / 扫码登录",
+    "signInHint": "网易云、QQ 音乐等平台共用原有登录窗口，按平台选择登录方式。",
+    "settings": "设置",
+    "settingsHint": "音质、歌词、外观、播放与服务连接。",
+    "workspace": "打开完整音乐工作区",
+    "workspaceHint": "进入原有界面，使用搜索、歌单、队列与歌词功能。",
+    "loading": "正在加载服务器曲库…"
+  },
   "mobileLibrary": {
     "platforms": "音乐平台",
     "login": "登录 / 扫码",

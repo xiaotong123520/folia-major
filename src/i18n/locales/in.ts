@@ -1,6 +1,17 @@
 
 
 export default {
+  "mobileAccess": {
+    "title": "Akun dan fitur lengkap",
+    "accounts": "Akun",
+    "signIn": "Masuk / kode QR",
+    "signInHint": "Gunakan jendela masuk bersama untuk NetEase, QQ Music dan platform lain. Pilih metode masuk yang tersedia.",
+    "settings": "Pengaturan",
+    "settingsHint": "Kualitas audio, lirik, tampilan, pemutaran dan koneksi.",
+    "workspace": "Buka ruang musik lengkap",
+    "workspaceHint": "Buka antarmuka asli untuk pencarian, daftar putar, antrean dan lirik.",
+    "loading": "Memuat pustaka server…"
+  },
   "mobileLibrary": {
     "platforms": "Platform musik",
     "login": "Masuk / kode QR",
