@@ -6,11 +6,11 @@ on:
       - feature/music-link-resolver
     paths:
       - "api-ts/music-backend-proxy.ts"
-      - "src/services/onlineMusic/musicBackendClient.ts"
-      - "src/services/onlineMusic/musicBackendProvider.ts"
+      - "src/services/onlineMusic/music-backend/musicBackendTransport.ts"
+      - "src/services/onlineMusic/music-backend/musicBackendProvider.ts"
       - "src/services/onlineMusic/providerRegistry.ts"
-      - "test/unit/musicBackendClient.test.ts"
-      - "test/unit/musicBackendProxy.test.ts"
+      - "test/unit/music-backend/musicBackendTransport.test.ts"
+      - "test/unit/music-backend/musicBackendProxy.test.ts"
       - ".github/workflows/music-backend-checks.yml"
       - "package.json"
       - "package-lock.json"
@@ -38,6 +38,6 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
       - name: Unit tests
-        run: npm run test:unit -- test/unit/musicBackendClient.test.ts test/unit/musicBackendProxy.test.ts
+        run: npm run test:unit -- test/unit/music-backend/musicBackendTransport.test.ts test/unit/music-backend/musicBackendProxy.test.ts
       - name: Build
         run: npm run build
