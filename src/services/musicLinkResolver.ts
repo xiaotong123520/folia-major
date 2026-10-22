@@ -79,10 +79,10 @@ export function resolveMusicLink(input: string): MusicLinkResolution {
   if (hostIs(host, 'music.youtube.com') || hostIs(host, 'youtube.com') || host === 'youtu.be' || hostIs(host, 'youtube-nocookie.com')) {
     const music = hostIs(host, 'music.youtube.com');
     const id = host === 'youtu.be' ? url.pathname.slice(1).split('/')[0] : url.searchParams.get('v') ?? pathId(url, /\/embed\/([^/?]+)/);
-    return make(music ? 'youtube-music' : 'youtube', 'video', 'official-embed', 'YouTube 链接已识别；网页端使用官方播放器，不提取受保护音频流。', id || undefined, true, true);
+    return make(music ? 'youtube-music' : 'youtube', 'video', 'official-embed', 'YouTube 链接已识别；网页端使用官方播放器，不提取受保护音频流。', id || undefined, true, false);
   }
   if (hostIs(host, 'soundcloud.com') || hostIs(host, 'on.soundcloud.com')) {
-    return make('soundcloud', 'track', 'official-embed', 'SoundCloud 链接已识别；应使用官方嵌入或授权 API，部分曲目可能受限制。', undefined, true, true);
+    return make('soundcloud', 'track', 'official-embed', 'SoundCloud 链接已识别；应使用官方嵌入或授权 API，部分曲目可能受限制。', undefined, true, false);
   }
   if (/\/rest\/(?:stream|download|search|ping|scrobble)(?:\.view)?$/i.test(url.pathname)) return make('navidrome', 'server', 'server-library', '看起来是 Subsonic/Navidrome 接口；请在 Folia 服务器音乐设置中配置可信服务器。', undefined, false, true);
   if (/\.(mp3|m4a|aac|ogg|opus|wav|flac|mp4|webm)$/i.test(url.pathname)) {
