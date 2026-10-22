@@ -44,5 +44,7 @@ jobs:
         run: npm run build
       - name: Check gateway syntax
         run: node --check deploy/music-backend-gateway/gateway.mjs
+      - name: Gateway integration tests
+        run: node --test deploy/music-backend-gateway/gateway.test.mjs
       - name: Build gateway image
         run: docker build -t folia-music-backend-gateway:test deploy/music-backend-gateway
