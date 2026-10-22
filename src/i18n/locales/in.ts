@@ -26,6 +26,13 @@ export default {
     "footer": "Pemutaran ditangani oleh Apple MusicKit dan tidak melewati batasan langganan atau wilayah. Token otorisasi hanya berada di memori halaman dan tidak disimpan permanen."
   },
     "radioAgent": {
+    "shareTitle": "Kenali tautan berbagi musik",
+    "sharePlaceholder": "Tempel URL platform musik (HTTPS)",
+    "shareResolve": "Kenali",
+    "shareUnsupported": "Tautan tidak dikenali. Gunakan URL berbagi musik standar.",
+    "shareNoMetadata": "Penyedia tidak mengembalikan informasi lagu.",
+    "shareProviderUnavailable": "Layanan musik tidak tersedia atau perlu izin masuk.",
+    "shareOfficialLink": "Buka melalui layanan musik resmi",
     "title": "Radio AI",
     "open": "Radio AI",
     "close": "Tutup radio",
