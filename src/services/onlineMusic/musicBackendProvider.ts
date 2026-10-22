@@ -22,6 +22,8 @@ type BackendSong = {
     durationMs?: number;
     url?: string;
     extra?: Record<string, unknown>;
+    is_vip?: boolean;
+    is_invalid?: boolean;
     [key: string]: unknown;
 };
 
@@ -85,7 +87,7 @@ const normalizeBackendSong = (raw: unknown): UnifiedSong => {
     const artists = artistsFrom(song);
     const albumRaw = song.album;
     const albumName = typeof albumRaw === 'string' ? albumRaw : String(albumRaw?.name ?? '');
-    const cover = String(song.coverUrl ?? song.cover ?? song.pic ?? (typeof albumRaw === 'object' ? albumRaw.coverUrl ?? albumRaw.cover : '') ?? '');
+    const cover = String(song.coverUrl ?? song.cover ?? song.pic ?? (albumRaw && typeof albumRaw === 'object' ? albumRaw.coverUrl ?? albumRaw.cover : '') ?? '');
     const durationMs = Number(song.durationMs ?? (Number(song.duration) > 0 ? Number(song.duration) * 1000 : 0));
     return {
         id: `${source}:${id}`,
@@ -104,7 +106,7 @@ const normalizeBackendSong = (raw: unknown): UnifiedSong => {
             mediaId: id,
             providerData: { source, backendSongId: id },
         },
-        resourceState: true,
+        ...(song.is_invalid ? { resourceState: false } : {}),
     };
 };
 
