@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Music2, SkipBack, SkipForward, Trash2, X } from 'lucide-react';
+import { Music2, Plus, SkipBack, SkipForward, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     audioDisplayName,
@@ -17,10 +17,11 @@ export interface ImportedAudioPlayerHandle {
 type Props = {
     onStartPlayback: () => void;
     pauseForMainPlayback: boolean;
+    onOpenImport: () => void;
 };
 
 const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
-    function ImportedAudioPlayer({ onStartPlayback, pauseForMainPlayback }, ref) {
+    function ImportedAudioPlayer({ onStartPlayback, pauseForMainPlayback, onOpenImport }, ref) {
         const { t } = useTranslation();
         const [tracks, setTracks] = useState<ImportedAudioTrack[]>([]);
         const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -121,20 +122,21 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
         return (
             <section
                 aria-label={t('musicImport.queue')}
-                className="fixed bottom-3 left-3 z-[95] w-[calc(100%-1.5rem)] max-w-sm rounded-2xl border border-white/20 bg-[#17151f]/95 p-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl sm:bottom-5 sm:left-5"
+                className="fixed bottom-[max(0.5rem,env(safe-area-inset-bottom))] left-2 right-2 z-[95] max-h-[min(62dvh,27rem)] overflow-y-auto rounded-2xl border border-white/20 bg-[#17151f]/95 p-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl sm:bottom-5 sm:left-5 sm:right-auto sm:w-96 sm:max-h-[70vh]"
             >
                 <div className="flex items-center gap-2">
                     <Music2 size={18} className="shrink-0 text-violet-200" />
                     <p className="min-w-0 flex-1 truncate text-sm font-medium">{activeTrack.name}</p>
                     <span className="text-xs text-white/50">{activeIndex + 1}/{tracks.length}</span>
-                    <button type="button" className="rounded-lg p-2 text-white/65 hover:bg-white/10" title={t('musicImport.clear')} aria-label={t('musicImport.clear')} onClick={clear}>
+                    <button type="button" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white/70 hover:bg-white/10" title="添加音乐" aria-label="添加音乐" onClick={onOpenImport}><Plus size={19}/></button>
+                    <button type="button" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white/65 hover:bg-white/10" title={t('musicImport.clear')} aria-label={t('musicImport.clear')} onClick={clear}>
                         <Trash2 size={16} />
                     </button>
                 </div>
                 <audio
                     key={activeTrack.id}
                     ref={audioRef}
-                    className="mt-2 w-full"
+                    className="mt-2 min-h-12 w-full"
                     controls
                     preload="metadata"
                     src={activeTrack.url}
@@ -145,11 +147,11 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                     }}
                 />
                 <div className="mt-1 flex items-center justify-between gap-3">
-                    <button type="button" className="rounded-lg p-2 disabled:opacity-30" disabled={activeIndex <= 0} aria-label={t('musicImport.previous')} onClick={() => switchTo(tracks[activeIndex - 1].id, true)}>
+                    <button type="button" className="flex h-11 w-11 items-center justify-center rounded-lg disabled:opacity-30" disabled={activeIndex <= 0} aria-label={t('musicImport.previous')} onClick={() => switchTo(tracks[activeIndex - 1].id, true)}>
                         <SkipBack size={17} />
                     </button>
                     <p className="text-center text-[11px] text-white/50">{t('musicImport.browserPlayback')}</p>
-                    <button type="button" className="rounded-lg p-2 disabled:opacity-30" disabled={activeIndex >= tracks.length - 1} aria-label={t('musicImport.next')} onClick={() => switchTo(tracks[activeIndex + 1].id, true)}>
+                    <button type="button" className="flex h-11 w-11 items-center justify-center rounded-lg disabled:opacity-30" disabled={activeIndex >= tracks.length - 1} aria-label={t('musicImport.next')} onClick={() => switchTo(tracks[activeIndex + 1].id, true)}>
                         <SkipForward size={17} />
                     </button>
                 </div>
