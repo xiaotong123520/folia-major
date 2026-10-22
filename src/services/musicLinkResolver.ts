@@ -70,7 +70,7 @@ export function resolveMusicLink(input: string): MusicLinkResolution {
     return make('kuwo', kind, 'unsupported', '酷我链接已识别，但 Folia 仍需实现并测试酷我 provider。', id, true, false);
   }
   if (hostIs(host, 'music.apple.com')) {
-    const id = url.searchParams.get('i') ?? pathId(url, /\/(?:album|playlist|artist)\/[^/]*?(\d{5,})/);
+    const id = url.searchParams.get('i') ?? pathId(url, /\/(?:album|playlist|artist)\/[^/]+\/(\d{5,})/);
     const kind: MusicLinkKind = /\/playlist\//.test(url.pathname) ? 'playlist' : /\/artist\//.test(url.pathname) ? 'artist' : /\/album\//.test(url.pathname) && !url.searchParams.has('i') ? 'album' : 'track';
     return make('apple-music', kind, 'official-embed', 'Apple Music 已识别；完整播放需官方 MusicKit 授权、有效开发者 token 和符合条件的订阅。', id, true, false, true);
   }
