@@ -54,3 +54,10 @@ GITHUB_PAGES=true npm run build
 - `https://cer.luckying.love/music/Lucky.php?Love=`
 
 **重要边界**：纯静态 GitHub Pages 不能执行 PHP、Node 服务端代理，也无法绕过 CORS、需要私钥的音频地址、VIP/DRM 访问限制。如果第三方接口直接返回音频、重定向到音频，或返回**允许浏览器跨域读取（CORS）的 JSON 音频地址**，播放器会尝试播放；若 JSON 不允许跨域读取、接口返回 HTML、需要 Cookies/签名或缺少授权，不能保证播放。此功能是可测试的直连点歌入口，不代表这三个第三方接口已通过真实音频验收，也不等于会员解锁。请勿把含凭据的私密 URL 粘贴到公共分享场景。
+
+
+## GitHub Pages 开放曲库补充
+
+手机「桐声音乐」→「在线点歌」中新增 Audius 开放音乐搜索。查询使用 `https://api.audius.co/v1/tracks/search`，选择结果后以**同一平台歌曲 ID**生成 `https://api.audius.co/v1/tracks/{id}/stream`。结果进入原有本地浏览器音乐队列。
+
+这是官方公开的、浏览器可使用的只读音乐 API 方案，与 QQ、网易云三个未经实播验证的点歌网址**相互独立**，不会按歌曲名冒充同一录音。不是会员歌曲破解接口。公开查询仍可能受 API 速率限制、区域限制或浏览器跨域配置影响。官方文档：https://docs.audius.co/api/ 和 https://docs.audius.co/sdk/ 。若未来申请公开 API Key，可通过客户端受支持的设置配置；不能把私有 Bearer Token 写进 GitHub Pages。
