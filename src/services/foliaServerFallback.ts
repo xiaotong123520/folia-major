@@ -16,6 +16,7 @@ export function normalizeFoliaServerBase(input: string): string | null {
         const url = new URL(input.trim());
         if (url.protocol !== 'https:' && !(url.protocol === 'http:' && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(url.hostname))) return null;
         if (url.username || url.password || url.search || url.hash) return null;
+        if (!url.hostname || /[\\*%]/.test(url.hostname)) return null;
         if (url.pathname !== '/' && url.pathname !== '') return null;
         return url.origin;
     } catch {
