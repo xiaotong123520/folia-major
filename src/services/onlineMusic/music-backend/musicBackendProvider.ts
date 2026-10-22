@@ -34,7 +34,7 @@ type BackendEnvelope<T> = { code?: number; msg?: string; data?: T };
 type BackendSearchData = { type?: string; songs?: BackendSong[] };
 
 const providerId = 'music-backend';
-const sourceAllowlist = new Set(['netease', 'qq', 'kugou', 'kuwo', 'migu', 'bilibili', 'soda', 'fivesing', 'jamendo', 'joox', 'qianqian']);
+const sourceAllowlist = new Set(['local', 'netease', 'qq', 'kugou', 'kuwo', 'migu', 'bilibili', 'soda', 'fivesing', 'jamendo', 'joox', 'qianqian']);
 
 const envBaseUrl = (): string => {
     const env = typeof import.meta !== 'undefined' ? (import.meta as ImportMeta & { env?: Record<string, unknown> }).env : undefined;
@@ -139,7 +139,7 @@ const buildClient = (): MusicBackendClient => {
 
 export const musicBackendProvider: OnlineMusicProvider = {
     id: providerId,
-        displayName: 'Server Music',
+    displayName: '我的服务器音乐',
     shortName: 'Backend',
     mark: { letter: 'F', color: '#7c3aed' },
     capabilities: {
