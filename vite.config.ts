@@ -203,7 +203,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
     .slice(0, 12)}`;
 
   return {
-    base: process.env.ELECTRON === 'true' ? './' : '/',
+    base: process.env.ELECTRON === 'true' ? './' : (process.env.GITHUB_PAGES === 'true' ? '/folia-major/' : '/'),
     worker: {
       format: 'es'
     },
