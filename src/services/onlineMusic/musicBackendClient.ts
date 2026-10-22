@@ -1,8 +1,8 @@
 /**
  * Minimal, defensive HTTP client for a self-hosted music backend.
  *
- * This is transport groundwork only; it is not registered as a Folia provider and does not
- * claim any third-party track is playable. Keep API credentials server-side; browser builds
+ * This is the bounded transport used by the optional Folia music backend provider.
+ * It does not claim that any third-party track is playable. Keep API credentials server-side; browser builds
  * must not receive privileged backend keys.
  */
 export interface MusicBackendClientOptions {
