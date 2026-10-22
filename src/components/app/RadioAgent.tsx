@@ -229,7 +229,7 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
         }
         // Recognition never grants playback rights; use the existing Folia provider.
         const providerId = result.platform;
-        if (!result.resourceId || result.kind !== 'track' || !['netease', 'qq', 'kugou'].includes(providerId)) return;
+        if (!result.resourceId || result.kind !== 'track' || result.access !== 'existing-provider-adapter') return;
         setShareBusy(true);
         try {
             const song = await omni.getSongDetail(providerId, result.resourceId);
