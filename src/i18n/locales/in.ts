@@ -26,6 +26,7 @@ export default {
     "footer": "Pemutaran ditangani oleh Apple MusicKit dan tidak melewati batasan langganan atau wilayah. Token otorisasi hanya berada di memori halaman dan tidak disimpan permanen."
   },
     "musicLink": {
+    "openOfficialAuth": "Buka otorisasi Apple Music resmi",
     "title": "Impor tautan musik",
     "close": "Tutup",
     "placeholder": "Tempel tautan berbagi lagu atau musik",
