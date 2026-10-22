@@ -84,4 +84,4 @@ Before coding the adapter, the following mapping must be verified against the co
 
 ## Immediate engineering gate
 
-The next code change should be a thin adapter with mocked transport tests, not a live third-party integration. The backend itself must first be hardened in a separate deployment/configuration review. If no authorized, stable stream is available for a result, Folia must show unavailable/restricted and offer the official provider page rather than claiming playback works.
+A thin adapter and mocked transport tests have now been added on the isolated development branch. The backend itself must still be hardened in a separate deployment/configuration review, and the adapter has not yet passed repository typecheck/build or real browser playback tests. If no authorized, stable stream is available for a result, Folia must show unavailable/restricted and offer the official provider page rather than claiming playback works.
