@@ -5,6 +5,7 @@ import { ChevronLeft, Music2, Radio as RadioIcon } from 'lucide-react';
 import RadioAgent from './components/app/RadioAgent';
 import AppleMusicConnect from './components/app/AppleMusicConnect';
 import MusicLinkImport from './components/app/MusicLinkImport';
+import ImportedAudioPlayer, { type ImportedAudioPlayerHandle } from './components/app/ImportedAudioPlayer';
 import { loadCachedOrFetchCover } from './services/coverCache';
 import VisualizerRenderer from './components/visualizer/VisualizerRenderer';
 import CommandPalette from './components/command-palette/CommandPalette';
@@ -193,6 +194,7 @@ export default function App() {
     const { t } = useTranslation();
     const [isRadioAgentOpen, setIsRadioAgentOpen] = useState(false);
     const [isMusicLinkImportOpen, setIsMusicLinkImportOpen] = useState(false);
+    const importedAudioPlayerRef = useRef<ImportedAudioPlayerHandle | null>(null);
     useEffect(() => {
         const openRadioAgent = () => setIsRadioAgentOpen(true);
         window.addEventListener('folia:open-radio-agent', openRadioAgent);
@@ -2899,6 +2901,16 @@ export default function App() {
                 onClose={() => setIsMusicLinkImportOpen(false)}
                 onPlayOnline={handleSearchResultPlay}
                 onOpenAppleMusic={() => setIsAppleMusicOpen(true)}
+                onAddFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
+                onAddAudioUrl={url => importedAudioPlayerRef.current?.addUrl(url) ?? false}
+            />}
+            {!isElectronWindow && <ImportedAudioPlayer
+                ref={importedAudioPlayerRef}
+                pauseForMainPlayback={playerState === PlayerState.PLAYING}
+                onStartPlayback={() => {
+                    audioRef.current?.pause();
+                    setPlayerState(PlayerState.PAUSED);
+                }}
             />}
 
             {currentView === 'player' && !(isLyricMatchOpen && isLocalPlaybackSong(currentSong)) && (
