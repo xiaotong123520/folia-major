@@ -56,7 +56,7 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onImpor
                         </button>
                         <label className="relative flex min-h-36 cursor-pointer flex-col items-start justify-between rounded-3xl border border-white/15 bg-white/[0.08] p-5 text-left focus-within:outline-2 focus-within:outline-violet-200">
                             <Upload size={25} className="text-violet-200"/><span className="text-lg font-semibold">本地音乐</span>
-                            <input type="file" accept="audio/*,.mp3,.m4a,.aac,.flac,.wav,.ogg,.opus,.webm" multiple
+                            <input type="file" accept=".mp3,.m4a,.aac,.wav,.flac,.ogg,.opus,.webm" multiple
                                 className="absolute h-px w-px opacity-0"
                                 aria-label="从手机选择本地音乐"
                                 onChange={event => {
