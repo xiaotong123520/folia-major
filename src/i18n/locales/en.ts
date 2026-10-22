@@ -645,6 +645,7 @@ export default {
       }
     },
     "commands": {
+      "open-ai-radio-agent": { "title": "Open AI Radio", "description": "Create a mood-based personal radio station" },
       "settings-ponder-hints": { "title": "Ponder tutorial hints", "description": "Choose when the hold-G tutorial hint appears" },
       "ponder-hints-always": { "title": "Ponder hints: always show", "description": "Show the hold-G hint on every teachable control" },
       "ponder-hints-unseen": { "title": "Ponder hints: only where I have not looked", "description": "Stop hinting a control once its tutorial has been watched" },
