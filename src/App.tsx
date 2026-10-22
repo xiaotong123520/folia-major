@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { AnimatePresence, motion, useMotionValueEvent } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, Radio as RadioIcon } from 'lucide-react';
+import { ChevronLeft, Music2, Radio as RadioIcon } from 'lucide-react';
 import RadioAgent from './components/app/RadioAgent';
+import AppleMusicConnect from './components/app/AppleMusicConnect';
 import { loadCachedOrFetchCover } from './services/coverCache';
 import VisualizerRenderer from './components/visualizer/VisualizerRenderer';
 import CommandPalette from './components/command-palette/CommandPalette';
@@ -190,6 +191,7 @@ export default function App() {
     countRender('App');
     const { t } = useTranslation();
     const [isRadioAgentOpen, setIsRadioAgentOpen] = useState(false);
+    const [isAppleMusicOpen, setIsAppleMusicOpen] = useState(false);
     const {
         navidromeEnabled, setNavidromeEnabledState,
         starredNavidromeSongIds, setStarredNavidromeSongIds,
@@ -2868,6 +2870,17 @@ export default function App() {
                 onPlayOnline={handleSearchResultPlay}
                 onPlayLocal={onPlayLocalSong}
             />
+            <button
+                type="button"
+                onClick={() => setIsAppleMusicOpen(true)}
+                aria-label="Apple Music 登录"
+                title="Apple Music 登录"
+                className="fixed bottom-40 right-4 z-[80] inline-flex h-12 items-center gap-2 rounded-full border border-pink-200/20 bg-[#211116]/95 px-4 text-sm text-white shadow-xl shadow-black/30 backdrop-blur-xl transition hover:border-pink-200/40 hover:bg-[#321923] sm:bottom-24 sm:right-7"
+            >
+                <Music2 size={17} className="text-pink-200" />
+                <span>Apple Music</span>
+            </button>
+            {isAppleMusicOpen && <AppleMusicConnect onClose={() => setIsAppleMusicOpen(false)} />}
 
             {currentView === 'player' && !(isLyricMatchOpen && isLocalPlaybackSong(currentSong)) && (
                 <PlayerPanel model={playerPanelModel} />
