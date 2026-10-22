@@ -1,7 +1,31 @@
 
 
 export default {
-  "radioAgent": {
+  "appleMusic": {
+    "name": "Apple Music",
+    "tokenUnavailable": "Token developer Apple Music tidak tersedia.",
+    "authorizedNotice": "Berhasil diotorisasi melalui Apple Music. Akses pustaka dan pemutaran tetap bergantung pada langganan, wilayah, dan dukungan browser.",
+    "authorizationFailed": "Otorisasi Apple Music gagal. Silakan coba lagi.",
+    "noResults": "Lagu tidak ditemukan. Coba kata kunci lain.",
+    "searchFailed": "Pencarian gagal. Periksa otorisasi, jaringan, wilayah, dan langganan.",
+    "playFailed": "Lagu ini tidak dapat diputar. Periksa langganan dan ketersediaannya di wilayah Anda.",
+    "signedOut": "Otorisasi Apple Music telah dicabut.",
+    "subtitle": "Otorisasi akun resmi · Folia",
+    "close": "Tutup",
+    "signInHeading": "Masuk dengan otorisasi resmi Apple",
+    "signInDescription": "Folia tidak pernah mengumpulkan atau menyimpan kata sandi Apple ID Anda. Ini membuka otorisasi MusicKit resmi Apple. Kredensial developer server harus dikonfigurasi terlebih dahulu.",
+    "connecting": "Menghubungkan ke Apple Music…",
+    "signIn": "Masuk ke Apple Music",
+    "authorized": "Apple Music terotorisasi",
+    "signOut": "Cabut otorisasi",
+    "searchLabel": "Cari lagu Apple Music",
+    "searchPlaceholder": "Cari lagu, artis, atau album",
+    "unknownSong": "Lagu tidak dikenal",
+    "song": "lagu",
+    "playSong": "Putar {{song}}",
+    "footer": "Pemutaran ditangani oleh Apple MusicKit dan tidak melewati batasan langganan atau wilayah. Token otorisasi hanya berada di memori halaman dan tidak disimpan permanen."
+  },
+    "radioAgent": {
     "title": "Radio AI",
     "open": "Radio AI",
     "close": "Tutup radio",
