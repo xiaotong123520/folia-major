@@ -141,6 +141,7 @@ export const musicBackendProvider: OnlineMusicProvider = {
     id: providerId,
     displayName: 'Music Backend',
     shortName: 'Backend',
+    mark: { letter: 'F', color: '#7c3aed' },
     capabilities: {
         search: true,
         playback: true,
