@@ -25,7 +25,22 @@ export default {
     "playSong": "Putar {{song}}",
     "footer": "Pemutaran ditangani oleh Apple MusicKit dan tidak melewati batasan langganan atau wilayah. Token otorisasi hanya berada di memori halaman dan tidak disimpan permanen."
   },
-    "radioAgent": {
+    "musicLink": {
+    "title": "Impor tautan musik",
+    "close": "Tutup",
+    "placeholder": "Tempel tautan berbagi lagu atau musik",
+    "inputLabel": "Tautan berbagi musik",
+    "inspect": "Periksa",
+    "resourceId": "ID sumber",
+    "fetchSong": "Ambil informasi lagu",
+    "openOriginal": "Buka tautan asli",
+    "unknownArtist": "Artis tidak dikenal",
+    "playExisting": "Putar melalui Folia",
+    "noSong": "Layanan musik tidak mengembalikan lagu ini. Periksa login penyedia atau gunakan pencarian aplikasi.",
+    "lookupFailed": "Gagal mengambil lagu. Sumber mungkin memerlukan login, konfigurasi API musik, atau koneksi jaringan.",
+    "disclaimer": "Hanya layanan musik yang tersedia dan API resmi yang digunakan. Pengenalan tautan tidak membuka lagu berlangganan atau membuat streaming tanpa izin. Atur server musik di pustaka server."
+  },
+  "radioAgent": {
     "shareTitle": "Kenali tautan berbagi musik",
     "sharePlaceholder": "Tempel URL platform musik (HTTPS)",
     "shareResolve": "Kenali",
