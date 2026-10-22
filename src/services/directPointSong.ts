@@ -19,8 +19,9 @@ export interface PointSongImport {
 const MAX_TITLE = 80;
 
 export function createPointSongImport(rawTitle: string, source: PointSongSource): PointSongImport | null {
+  if (/[\u0000-\u001f\u007f]/.test(rawTitle)) return null;
   const title = rawTitle.trim().replace(/\s+/g, ' ');
-  if (!title || title.length > MAX_TITLE || /[\u0000-\u001f\u007f]/.test(title)) return null;
+  if (!title || title.length > MAX_TITLE) return null;
 
   const qqFirst = new URL('https://api.lxink.cn/api-qqmusic/');
   qqFirst.searchParams.set('action', 'play');
