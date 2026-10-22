@@ -47,3 +47,49 @@ This stack keeps the upstream Go API off host-published ports. Only the gateway 
 验证步骤：在网页搜索一首可公开播放的歌曲 → 手动选择「QQ点歌」或「网易云点歌」 → 点击播放并拖动进度；同时在浏览器开发者工具查看 `/api/v1/music/stream` 是否返回 `audio/*` 和 200/206。当前外部三方 API 未能直接取得可核实音频响应，必须在实际运行服务器上进行测试。
 
 本仓库附带不联网的模拟音频测试：`node --test deploy/music-backend-gateway/fallback/server.test.mjs`，以及 `.github/workflows/verify-song-api-server.yml`。这些测试证明代码调用顺序与接口兼容逻辑，不能证明第三方服务真的在线或有会员播放授权。
+
+
+## Three enabled server-side point-song endpoints
+
+The Docker service `music-source-fallback` sits between the existing authenticated gateway and the original Go API. These **three user-supplied name-based endpoints** are enabled with `MUSIC_ENABLE_NAME_LOOKUP=true`:
+
+| Platform | Endpoint |
+|---|---|
+| QQ first | https://api.lxink.cn/api-qqmusic/?action=play&type=vip&songName= |
+| QQ second | https://cer.luckying.love/music/Lucky.php?Love= |
+| NetEase | https://cer.luckying.love/music/LuckyWYY.php?Love= |
+
+The QQ search alternative tries the first URL, then the second on an error; NetEase uses its own URL. Search labels warn that name-based lookups can return a different recording. Actual audio must have an allowed content type. Remote media URLs and redirects must use HTTPS and match `MUSIC_AUDIO_ALLOW_HOSTS` (configured in your private `.env`); unexpected HTML/JSON is not streamed as audio. `type=vip` is an existing vendor query parameter and does not grant membership or DRM permissions.
+
+The interfaces are **configured, not externally verified or deployed to your actual server**. The source response schema and availability can change.
+
+### Deploy on your Baota server via SSH / Termius
+
+Docker and Docker Compose must be installed. On the server terminal:
+
+~~~sh
+git clone --branch feature/multi-source-playback-gateway https://github.com/xiaotong123520/folia-major.git tongsheng-dev
+cd tongsheng-dev/deploy/music-backend-gateway
+cp .env.example .env
+printf '{}\n' > cookies.json
+chmod 600 .env cookies.json
+~~~
+
+Change the sample `MUSIC_BACKEND_API_KEY` in `.env` to a random, unique 32+ byte secret (e.g. generate with `openssl rand -hex 32`); do not share or commit it. Ensure `MUSIC_ENABLE_NAME_LOOKUP=true` and carefully configure `MUSIC_AUDIO_ALLOW_HOSTS` with **trusted media hostnames only**.
+
+~~~sh
+docker compose config --quiet
+docker compose up -d --build
+docker compose ps
+curl -i http://127.0.0.1:8090/healthz
+~~~
+
+In Baota, create a **dedicated HTTPS API host** pointing via Nginx reverse proxy to `http://127.0.0.1:8090`. Ports 8080 and 8093 remain private; the only host-bound port is 8090 on loopback.
+
+To use it with GitHub Pages, the repository Actions variable `VITE_MUSIC_BACKEND_BASE_URL` must point to the publicly resolvable HTTPS API origin, with no API secret. The backend `MUSIC_PUBLIC_ORIGINS` may include `https://xiaotong123520.github.io` **only if serving audio that anyone is permitted to access**: CORS and Origin are not authentication. For private data, use the existing Vercel server-side Bearer proxy or a separate user-authenticated solution.
+
+The development branch is not production. It does not modify existing server music files. Finish automated tests, real HTTPS streaming with Range/206, and browser testing before merging/publishing.
+
+### Verification
+
+The CI workflow `.github/workflows/verify-song-api-server.yml` checks Node syntax, mocked endpoint fallback cases, Range handling, the original gateway, and Docker Compose. Unit tests prove request/response handling, **not that the three live upstreams are operational**.
