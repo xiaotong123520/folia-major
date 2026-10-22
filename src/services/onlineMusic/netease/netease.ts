@@ -1,7 +1,7 @@
 import { NoCopyrightRecommendation, SongPrivilege, SongResult } from "../../../types";
 import { readProviderSessionValue, removeProviderSessionValue, writeProviderSessionValue } from '../providerStorage';
 import { OnlineProviderError } from '../../../types/onlineMusic';
-import { foliaProviderApiBase } from '../../foliaServerFallback';
+import { getFoliaServerBase } from '../../foliaServerFallback';
 import type { PersonalFmRequestOptions, ProviderSongAvailability } from '../../../types/onlineMusic';
 import { withLoginRequestLimit } from '../login/loginRequestLimit';
 import { withOnlineRequestLimit } from '../failure/onlineRequestLimit';
@@ -38,7 +38,8 @@ const getConfiguredApiBase = () => {
     return process.env.VITE_NETEASE_API_BASE;
   }
 
-  return foliaProviderApiBase('netease');
+  const fallback = getFoliaServerBase();
+  return fallback ? `${fallback}/netease` : null;
 };
 
 /** 网页版配置的远端 API 地址（自检与诊断报告用）；桌面版走内嵌后端，返回 null。 */
