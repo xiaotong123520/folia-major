@@ -152,7 +152,7 @@ export default async function handler(req: Request): Promise<Response> {
     if (path === "/api/v1/music/stream") outHeaders.set("Cache-Control", "private, no-store");
     else outHeaders.set("Cache-Control", "no-store, max-age=0");
 
-    if (req.method === "HEAD") {
+    if (req.method === "HEAD" || upstreamResponse.status === 204 || upstreamResponse.status === 304) {
       return new Response(null, { status: upstreamResponse.status, headers: outHeaders });
     }
     if (path === "/api/v1/music/stream") {
