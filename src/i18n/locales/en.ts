@@ -38,6 +38,7 @@ export default {
     "searching": "Searching for real, playable tracks…",
     "noResults": "No matching tracks yet. Try another prompt or check your music-service configuration.",
     "searchFailed": "Online catalog search failed. Check whether your music service is available.",
+    "localLibraryFallback": "Local library",
     "localSource": "Server / local library",
     "onlineSource": "Online music",
     "unknownArtist": "Unknown artist",
