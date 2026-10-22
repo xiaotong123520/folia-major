@@ -2858,7 +2858,7 @@ export default function App() {
                 animejs 不进 bootstrap chunk。 */}
             <PonderHost theme={theme} isDaylight={isDaylight} />
 
-            <button
+            {!isElectronWindow && <button
                 type="button"
                 onClick={() => setIsRadioAgentOpen(true)}
                 aria-label={t('radioAgent.open')}
@@ -2867,25 +2867,25 @@ export default function App() {
             >
                 <RadioIcon size={17} className="text-violet-200" />
                 <span>{t('radioAgent.open')}</span>
-            </button>
-            <RadioAgent
+            </button>}
+            {!isElectronWindow && <RadioAgent
                 open={isRadioAgentOpen}
                 onClose={() => setIsRadioAgentOpen(false)}
                 localSongs={localSongs}
                 onPlayOnline={handleSearchResultPlay}
                 onPlayLocal={onPlayLocalSong}
-            />
-            <button
+            />}
+            {!isElectronWindow && <button
                 type="button"
                 onClick={() => setIsAppleMusicOpen(true)}
-                aria-label="Apple Music 登录"
-                title="Apple Music 登录"
+                aria-label={t('appleMusic.signIn')}
+                title={t('appleMusic.signIn')}
                 className="fixed bottom-40 right-4 z-[80] inline-flex h-12 items-center gap-2 rounded-full border border-pink-200/20 bg-[#211116]/95 px-4 text-sm text-white shadow-xl shadow-black/30 backdrop-blur-xl transition hover:border-pink-200/40 hover:bg-[#321923] sm:bottom-24 sm:right-7"
             >
                 <Music2 size={17} className="text-pink-200" />
-                <span>Apple Music</span>
-            </button>
-            {isAppleMusicOpen && <AppleMusicConnect onClose={() => setIsAppleMusicOpen(false)} />}
+                <span>{t('appleMusic.name')}</span>
+            </button>}
+            {!isElectronWindow && isAppleMusicOpen && <AppleMusicConnect onClose={() => setIsAppleMusicOpen(false)} />}
 
             {currentView === 'player' && !(isLyricMatchOpen && isLocalPlaybackSong(currentSong)) && (
                 <PlayerPanel model={playerPanelModel} />
