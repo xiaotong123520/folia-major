@@ -1,5 +1,5 @@
 import { OnlineProviderError } from '../../../types/onlineMusic';
-import { foliaProviderApiBase } from '../../foliaServerFallback';
+import { getFoliaServerBase } from '../../foliaServerFallback';
 import { readProviderSessionValue, removeProviderSessionValue, writeProviderSessionValue } from '../providerStorage';
 import { withLoginRequestLimit } from '../login/loginRequestLimit';
 import { withOnlineRequestLimit } from '../failure/onlineRequestLimit';
@@ -117,7 +117,8 @@ const getWebApiBase = (): string => {
         ? String(process.env?.VITE_QQ_API_BASE || '')
         : '';
     const value = viteValue || processValue;
-    return value.trim().replace(/\/$/, '') || foliaProviderApiBase('qq') || '';
+    const fallback = getFoliaServerBase();
+    return value.trim().replace(/\/$/, '') || (fallback ? `${fallback}/qq` : '');
 };
 
 // Electron embeds qq-music-api and starts it on a free port, so the base is only known at runtime.
@@ -195,7 +196,7 @@ const isSameOriginBase = (base: string): boolean => base.startsWith('/');
 // Our own CORS-allowlisted Folia gateway accepts X-QQ-Session, so keep the
 // sealed session token out of request URLs and reverse-proxy access logs.
 const canUseSessionHeader = (base: string): boolean => (
-    isSameOriginBase(base) || base === foliaProviderApiBase('qq')
+    isSameOriginBase(base) || (Boolean(getFoliaServerBase()) && base === `${getFoliaServerBase()}/qq`)
 );
 
 export const hasQqSession = (): boolean => Boolean(getWebSessionCookie());
