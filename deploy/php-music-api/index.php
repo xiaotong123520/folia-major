@@ -26,6 +26,17 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
     reply(405, ['code' => 405, 'msg' => 'Method not allowed']);
 }
 
+$apiKey = (string) (getenv('MUSIC_BACKEND_API_KEY') ?: '');
+$provided = (string) ($_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '');
+$hasBearer = $apiKey !== '' && str_starts_with($provided, 'Bearer ')
+    && hash_equals($apiKey, substr($provided, 7));
+// Public-origin mode is only for files you are legally allowed to serve to everyone.
+// A forged Origin can bypass CORS restrictions; do not use this mode for private libraries.
+$publicRead = $origin !== '' && in_array($origin, $allowed, true);
+if (!$hasBearer && !$publicRead && parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH) !== '/healthz') {
+    reply(401, ['code' => 401, 'msg' => 'Unauthorized']);
+}
+
 $root = realpath((string) (getenv('MUSIC_LIBRARY_ROOT') ?: ''));
 $index = (string) (getenv('MUSIC_LIBRARY_INDEX') ?: '');
 if (!$root || !is_dir($root) || !is_file($index) || !is_readable($index)) {
