@@ -38,6 +38,7 @@ export default {
     "searching": "Mencari lagu yang benar-benar tersedia…",
     "noResults": "Belum ada lagu yang cocok. Coba deskripsi lain atau periksa konfigurasi layanan musik.",
     "searchFailed": "Pencarian katalog daring gagal. Periksa layanan musik.",
+    "localLibraryFallback": "Pustaka lokal",
     "localSource": "Server / pustaka lokal",
     "onlineSource": "Musik daring",
     "unknownArtist": "Artis tidak dikenal",
