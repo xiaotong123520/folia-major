@@ -1,3 +1,4 @@
+import { foliaBackendApiUrl } from '../../services/foliaServerFallback';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowLeft, AudioLines, Bot, Check, LoaderCircle, Mic, Music2, Pause, Play, Radio, Send, Settings2, Volume2, VolumeX, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -123,7 +124,7 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
         const fallback = makeFallbackBrief(prompt);
         let activeBrief = fallback;
         try {
-            const response = await fetch('/api/radio-agent', {
+            const response = await fetch(foliaBackendApiUrl('/api/radio-agent'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: prompt }),
