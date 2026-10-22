@@ -240,10 +240,10 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                     </button>
                     <button type="button" aria-label="下一首" disabled={activeIndex >= tracks.length - 1} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl disabled:opacity-30" onClick={() => switchTo(tracks[activeIndex + 1].id, true)}><SkipForward size={19}/></button>
                 </div>}
-                <div className={mobileExpanded ? 'block' : 'hidden sm:block'}>
+                <div>
                 <audio
                     ref={audioRef}
-                    className="mt-2 w-full"
+                    className={mobileExpanded ? "mt-2 w-full" : "pointer-events-none absolute h-px w-px opacity-0 sm:pointer-events-auto sm:static sm:mt-2 sm:h-auto sm:w-full sm:opacity-100"}
                     controls
                     preload="metadata"
                     src={fallbackRetry?.id === activeTrack.id ? fallbackRetry.url : activeTrack.url}
@@ -290,6 +290,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                         if (activeIndex + 1 < tracks.length) switchTo(tracks[activeIndex + 1].id, true);
                     }}
                 />
+                <div className={mobileExpanded ? "block" : "hidden sm:block"}>
                 <div className="mt-1 flex items-center justify-between gap-3">
                     <button type="button" className="rounded-lg p-2 disabled:opacity-30" disabled={activeIndex <= 0} aria-label={t('musicImport.previous')} onClick={() => switchTo(tracks[activeIndex - 1].id, true)}>
                         <SkipBack size={17} />
@@ -312,6 +313,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                 <button type="button" className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/15 text-sm text-white/70 sm:hidden" onClick={clear}>
                     <Trash2 size={16}/> 清空播放队列
                 </button>
+                </div>
                 </div>
                 {error && <p role="alert" className="mt-2 text-xs text-amber-200">{error}</p>}
             </section>
