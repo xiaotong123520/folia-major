@@ -37,7 +37,7 @@ export default async function handler(req: Request) {
     const token = signingInput + "." + base64url(signature);
     return new Response(JSON.stringify({ token, expiresAt: now + 60 * 60 * 24 * 30 }), { status: 200, headers });
   } catch (error) {
-    console.error("Apple Music developer token signing failed:", error instanceof Error ? error.message : "unknown error");
+    console.error("[AppleMusic] developer token signing failed:", error);
     return new Response(JSON.stringify({ error: "Apple Music developer token could not be created.", code: "APPLE_MUSICKIT_TOKEN_ERROR" }), { status: 500, headers });
   }
 }
