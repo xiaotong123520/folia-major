@@ -27,6 +27,7 @@ export const navigationCommands: CommandPaletteCommand[] = [
     {
         id: 'open-ai-radio-agent', group: 'navigation', title: 'Open AI Radio', description: 'Create a mood-based personal radio station',
         keywords: ['ai radio', 'personal radio', 'mood radio', 'AI 电台', '音乐电台', '心情电台'],
+        isAvailable: () => typeof window !== 'undefined' && !Boolean((window as typeof window & { electron?: unknown }).electron),
         execute: () => { window.dispatchEvent(new CustomEvent('folia:open-radio-agent')); return true; },
     },
     createToggleCommand('navigate-lattice', 'navigation', 'Lattice open', 'Show the play queue as a queue collage', ['lattice', 'queue collage', 'song wall', 'poster wall', '队列拼贴', '歌曲墙', '海报墙'], context => context.navigation.navigateToLattice(),
