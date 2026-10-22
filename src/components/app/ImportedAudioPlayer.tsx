@@ -8,11 +8,13 @@ import {
     type ImportedAudioTrack,
 } from '../../services/importedAudio';
 import { importedAudioDatabase, writeImportedAudio } from '../../services/importedAudioStorage';
+import type { PointSongImport } from '../../services/directPointSong';
 
 /** Persistent browser audio queue. Unlike the import dialog it stays mounted while songs play. */
 export interface ImportedAudioPlayerHandle {
     addFiles(files: File[]): number;
     addUrl(input: string): boolean;
+    addPointSong(request: PointSongImport): boolean;
 }
 
 type Props = {
@@ -26,6 +28,9 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
         const [tracks, setTracks] = useState<ImportedAudioTrack[]>([]);
         const [selectedId, setSelectedId] = useState<string | null>(null);
         const [error, setError] = useState('');
+        const [fallbackRetry, setFallbackRetry] = useState<{ id: string; url: string } | null>(null);
+        const fallbackAttemptsRef = useRef(new Map<string, number>());
+        const playWasStartedRef = useRef(false);
         const audioRef = useRef<HTMLAudioElement | null>(null);
         const ownedUrlsRef = useRef(new Set<string>());
         const playAfterSelectionRef = useRef(false);
@@ -42,7 +47,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                     const url = item.file ? URL.createObjectURL(item.file) : validatePlayableUrl(item.url ?? '');
                     if (!url) return [];
                     if (item.file) ownedUrlsRef.current.add(url);
-                    return [{ id: item.id, name: item.name, url, temporary: Boolean(item.file) }];
+                    return [{ id: item.id, name: item.name, url, temporary: Boolean(item.file), fallbackUrls: item.fallbackUrls?.map(value => validatePlayableUrl(value)).filter((value): value is string => Boolean(value)) ?? [] }];
                 });
                 setTracks(current => [...restored.filter(item => !current.some(track => track.id === item.id)), ...current]);
                 setSelectedId(current => current ?? restored[0]?.id ?? null);
@@ -98,6 +103,29 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                 })).catch(storageError);
                 return true;
             },
+            addPointSong(request) {
+                const url = validatePlayableUrl(request.url, window.isSecureContext);
+                if (!url || request.name.trim().length === 0) return false;
+                const fallbackUrls = request.fallbackUrls
+                    .map(candidate => validatePlayableUrl(candidate, window.isSecureContext))
+                    .filter((candidate): candidate is string => Boolean(candidate) && candidate !== url)
+                    .slice(0, 3);
+                const track = {
+                    id: crypto.randomUUID(),
+                    name: request.name,
+                    url,
+                    temporary: false,
+                    fallbackUrls,
+                };
+                setTracks(current => [...current, track]);
+                setSelectedId(current => current ?? track.id);
+                setError('');
+                void writeImportedAudio(() => importedAudioDatabase.tracks.put({
+                    id: track.id, name: track.name, url: track.url,
+                    fallbackUrls: track.fallbackUrls, createdAt: Date.now(),
+                })).catch(storageError);
+                return true;
+            },
         }), [t]);
 
         const activeTrack = tracks.find(item => item.id === selectedId) ?? tracks[0] ?? null;
@@ -109,6 +137,8 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                 return;
             }
             audioRef.current?.pause();
+            playWasStartedRef.current = false;
+            setFallbackRetry(null);
             playAfterSelectionRef.current = shouldPlay;
             setSelectedId(id);
             setError('');
@@ -118,13 +148,18 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
             if (!playAfterSelectionRef.current || !activeTrack) return;
             playAfterSelectionRef.current = false;
             void audioRef.current?.play().catch(() => setError(t('musicImport.tapPlay')));
-        }, [activeTrack?.id, t]);
+        }, [activeTrack?.id, fallbackRetry?.url, t]);
 
         const remove = (id: string) => {
             restoreVersionRef.current += 1;
             const removed = tracks.find(item => item.id === id);
             if (!removed) return;
-            if (activeTrack?.id === id) audioRef.current?.pause();
+            if (activeTrack?.id === id) {
+                audioRef.current?.pause();
+                setFallbackRetry(null);
+                playWasStartedRef.current = false;
+            }
+            fallbackAttemptsRef.current.delete(id);
             if (removed.temporary) {
                 URL.revokeObjectURL(removed.url);
                 ownedUrlsRef.current.delete(removed.url);
@@ -141,6 +176,9 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
             for (const url of ownedUrlsRef.current) URL.revokeObjectURL(url);
             ownedUrlsRef.current.clear();
             playAfterSelectionRef.current = false;
+            playWasStartedRef.current = false;
+            fallbackAttemptsRef.current.clear();
+            setFallbackRetry(null);
             setTracks([]);
             setSelectedId(null);
             setError('');
@@ -168,9 +206,22 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                     className="mt-2 w-full"
                     controls
                     preload="metadata"
-                    src={activeTrack.url}
-                    onPlay={() => { setError(''); onStartPlayback(); }}
-                    onError={() => setError(t('musicImport.audioError'))}
+                    src={fallbackRetry?.id === activeTrack.id ? fallbackRetry.url : activeTrack.url}
+                    onPlay={() => { playWasStartedRef.current = true; setError(''); onStartPlayback(); }}
+                    onPause={() => { if (!audioRef.current?.error) playWasStartedRef.current = false; }}
+                    onError={() => {
+                        const attempt = fallbackAttemptsRef.current.get(activeTrack.id) ?? 0;
+                        const candidate = activeTrack.fallbackUrls?.[attempt];
+                        if (candidate) {
+                            fallbackAttemptsRef.current.set(activeTrack.id, attempt + 1);
+                            playAfterSelectionRef.current = playWasStartedRef.current;
+                            setFallbackRetry({ id: activeTrack.id, url: candidate });
+                            setError('首个点歌地址不可用，正在尝试备用接口');
+                        } else {
+                            playWasStartedRef.current = false;
+                            setError(t('musicImport.audioError') + '；接口可能返回 JSON、拒绝跨域访问或无播放权限');
+                        }
+                    }
                     onEnded={() => {
                         if (activeIndex + 1 < tracks.length) switchTo(tracks[activeIndex + 1].id, true);
                     }}
