@@ -38,6 +38,7 @@ export default {
     "searching": "正在搜索可播放的歌曲……",
     "noResults": "暂时没有找到匹配歌曲。可以换一种描述，或检查音乐服务配置。",
     "searchFailed": "在线曲库搜索失败，请检查音乐服务是否可用。",
+    "localLibraryFallback": "本地曲库",
     "localSource": "服务器 / 本地曲库",
     "onlineSource": "在线音乐",
     "unknownArtist": "未知歌手",
