@@ -163,7 +163,9 @@ export default async function handler(req: Request): Promise<Response> {
     }
     const body = await readLimitedBody(upstreamResponse, 2_000_000);
     if (body === null) return json(502, { error: "Music backend response exceeds the 2 MB limit" });
-    return new Response(body, { status: upstreamResponse.status, headers: outHeaders });
+    const bodyBuffer = new ArrayBuffer(body.byteLength);
+    new Uint8Array(bodyBuffer).set(body);
+    return new Response(bodyBuffer, { status: upstreamResponse.status, headers: outHeaders });
   } catch {
     return json(502, { error: "Music backend upstream request failed" });
   }
