@@ -1,3 +1,5 @@
+import { useMediaQuery } from '../../../../hooks/useMediaQuery';
+import MobileCollectionCards from './MobileCollectionCards';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Map as MapIcon } from 'lucide-react';
@@ -77,6 +79,7 @@ export const DesktopGrid3DSurface: React.FC<DesktopGrid3DSurfaceProps> = ({
     ponderControls,
     gridMapPonderScope,
 }) => {
+    const mobile = useMediaQuery('(max-width: 639px)');
     // GridMap 就是网格里「打开着的目录」（core 的目录会话 store 记着打开的是哪个，见 useLibraryDirectorySessionStore）：
     // 打开地图 = openDirectory，关掉地图 = closeDirectory（退场动画结束之后：地图还在淡出，筛选结果不能先跳回全部；
     // 关掉时的 key 记下来，退场期间换了 section 也关对的那个）。挂载不算打开、卸载不算关闭——换 suite 卸载网格时
@@ -186,7 +189,14 @@ export const DesktopGrid3DSurface: React.FC<DesktopGrid3DSurfaceProps> = ({
                 </div>
             </div>
 
-            <Grid3DSlider
+            {mobile ? <MobileCollectionCards
+                key={focusMemoryScope}
+                items={visibleItems}
+                onSelect={handleVisibleSelect}
+                isInteractive={isInteractive && !showGridMap}
+                isLoading={isLoading}
+                emptyMessage={emptyMessage}
+            /> : <Grid3DSlider
                 key={focusMemoryScope}
                 items={visibleItems}
                 focusedIndex={visibleFocusedIndex}
@@ -197,7 +207,7 @@ export const DesktopGrid3DSurface: React.FC<DesktopGrid3DSurfaceProps> = ({
                 emptyMessage={emptyMessage}
                 isDaylight={isDaylight}
                 hasFloatingPlayer={hasFloatingPlayer}
-            />
+            />}
 
             <AnimatePresence onExitComplete={handleGridMapExitComplete}>
                 {showGridMap && (
