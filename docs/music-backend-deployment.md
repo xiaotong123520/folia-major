@@ -12,6 +12,8 @@ This branch contains an optional Folia provider adapter, a bounded HTTP client, 
 - `api-ts/music-backend-proxy.ts`: same-origin, read-only allowlist proxy for search, lyrics, stream, inspect/switch, album and playlist detail. It forwards Range headers and selected audio response headers; it does not expose cookie/QR-login routes.
 - `vercel.json`: routes `/api/music-backend/*` to the allowlisted proxy.
 - `test/unit/musicBackendClient.test.ts`: transport validation tests.
+- `test/unit/musicBackendProxy.test.ts`: proxy allowlist, origin, query filtering, and Range-forwarding tests.
+- `.github/workflows/music-backend-checks.yml`: CI typecheck, focused unit tests, and build.
 - `.env.example`: optional public backend URL.
 - `docs/music-backend-evaluation.md`: candidate and security review.
 
