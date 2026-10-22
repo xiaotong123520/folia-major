@@ -37,6 +37,29 @@ trap cleanup EXIT INT TERM
 compose up -d --wait
 curl --fail --silent --show-error "http://127.0.0.1:$FOLIA_HTTP_PORT/healthz" >/dev/null
 curl --fail --silent --show-error "http://127.0.0.1:$FOLIA_HTTP_PORT/api/healthz" >/dev/null
+# GitHub Pages cross-origin calls must be accepted only from the configured origin.
+cors_allowed="$(curl --silent --show-error --include \
+  -H 'Origin: https://xiaotong123520.github.io' \
+  "http://127.0.0.1:$FOLIA_HTTP_PORT/api/healthz")"
+if ! printf '%s' "$cors_allowed" | grep -qi '^Access-Control-Allow-Origin: https://xiaotong123520.github.io'; then
+  echo "The Folia gateway did not allow the selected GitHub Pages origin" >&2
+  exit 1
+fi
+cors_blocked="$(curl --silent --show-error --include \
+  -H 'Origin: https://untrusted.example' \
+  "http://127.0.0.1:$FOLIA_HTTP_PORT/api/healthz")"
+if printf '%s' "$cors_blocked" | grep -qi '^Access-Control-Allow-Origin:'; then
+  echo "The Folia gateway incorrectly allows an untrusted origin" >&2
+  exit 1
+fi
+preflight_status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+  -X OPTIONS -H 'Origin: https://xiaotong123520.github.io' \
+  -H 'Access-Control-Request-Method: GET' -H 'Access-Control-Request-Headers: X-QQ-Session' \
+  "http://127.0.0.1:$FOLIA_HTTP_PORT/qq/login/status")"
+if [ "$preflight_status" != 204 ]; then
+  echo "CORS preflight was not handled: HTTP $preflight_status" >&2
+  exit 1
+fi
 curl --fail --silent --show-error "http://127.0.0.1:$FOLIA_SYNC_PORT/health" >/dev/null
 curl --fail --silent --show-error "http://127.0.0.1:$FOLIA_HTTP_PORT/" | grep -q '<div id="root"></div>'
 curl --fail --silent --show-error "http://127.0.0.1:$FOLIA_HTTP_PORT/runtime-config.js" | grep -q 'aiProvider:"gemini",deployment:"docker"'
