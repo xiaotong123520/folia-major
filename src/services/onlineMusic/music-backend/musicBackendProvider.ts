@@ -106,7 +106,7 @@ const normalizeBackendSong = (raw: unknown): UnifiedSong => {
         sourceRef: {
             kind: 'online',
             providerId,
-            mediaId: id,
+            mediaId: `${source}:${id}`,
             providerData: { source, backendSongId: id, isVip: Boolean(song.is_vip) },
         },
         ...(song.is_invalid ? { resourceState: false } : {}),
@@ -168,8 +168,9 @@ export const musicBackendProvider: OnlineMusicProvider = {
             const rawId = separator > 0 ? inputId.slice(separator + 1) : inputId;
             const result = await musicBackendProvider.search!.searchSongs(rawId, 50, 0);
             const matches = result.items.filter((song) => {
-                if (song.sourceRef?.kind !== 'online' || song.sourceRef.mediaId !== rawId) return false;
-                return !sourceHint || song.sourceRef.providerData?.source === sourceHint;
+                if (song.sourceRef?.kind !== 'online') return false;
+                if (sourceHint) return song.sourceRef.mediaId === inputId;
+                return song.sourceRef.mediaId === inputId || song.sourceRef.mediaId === rawId;
             });
             return matches.length === 1 ? matches[0] : null;
         },
