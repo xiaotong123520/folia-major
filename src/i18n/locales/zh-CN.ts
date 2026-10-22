@@ -1,6 +1,25 @@
 
 
 export default {
+  "mobileLibrary": {
+    "platforms": "音乐平台",
+    "login": "登录 / 扫码",
+    "loginHint": "复用各平台原有登录。二维码和浏览器登录取决于平台及后端支持；同一部手机可使用平台支持的识图或浏览器登录方式。",
+    "unavailable": "后端尚未可用",
+    "failed": "切换平台失败，请重试。",
+    "connected": "已登录",
+    "search": "搜索歌曲或歌手",
+    "playlist": "我的歌单",
+    "albums": "我的专辑",
+    "explore": "发现推荐",
+    "local": "本地曲库",
+    "player": "正在播放",
+    "settings": "完整设置",
+    "navigation": "手机曲库导航",
+    "home": "首页",
+    "fullLibrary": "进入完整音乐库",
+    "fullLibraryHint": "歌单、推荐、专辑、歌词和完整设置"
+},
   "personal": {
     "brand": "桐声音乐",
     "tools": "打开音乐工具",

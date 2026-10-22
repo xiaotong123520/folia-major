@@ -66,7 +66,7 @@ import { persistPlaybackCache } from './components/app/playback/persistPlaybackC
 import { useAppOverlaysModel } from './components/app/overlays/useAppOverlaysModel';
 import { resolveNextUpTrack } from './components/app/overlays/now-playing-toast/resolveNextUpTrack';
 import { shouldShowNowPlayingToast } from './components/app/overlays/now-playing-toast/nowPlayingToastVisibility';
-import { isWallLibrarySuite, useActiveLibrarySuiteId } from './library/app/librarySuiteChoice';
+import { chooseLibrarySuite, isWallLibrarySuite, useActiveLibrarySuiteId } from './library/app/librarySuiteChoice';
 import {
     createSearchAlbumCollection,
     createSearchArtistCollection,
@@ -151,7 +151,7 @@ import { selectDesktopSettingsSnapshot, useDesktopSettingsStore } from './stores
 import { selectSleepTimerSnapshot, useSleepTimerStore } from './stores/useSleepTimerStore';
 import { selectStageSettingsSnapshot, useStageSettingsStore } from './stores/useStageSettingsStore';
 import { selectAudioSettingsSnapshot, useAudioSettingsStore } from './stores/useAudioSettingsStore';
-import { useSettingsModalStore } from './stores/useSettingsModalStore';
+import { openSettings, useSettingsModalStore } from './stores/useSettingsModalStore';
 import { audioBands, audioPower, bass, currentTime, lowMid, lyricCurrentTime, mid, spectrum, treble, vocal } from './stores/motionSignals';
 import { useAppChromeStore } from './stores/useAppChromeStore';
 import { useAppViewStore } from './stores/useAppViewStore';
@@ -2866,6 +2866,13 @@ export default function App() {
             <PonderHost theme={theme} isDaylight={isDaylight} />
 
             {!isElectronWindow && <PersonalMusicTools
+                mobileActions={{
+                    accountController,
+                    onLibrary: tab => { chooseLibrarySuite('grid'); navigateDirectHome(); setHomeViewTab(tab); },
+                    onSearch: query => { chooseLibrarySuite('grid'); navigateToSearch({ query, sourceTab: activeProviderId }); },
+                    onPlayer: navigateToPlayer,
+                    onSettings: () => openSettings(),
+                }}
                 onImport={() => setIsMusicLinkImportOpen(true)}
                 onImportFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
                 onRadio={() => setIsRadioAgentOpen(true)}

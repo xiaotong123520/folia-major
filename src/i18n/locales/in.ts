@@ -1,6 +1,25 @@
 
 
 export default {
+  "mobileLibrary": {
+    "platforms": "Platform musik",
+    "login": "Masuk / kode QR",
+    "loginHint": "Gunakan login platform yang tersedia. Login QR dan browser bergantung pada platform dan backend. Pada ponsel yang sama, gunakan opsi gambar atau browser yang didukung platform.",
+    "unavailable": "Backend belum tersedia",
+    "failed": "Gagal mengganti platform. Coba lagi.",
+    "connected": "Sudah masuk",
+    "search": "Cari lagu atau artis",
+    "playlist": "Daftar putar",
+    "albums": "Album",
+    "explore": "Temukan",
+    "local": "Pustaka lokal",
+    "player": "Sedang diputar",
+    "settings": "Pengaturan",
+    "navigation": "Navigasi pustaka seluler",
+    "home": "Beranda",
+    "fullLibrary": "Buka pustaka musik lengkap",
+    "fullLibraryHint": "Daftar putar, rekomendasi, album, lirik, dan pengaturan"
+},
   "personal": {
     "brand": "Tongsheng Music",
     "tools": "Buka alat musik",
