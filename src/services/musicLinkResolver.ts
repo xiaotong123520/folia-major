@@ -54,7 +54,7 @@ export function resolveMusicLink(input: string): MusicLinkResolution {
     const id = url.searchParams.get('id') ?? hashQuery.get('id') ?? pathId(url, /\/(?:song|album|playlist|artist)\/(\d+)/);
     const route = url.hash + url.pathname;
     const kind: MusicLinkKind = /playlist/.test(route) ? 'playlist' : /album/.test(route) ? 'album' : /artist/.test(route) ? 'artist' : 'track';
-    return make('netease', kind, 'existing-provider-adapter', '网易云链接已识别；播放仍取决于现有 provider、曲目可用性和账号权限。', id ?? undefined, true, true);
+    return make('netease', kind, 'existing-provider-adapter', '网易云链接已识别；播放仍取决于现有 provider、曲目可用性和账号权限。', id ?? undefined, Boolean(id), Boolean(id && kind === 'track'));
   }
   if (hostIs(host, 'y.qq.com') || hostIs(host, 'c.y.qq.com') || hostIs(host, 'i.y.qq.com')) {
     const id = url.searchParams.get('songmid') ?? url.searchParams.get('id') ?? pathId(url, /\/(?:songDetail|albumDetail|playlist)\/([^/?]+)/);
@@ -84,9 +84,9 @@ export function resolveMusicLink(input: string): MusicLinkResolution {
   if (hostIs(host, 'soundcloud.com') || hostIs(host, 'on.soundcloud.com')) {
     return make('soundcloud', 'track', 'official-embed', 'SoundCloud 链接已识别；应使用官方嵌入或授权 API，部分曲目可能受限制。', undefined, true, false);
   }
-  if (/\/rest\/(?:stream|download|search|ping|scrobble)(?:\.view)?$/i.test(url.pathname)) return make('navidrome', 'server', 'server-library', '看起来是 Subsonic/Navidrome 接口；请在 Folia 服务器音乐设置中配置可信服务器。', undefined, false, true);
+  if (/\/rest\/(?:stream|download|search|ping|scrobble)(?:\.view)?$/i.test(url.pathname)) return make('navidrome', 'server', 'server-library', '看起来是 Subsonic/Navidrome 接口；请在 Folia 服务器音乐设置中配置可信服务器。', undefined, false, false);
   if (/\.(mp3|m4a|aac|ogg|opus|wav|flac|mp4|webm)$/i.test(url.pathname)) {
-    return make('direct-audio', 'audio', 'direct-audio', '识别为媒体直链；仅在来源可信且访问权限、跨域设置允许时播放。', undefined, false, true);
+    return make('direct-audio', 'audio', 'direct-audio', '识别为媒体直链；尚未接入 Folia 播放队列，且只应使用可信来源。', undefined, false, false);
   }
   return make('unknown', 'unknown', 'unsupported', '暂不支持此域名；请粘贴平台标准分享链接或使用服务器音乐库。', undefined, false, false);
 }
