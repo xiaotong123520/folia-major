@@ -3,6 +3,7 @@ import generateTheme from '/app/api/generate-theme.js';
 import generateOpenAiTheme from '/app/api/generate-theme_openai.js';
 import lyricProxy from '/app/api/lyric-proxy.js';
 import segmentLyrics from '/app/api/segment-lyrics.js';
+import appleMusicToken from '/app/api/apple-music-token.js';
 
 // 当前文件：把现有 Vercel 风格处理器装配为 Docker 常驻 HTTP 服务。
 //
@@ -111,6 +112,7 @@ app.use(navidromePresetRouter);
 app.all('/api/generate-theme', jsonBody, generateTheme);
 app.all('/api/generate-theme_openai', rawBody, fromEdge(generateOpenAiTheme));
 app.all('/api/segment-lyrics', rawBody, fromEdge(segmentLyrics));
+app.all('/api/apple-music-token', rawBody, fromEdge(appleMusicToken));
 app.all('/api/lyric-proxy', jsonBody, textBody, lyricProxy);
 
 app.use((error, _req, res, _next) => {
