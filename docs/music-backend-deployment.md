@@ -2,7 +2,7 @@
 
 ## Status
 
-This isolated branch contains an optional Folia provider adapter, bounded HTTP transport, same-origin allowlisted proxy, focused unit tests, and a CI workflow. CI passed at commit `aee10b57fb0a2fddac40dd32a5e262ced9d52bdd`; later source-identity and proxy redirect-hardening changes are being revalidated. Real authorized playback has not been smoke-tested because no upstream API is configured. Do not merge or deploy until the latest CI passes and real playback is verified.
+This isolated branch contains an optional Folia provider adapter, bounded HTTP transport, same-origin allowlisted proxy, a private upstream gateway deployment stack, focused unit tests, and CI workflows. At commit `6d3f53838e369f9d308ac38634b42d246bfd9b6e`, the focused typecheck, unit tests, and frontend build passed; the latest gateway image build and broader PR tests are still running. Real authorized playback has not been smoke-tested because no upstream has been deployed/configured. Do not merge or deploy to production until the latest CI passes and real playback is verified.
 
 ## Files added or updated
 
@@ -16,6 +16,7 @@ This isolated branch contains an optional Folia provider adapter, bounded HTTP t
 - `.github/workflows/music-backend-checks.yml`: CI typecheck, focused unit tests, and build.
 - `.env.example`: optional public backend URL.
 - `docs/music-backend-evaluation.md`: candidate and security review.
+- `deploy/music-backend-gateway/`: Docker Compose deployment for a private upstream API and a bearer-authenticated, allowlisted gateway; the Go API container has no published host port.
 
 ## Configure for local development
 
@@ -35,7 +36,7 @@ The browser adapter uses the same-origin Vercel proxy when `VITE_MUSIC_BACKEND_B
 
 Do not prefix either server variable with `VITE_`. The proxy is read-only and has a best-effort per-IP rate limit, but in-memory limits are not a substitute for a durable edge/WAF rate limit. Before production use, the upstream must be configured so public requests cannot read or alter platform cookies, initiate QR login, or access administrative configuration.
 
-The stock `go-music-api` router currently mounts cookie read/write and QR-login routes without visible route-level authentication, and uses permissive CORS. Do not expose the stock service directly to the internet. The Folia proxy does not expose those management routes, but the upstream must still be private or independently hardened. Minimum acceptable deployment design:
+The stock `go-music-api` router currently mounts cookie read/write and QR-login routes without visible route-level authentication, and uses permissive CORS. Do not expose the stock service directly to the internet. The Folia proxy does not expose those management routes, but the upstream must still be private or independently hardened. A starter private gateway stack is now available under `deploy/music-backend-gateway/`; it binds only to host loopback and requires a Bearer key. Minimum acceptable deployment design:
 
 - Run it on a private network or bind it to loopback behind a gateway.
 - Allowlist only the Folia web origin at the gateway; do not combine wildcard origin with credentialed CORS.
@@ -78,3 +79,8 @@ Then test with a secured backend using a track that is publicly playable or auth
 - local music and Navidrome continue to work unchanged.
 
 Do not merge until typecheck, unit tests, build, and smoke tests pass.
+
+
+## Deploy the private upstream gateway
+
+See [deploy/music-backend-gateway/README.md](../deploy/music-backend-gateway/README.md). The stack keeps the Go service on a private Docker network, exposes only a bearer-authenticated gateway on `127.0.0.1:8090`, and intentionally omits cookie/QR-login endpoints. Configure a dedicated HTTPS reverse proxy in Baota, then set the Vercel Preview environment variables from the README. Never put the bearer key in a `VITE_*` variable. The gateway image syntax/build checks are now included in CI.
