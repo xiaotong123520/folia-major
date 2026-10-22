@@ -25,7 +25,7 @@
 
 ## 自有服务器解析兜底
 
-见 [服务器接入与验收](docs/personal-deployment.md)。GitHub Pages 只托管前端，无法运行 PHP/Node、保存平台会话或提供服务器音频代理。尚未配置 API 地址时，界面明确显示服务器未连接。
+见 [服务器接入与验收](docs/personal-deployment.md)；如需播放你服务器上已经保存的合法音乐文件，另见 [宝塔 PHP 本地曲库接口](deploy/php-music-api/README.md)。该接口不会移动或修改原歌曲。GitHub Pages 只托管前端，无法运行 PHP/Node、保存平台会话或提供服务器音频代理。尚未配置 API 地址时，界面明确显示服务器未连接。
 
 ## 开发
 
