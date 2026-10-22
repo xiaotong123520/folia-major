@@ -67,7 +67,7 @@ export default function FoliaServerSettings({ onClose }: Props) {
             <div className="min-h-0 space-y-4 overflow-y-auto p-4 sm:p-6">
                 <div className="flex items-start gap-3 rounded-xl bg-emerald-200/5 p-3 text-xs leading-6 text-white/70">
                     <ShieldCheck size={18} className="mt-1 shrink-0 text-emerald-200"/>
-                    <span>网站继续由 GitHub Pages 托管。服务器提供网易云、QQ、酷狗适配器和 AI 接口。必须是你自己的 Folia HTTPS 网关，不能直接填音乐平台的首页，也不会绕过会员或版权限制。</span>
+                    <span>网站继续由 GitHub Pages 托管。服务器提供在线音乐适配器和 AI 接口。必须是你自己的 Folia HTTPS 网关，不能直接填音乐平台的首页，也不会绕过会员或版权限制。</span>
                 </div>
                 <label htmlFor="folia-server-input" className="block text-sm text-white/80">宝塔服务器 HTTPS 网关地址</label>
                 <input id="folia-server-input" type="url" value={input}
