@@ -1,6 +1,25 @@
 
 
 export default {
+  "mobileLibrary": {
+    "platforms": "Music platforms",
+    "login": "Sign in / QR code",
+    "loginHint": "Use the existing platform sign-in. QR and browser sign-in depend on each platform and its configured backend. On the same phone, use the platform-supported image or browser sign-in option.",
+    "unavailable": "Backend unavailable",
+    "failed": "Could not switch platform. Try again.",
+    "connected": "Signed in",
+    "search": "Search songs or artists",
+    "playlist": "Playlists",
+    "albums": "Albums",
+    "explore": "Discover",
+    "local": "Local library",
+    "player": "Now playing",
+    "settings": "Settings",
+    "navigation": "Mobile library navigation",
+    "home": "Home",
+    "fullLibrary": "Open complete music library",
+    "fullLibraryHint": "Playlists, recommendations, albums, lyrics and settings"
+},
   "personal": {
     "brand": "Tongsheng Music",
     "tools": "Open music tools",

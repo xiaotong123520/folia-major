@@ -1,17 +1,22 @@
+import { useTranslation } from 'react-i18next';
+import MobilePlatformLibrary, { type MobileLibraryActions } from './MobilePlatformLibrary';
 import { useState } from 'react';
 import { AudioLines, ChevronRight, Compass, Disc3, Film, Home, Link2, ListMusic, Music2, Radio, Server, Upload } from 'lucide-react';
+import { openLoginWindow } from '../login/loginWindowStore';
 import ServerAudioLibrary from './ServerAudioLibrary';
 
 // A real phone landing screen replaces the cropped desktop lattice on narrow viewports.
 type Tab = 'home' | 'music' | 'server' | 'more';
 
-export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, onImportFiles }: {
+export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, onImportFiles, mobileActions }: {
+    mobileActions: MobileLibraryActions;
     onImport: () => void;
     onRadio: () => void;
     onApple: () => void;
     onVideos: () => void;
     onImportFiles: (files: File[]) => number;
 }) {
+    const { t } = useTranslation();
     const [tab, setTab] = useState<Tab>('home');
     const [classic, setClassic] = useState(false);
     const [hint, setHint] = useState('');
@@ -22,11 +27,15 @@ export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, 
         { key: 'more' as const, title: '更多', icon: ListMusic },
     ];
     const title = { home: '发现好声音', music: '我的音乐', server: '服务器音乐', more: '我的空间' }[tab];
+    const workspace = (action: () => void) => { setClassic(true); action(); };
     if (classic) {
-        return <button type="button" onClick={() => setClassic(false)}
-            className="fixed bottom-[max(90px,calc(env(safe-area-inset-bottom)+78px))] right-4 z-[131] flex min-h-12 items-center gap-2 rounded-full border border-violet-200/35 bg-[#201b2e] px-4 text-sm font-semibold text-white shadow-2xl sm:hidden">
-            <Home size={18}/> 返回手机版
-        </button>;
+        return <nav aria-label={t('mobileLibrary.navigation')}
+            className="fixed bottom-0 left-0 right-0 z-[85] flex items-center justify-around border-t border-white/15 bg-[#17151f]/95 pb-[max(8px,env(safe-area-inset-bottom))] pt-2 text-white backdrop-blur-xl sm:hidden">
+            <button type="button" onClick={() => setClassic(false)} className="min-h-12 px-3 text-sm"><Home size={19} className="mx-auto mb-1"/>{t('mobileLibrary.home')}</button>
+            <button type="button" onClick={() => openLoginWindow()} className="min-h-12 px-3 text-sm"><Music2 size={19} className="mx-auto mb-1"/>{t('mobileLibrary.platforms')}</button>
+            <button type="button" onClick={mobileActions.onPlayer} className="min-h-12 px-3 text-sm"><Disc3 size={19} className="mx-auto mb-1"/>{t('mobileLibrary.player')}</button>
+            <button type="button" onClick={mobileActions.onSettings} className="min-h-12 px-3 text-sm"><ListMusic size={19} className="mx-auto mb-1"/>{t('mobileLibrary.settings')}</button>
+        </nav>;
     }
 
     return (
@@ -67,6 +76,10 @@ export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, 
                         <p className="flex items-center gap-2 text-xs text-white/40"><Server size={15}/> 宝塔媒体服务需要单独连接后使用</p>
                     </>}
                     {tab === 'music' && <>
+                        <MobilePlatformLibrary {...mobileActions}
+                            onLibrary={value => workspace(() => mobileActions.onLibrary(value))}
+                            onSearch={query => workspace(() => mobileActions.onSearch(query))}
+                            onPlayer={() => workspace(mobileActions.onPlayer)} />
                         <div className="space-y-2"><p className="text-xs tracking-[0.2em] text-violet-200">YOUR MUSIC</p><h1 className="text-3xl font-semibold">{title}</h1><p className="text-sm text-white/50">音乐文件可以保存在当前手机浏览器中。</p></div>
                         <div className="grid grid-cols-2 gap-3">
                             <button type="button" onClick={onImport}
@@ -110,9 +123,9 @@ export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, 
                     </div>
                     {tab === 'more' && <>
                         <div className="space-y-2"><p className="text-xs tracking-widest text-violet-200">SETTINGS</p><h1 className="text-3xl font-semibold">{title}</h1></div>
-                        <button type="button" onClick={() => setClassic(true)}
+                        <button type="button" onClick={() => workspace(() => mobileActions.onLibrary('playlist'))}
                             className="flex min-h-16 w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-left">
-                            <Compass size={22} className="text-violet-200"/><span className="min-w-0 flex-1"><span className="block text-sm font-semibold">进入原版网格视图</span><span className="block text-xs text-white/50">保留 Folia 的经典实验性布局</span></span><ChevronRight size={19}/>
+                            <Compass size={22} className="text-violet-200"/><span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{t('mobileLibrary.fullLibrary')}</span><span className="block text-xs text-white/50">{t('mobileLibrary.fullLibraryHint')}</span></span><ChevronRight size={19}/>
                         </button>
                         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm leading-7 text-white/60">
                             将网站添加到主屏幕：iPhone Safari → 分享 → 添加到主屏幕。电脑继续使用原有布局。

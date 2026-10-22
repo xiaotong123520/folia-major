@@ -1,10 +1,12 @@
+import type { MobileLibraryActions } from './MobilePlatformLibrary';
 import MobileMediaHome from './MobileMediaHome';
 import { useState } from 'react';
 import { AudioLines, Film, Link2, Music2, Radio, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 // A mobile-first music entry; on desktop retain the compact original toolbar.
-export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideos, onImportFiles }: {
+export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideos, onImportFiles, mobileActions }: {
+    mobileActions: MobileLibraryActions;
     onImport: () => void;
     onRadio: () => void;
     onApple: () => void;
@@ -37,6 +39,6 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideo
             </nav>}
         </aside>
 
-        <MobileMediaHome onImport={onImport} onRadio={onRadio} onApple={onApple} onVideos={onVideos} onImportFiles={onImportFiles} />
+        <MobileMediaHome mobileActions={mobileActions} onImport={onImport} onRadio={onRadio} onApple={onApple} onVideos={onVideos} onImportFiles={onImportFiles} />
     </>;
 }
