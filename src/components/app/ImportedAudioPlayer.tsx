@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Music2, Pause, SkipBack, SkipForward, Trash2, X } from 'lucide-react';
+import { Music2, SkipBack, SkipForward, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     audioDisplayName,
