@@ -117,7 +117,7 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
                             <input
                                 type="file"
                                 multiple
-                                accept="audio/*,.mp3,.m4a,.aac,.flac,.wav,.ogg,.opus,.webm"
+                                accept=".mp3,.m4a,.aac,.wav,.flac,.ogg,.opus,.webm"
                                 className="sr-only"
                                 onChange={event => {
                                     importFiles(Array.from(event.currentTarget.files ?? []));
