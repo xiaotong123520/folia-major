@@ -221,7 +221,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                             playWasStartedRef.current = false;
                             setError(t('musicImport.audioError') + '；接口可能返回 JSON、拒绝跨域访问或无播放权限');
                         }
-                    }
+                    }}
                     onEnded={() => {
                         if (activeIndex + 1 < tracks.length) switchTo(tracks[activeIndex + 1].id, true);
                     }}
