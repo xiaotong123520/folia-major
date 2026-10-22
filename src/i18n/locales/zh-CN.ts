@@ -645,6 +645,7 @@ export default {
       }
     },
     "commands": {
+      "open-ai-radio-agent": { "title": "打开 AI 电台", "description": "根据心情创建私人音乐电台" },
       "settings-ponder-hints": { "title": "思索教程提示", "description": "设置长按 G 的提示什么时候出现" },
       "ponder-hints-always": { "title": "思索提示：始终显示", "description": "所有可教学的控件都提示长按 G" },
       "ponder-hints-unseen": { "title": "思索提示：仅未看过的区域", "description": "某个控件的教程看过之后就不再提示它" },
