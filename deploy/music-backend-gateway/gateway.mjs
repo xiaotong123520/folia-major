@@ -109,17 +109,19 @@ const server = http.createServer((req, res) => {
       if (size > maxJsonBytes) {
         tooLarge = true;
         upstreamRes.destroy();
+        if (!res.headersSent) json(res, 502, { error: 'Upstream response exceeds 2 MB limit' });
+        else res.destroy();
         return;
       }
       chunks.push(chunk);
     });
     upstreamRes.on('end', () => {
-      if (res.destroyed) return;
-      if (tooLarge) return json(res, 502, { error: 'Upstream response exceeds 2 MB limit' });
+      if (res.destroyed || res.writableEnded || tooLarge) return;
       res.writeHead(upstreamRes.statusCode || 502, responseHeaders);
       res.end(Buffer.concat(chunks));
     });
     upstreamRes.on('error', () => {
+      if (res.writableEnded || res.destroyed) return;
       if (!res.headersSent) json(res, 502, { error: 'Upstream request failed' });
       else res.destroy();
     });
