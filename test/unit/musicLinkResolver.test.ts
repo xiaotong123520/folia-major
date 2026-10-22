@@ -43,6 +43,22 @@ describe('resolveMusicLink', () => {
     expect(isSupportedMusicLink('https://music.apple.com/us/album/example/123456789')).toBe(false);
   });
 
+  it('keeps recognition separate from real player integration', () => {
+    for (const url of [
+      'https://music.163.com/',
+      'https://y.qq.com/',
+      'https://www.kugou.com/',
+      'https://cdn.example.com/song.mp3',
+      'https://music.example.com/rest/stream.view?id=3',
+    ]) {
+      expect(isSupportedMusicLink(url)).toBe(false);
+    }
+    expect(isSupportedMusicLink('https://music.163.com/#/song?id=123456')).toBe(true);
+    expect(isSupportedMusicLink('https://y.qq.com/n/ryqq/songDetail/003abc')).toBe(true);
+    expect(isSupportedMusicLink('https://www.kugou.com/song/#hash=ABC123')).toBe(true);
+    expect(resolveMusicLink('https://y.qq.com/n/ryqq/albumDetail/123456').canPlayInFolia).toBe(false);
+  });
+
   it('does not claim Kuwo is wired to playback', () => {
     const result = resolveMusicLink('https://www.kuwo.cn/play_detail/12345');
     expect(result.access).toBe('unsupported');
