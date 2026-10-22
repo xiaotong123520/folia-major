@@ -15,15 +15,24 @@ function fallback(message: string) {
 function parseBrief(value: unknown, message: string) {
   const root = value as { title?: unknown; mood?: unknown; genres?: unknown; searchTerms?: unknown; energy?: unknown; narration?: unknown } | null;
   if (!root || typeof root !== "object") return fallback(message);
-  const genres = Array.isArray(root.genres) ? root.genres.filter((x): x is string => typeof x === "string").slice(0, 5) : [];
-  const searchTerms = Array.isArray(root.searchTerms) ? root.searchTerms.filter((x): x is string => typeof x === "string" && x.trim().length > 0).slice(0, 4) : [];
+  const cleanText = (item: unknown, maxLength: number): string | null => {
+    if (typeof item !== "string") return null;
+    const cleaned = item.replace(/[\\u0000-\\u001f\\u007f]/g, " ").trim().slice(0, maxLength);
+    return cleaned || null;
+  };
+  const genres = Array.isArray(root.genres)
+    ? root.genres.map(item => cleanText(item, 40)).filter((item): item is string => item !== null).slice(0, 5)
+    : [];
+  const searchTerms = Array.isArray(root.searchTerms)
+    ? [...new Set(root.searchTerms.map(item => cleanText(item, 80)).filter((item): item is string => item !== null))].slice(0, 4)
+    : [];
   return {
-    title: typeof root.title === "string" ? root.title.slice(0, 60) : fallback(message).title,
-    mood: typeof root.mood === "string" ? root.mood.slice(0, 100) : fallback(message).mood,
+    title: cleanText(root.title, 60) ?? fallback(message).title,
+    mood: cleanText(root.mood, 100) ?? fallback(message).mood,
     genres: genres.length ? genres : fallback(message).genres,
     searchTerms: searchTerms.length ? searchTerms : fallback(message).searchTerms,
     energy: root.energy === "high" || root.energy === "medium" ? root.energy : "low",
-    narration: typeof root.narration === "string" ? root.narration.slice(0, 240) : fallback(message).narration,
+    narration: cleanText(root.narration, 240) ?? fallback(message).narration,
   };
 }
 
