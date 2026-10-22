@@ -117,6 +117,18 @@ export class MusicBackendClient {
         }
     }
 
+    getPublicEndpointUrl(endpoint: string, query: Record<string, string | number | boolean | undefined> = {}): string {
+        if (!endpoint.startsWith('/') || endpoint.startsWith('//') || endpoint.includes('..')) {
+            throw new MusicBackendHttpError('Invalid music backend endpoint');
+        }
+        const url = new URL(this.baseUrl.toString());
+        url.pathname = `${this.baseUrl.pathname}${endpoint}`.replace(/\\/{2,}/g, '/');
+        for (const [key, value] of Object.entries(query)) {
+            if (value !== undefined) url.searchParams.set(key, String(value));
+        }
+        return url.toString();
+    }
+
     search(query: string, limit = 20, offset = 0, signal?: AbortSignal): Promise<unknown> {
         const normalizedQuery = query.trim();
         if (!normalizedQuery) return Promise.resolve({ items: [], total: 0 });
