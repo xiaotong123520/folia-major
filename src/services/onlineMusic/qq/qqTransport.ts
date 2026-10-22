@@ -1,4 +1,5 @@
 import { OnlineProviderError } from '../../../types/onlineMusic';
+import { foliaProviderApiBase } from '../../foliaServerFallback';
 import { readProviderSessionValue, removeProviderSessionValue, writeProviderSessionValue } from '../providerStorage';
 import { withLoginRequestLimit } from '../login/loginRequestLimit';
 import { withOnlineRequestLimit } from '../failure/onlineRequestLimit';
@@ -116,7 +117,7 @@ const getWebApiBase = (): string => {
         ? String(process.env?.VITE_QQ_API_BASE || '')
         : '';
     const value = viteValue || processValue;
-    return value.trim().replace(/\/$/, '');
+    return value.trim().replace(/\/$/, '') || foliaProviderApiBase('qq') || '';
 };
 
 // Electron embeds qq-music-api and starts it on a free port, so the base is only known at runtime.
