@@ -15,7 +15,13 @@ const base64url = (value: string | Uint8Array): string => {
     const bytes = typeof value === 'string' ? new TextEncoder().encode(value) : value;
     let binary = '';
     for (const byte of bytes) binary += String.fromCharCode(byte);
-    return btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    return btoa(binary).replace(/=/g, '').replaceAll('+', '-').replaceAll('/', '_');
+};
+
+const toArrayBuffer = (bytes: Uint8Array): ArrayBuffer => {
+    const copy = new Uint8Array(bytes.byteLength);
+    copy.set(bytes);
+    return copy.buffer;
 };
 
 const decodePrivateKey = (pem: string): Uint8Array => {
@@ -44,7 +50,7 @@ export async function handleAppleMusicToken(request: Request, env: AppleTokenEnv
         const pem = privateKeyValue.replace(/\\n/g, '\n');
         const key = await crypto.subtle.importKey(
             'pkcs8',
-            decodePrivateKey(pem),
+            toArrayBuffer(decodePrivateKey(pem)),
             { name: 'ECDSA', namedCurve: 'P-256' },
             false,
             ['sign'],
@@ -52,7 +58,7 @@ export async function handleAppleMusicToken(request: Request, env: AppleTokenEnv
         const signature = await crypto.subtle.sign(
             { name: 'ECDSA', hash: 'SHA-256' },
             key,
-            new TextEncoder().encode(signingInput),
+            toArrayBuffer(new TextEncoder().encode(signingInput)),
         );
         return new Response(JSON.stringify({
             token: signingInput + '.' + base64url(new Uint8Array(signature)),
