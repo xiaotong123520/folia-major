@@ -29,6 +29,9 @@ export interface PlatformNamePlace {
 }
 
 export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
+    'src/services/directPointSong.ts': { n: { netease: 5, qq: 12 }, kind: 'stored', why: 'three public point-song API endpoint hosts and source IDs for browser-only GitHub Pages; no provider login, entitlement or transport internals' },
+    'src/components/app/MusicLinkImport.tsx': { n: { netease: 1, qq: 4 }, kind: 'text', why: 'three platform labels and direct import buttons in the user-selected browser-only point-song dialog' },
+    'src/components/app/ImportedAudioPlayer.tsx': { n: { qq: 1 }, kind: 'text', why: 'visible fallback message for the user-selected QQ direct audio candidate' },
     'src/services/musicLinkResolver.ts': { n: { netease: 4, qq: 3, kugou: 3, ytm: 4 }, kind: 'stored', why: 'recognized URL domains, external share-link identifiers and user-facing descriptions; no provider transport or entitlement logic' },
     'src/services/musicResolver.ts': { n: { netease: 2, qq: 2, kugou: 2 }, kind: 'stored', why: 'generated external music URL mappings for provider-host identity, not playback or provider transport logic' },
     'api-ts/lyric-proxy.ts': { n: { qq: 2, kugou: 1 }, kind: 'main', why: 'the hosts the lyric relay may reach' },
