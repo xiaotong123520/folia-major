@@ -1,0 +1,43 @@
+name: Music backend adapter checks
+
+on:
+  pull_request:
+    branches:
+      - feature/music-link-resolver
+    paths:
+      - "api-ts/music-backend-proxy.ts"
+      - "src/services/onlineMusic/musicBackendClient.ts"
+      - "src/services/onlineMusic/musicBackendProvider.ts"
+      - "src/services/onlineMusic/providerRegistry.ts"
+      - "test/unit/musicBackendClient.test.ts"
+      - "test/unit/musicBackendProxy.test.ts"
+      - ".github/workflows/music-backend-checks.yml"
+      - "package.json"
+      - "package-lock.json"
+  push:
+    branches:
+      - feature/music-backend-evaluation
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test:unit -- test/unit/musicBackendClient.test.ts test/unit/musicBackendProxy.test.ts
+      - name: Build
+        run: npm run build
