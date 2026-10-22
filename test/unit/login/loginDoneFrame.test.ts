@@ -188,7 +188,7 @@ describe('the animation after a sign-in, as a function of time', () => {
 });
 
 describe('the colour that fills the window', () => {
-    const colours = listOnlineMusicProviders().map(provider => omni.getProviderMark(provider.id)!.color);
+    const colours = listOnlineMusicProviders().filter(provider => provider.capabilities.auth).map(provider => omni.getProviderMark(provider.id)!.color);
 
     it('shades each platform\'s colour inside its own hue: a lighter end, a darker end, a deeper corner', () => {
         expect(colours.length).toBeGreaterThanOrEqual(6);
