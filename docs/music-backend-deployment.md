@@ -6,13 +6,13 @@ This branch contains an optional Folia provider adapter, a bounded HTTP client, 
 
 ## Files added or updated
 
-- `src/services/onlineMusic/musicBackendClient.ts`: bounded JSON transport, HTTPS enforcement, request timeout/cancellation, endpoint validation and size limits.
-- `src/services/onlineMusic/musicBackendProvider.ts`: maps the candidate API's search and lyrics response into Folia's provider contract; uses the backend stream endpoint for audio.
+- `src/services/onlineMusic/music-backend/musicBackendTransport.ts`: bounded JSON transport, HTTPS enforcement, request timeout/cancellation, endpoint validation and size limits.
+- `src/services/onlineMusic/music-backend/musicBackendProvider.ts`: maps the candidate API's search and lyrics response into Folia's provider contract; uses the backend stream endpoint for audio.
 - `src/services/onlineMusic/providerRegistry.ts`: registers the optional provider. It reports not configured until the base URL is set.
 - `api-ts/music-backend-proxy.ts`: same-origin, read-only allowlist proxy for search, lyrics, stream, inspect/switch, album and playlist detail. It forwards Range headers and selected audio response headers; it does not expose cookie/QR-login routes.
 - `vercel.json`: routes `/api/music-backend/*` to the allowlisted proxy.
-- `test/unit/musicBackendClient.test.ts`: transport validation tests.
-- `test/unit/musicBackendProxy.test.ts`: proxy allowlist, origin, query filtering, and Range-forwarding tests.
+- `test/unit/music-backend/musicBackendTransport.test.ts`: transport validation tests.
+- `test/unit/music-backend/musicBackendProxy.test.ts`: proxy allowlist, origin, query filtering, and Range-forwarding tests.
 - `.github/workflows/music-backend-checks.yml`: CI typecheck, focused unit tests, and build.
 - `.env.example`: optional public backend URL.
 - `docs/music-backend-evaluation.md`: candidate and security review.
@@ -63,7 +63,7 @@ From a checkout of this branch:
 ```bash
 npm ci
 npm run typecheck
-npm run test:unit -- test/unit/musicBackendClient.test.ts
+npm run test:unit -- test/unit/music-backend/musicBackendTransport.test.ts
 npm run build
 ```
 
