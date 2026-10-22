@@ -41,3 +41,16 @@ GITHUB_PAGES=true npm run build
 ## 开源与来源
 
 本项目基于 Folia，遵循 AGPL-3.0。原始版权、贡献者和第三方声明保留，详见 [NOTICE.md](NOTICE.md)、[LICENSE](LICENSE) 与 [CONTRIBUTORS.md](CONTRIBUTORS.md)。
+
+
+## GitHub Pages 直连点歌（不使用服务器）
+
+在网页右上角「桐声音乐 → 导入音乐 / 链接解析」中输入歌名，选择 QQ 点歌、网易云点歌或 QQ 备用接口；音源会添加到网页下方的音频队列。QQ 首选加载失败时尝试第二条 QQ 地址。候选地址和备用地址存储在当前浏览器 IndexedDB 中，刷新后可恢复。
+
+使用的原始接口：
+
+- `https://api.lxink.cn/api-qqmusic/?action=play&type=vip&songName=`
+- `https://cer.luckying.love/music/LuckyWYY.php?Love=`
+- `https://cer.luckying.love/music/Lucky.php?Love=`
+
+**重要边界**：纯静态 GitHub Pages 不能执行 PHP、Node 服务端代理，也无法绕过 CORS、需要私钥的音频地址、VIP/DRM 访问限制。只有第三方接口**直接返回浏览器能播放的音频、或 HTTP 重定向到可播放资源**时，网页音频控件才能播放；若返回 JSON、HTML、需要 Cookies/签名或未授权资源，不能保证播放。此功能是可测试的直连点歌入口，不代表这三个第三方接口已通过真实音频验收，也不等于会员解锁。请勿把含凭据的私密 URL 粘贴到公共分享场景。
