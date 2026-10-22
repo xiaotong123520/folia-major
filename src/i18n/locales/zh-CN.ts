@@ -26,6 +26,7 @@ export default {
     "footer": "播放由 Apple MusicKit 处理，不会绕过订阅或地区限制。授权令牌只保存在当前页面内存中；关闭页面后不持久化。"
   },
     "musicLink": {
+    "openOfficialAuth": "打开 Apple Music 官方授权",
     "title": "导入音乐链接",
     "close": "关闭",
     "placeholder": "粘贴歌曲或音乐平台分享链接",
