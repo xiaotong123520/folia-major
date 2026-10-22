@@ -124,3 +124,11 @@ Review fixes now include Docker provider selection (`AI_PROVIDER`), bounded/clea
 
 Important hosting distinction: GitHub Pages is static hosting and cannot run the `api/radio-agent` server endpoint. The Vercel Preview (or another server runtime that supports the compiled `api/radio-agent.js`) is required for AI-backed curation. If Vercel is not the production host, the UI safely falls back to local rules but will not have server-side AI until the endpoint is deployed.
 
+
+## Music share-link import (October 22, 2026)
+
+- `src/services/musicLinkResolver.ts` is ported from the separately reviewed music-link branch into `feature/ai-radio-agent-v1`; network-free URL classification does not decode restricted streams.
+- The AI Radio overlay now has a paste-link input and identifies standard provider share URLs. For a track share link on an existing NetEase, QQ or Kugou provider, it requests real track details from `omni.getSongDetail` and adds a returned song to the existing list. Availability, login, licensed source and playable audio are still decided by Folia's existing provider at playback time.
+- Apple Music, YouTube and SoundCloud official links open the provider's official page while direct import/playback is not yet integrated. Kuwo currently has URL recognition only. Direct audio and personal Navidrome should be added through trusted source/server configuration, not arbitrary server-side proxying.
+- No member-track unlocking, subscription bypass, cookies, or protected audio extraction is implemented.
+- Requires `npm run typecheck`, `npm run test:unit`, and actual browser playback tests on the current commit before merging to `main`.
