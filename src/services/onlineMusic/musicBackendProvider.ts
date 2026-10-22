@@ -173,13 +173,13 @@ export const musicBackendProvider: OnlineMusicProvider = {
             });
             return { url, fetchedAt: Date.now(), quality };
         },
-    },
-    getAvailability(song: SongResult): ProviderSongAvailability {
-        if (song.resourceState === false) return { state: 'unavailable', reason: 'taken-down' };
-        const ref = song.sourceRef;
-        const isVip = ref?.kind === 'online' && ref.providerId === providerId && ref.providerData?.isVip === true;
-        if (isVip) return { state: 'unknown', reason: 'restricted', label: '可能需要平台会员权限' };
-        return { state: 'unknown' };
+        getAvailability(song: SongResult): ProviderSongAvailability {
+            if (song.resourceState === false) return { state: 'unavailable', reason: 'taken-down' };
+            const ref = song.sourceRef;
+            const isVip = ref?.kind === 'online' && ref.providerId === providerId && ref.providerData?.isVip === true;
+            if (isVip) return { state: 'unknown', reason: 'restricted', label: '可能需要平台会员权限' };
+            return { state: 'unknown' };
+        },
     },
     search: {
         async searchSongs(query, limit, offset) {
