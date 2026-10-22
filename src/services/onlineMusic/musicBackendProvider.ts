@@ -148,7 +148,6 @@ export const musicBackendProvider: OnlineMusicProvider = {
         recommendations: false,
         mutations: false,
         wordByWordLyrics: false,
-        songDetail: true,
     },
     getAvailability: () => ({
         configured: Boolean(makeClient()),
@@ -168,22 +167,16 @@ export const musicBackendProvider: OnlineMusicProvider = {
         },
     },
     playback: {
-        async getSongDetail(id) {
-            const rawId = String(id).split(':').pop() ?? String(id);
-            const result = await musicBackendProvider.search!.searchSongs(rawId, 20, 0);
-            return result.items.find((song) => String(song.sourceRef?.kind === 'online' ? song.sourceRef.mediaId : song.id) === rawId) ?? null;
-        },
         async getAudioSource(song, quality: AudioQualityPreference) {
             const client = buildClient();
             const item = getProviderSong(song);
             // The backend's stream endpoint is the actual audio route and documents Range support.
             // Do not append credentials to URLs; only use a server-side protected deployment.
-            const url = new URL('/api/v1/music/stream', new URL(client['baseUrl'].toString()));
-            for (const [key, value] of Object.entries({
+            const url = client.getPublicEndpointUrl('/api/v1/music/stream', {
                 id: item.id, source: item.source, name: item.name, artist: item.artist, album: item.album,
-                cover: item.cover, quality,
-            })) if (value) url.searchParams.set(key, value);
-            return { url: url.toString(), fetchedAt: Date.now(), quality };
+                cover: item.cover,
+            });
+            return { url, fetchedAt: Date.now(), quality };
         },
     },
     lyrics: {
