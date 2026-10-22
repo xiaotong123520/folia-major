@@ -121,7 +121,7 @@ export class MusicBackendClient {
         const normalizedQuery = query.trim();
         if (!normalizedQuery) return Promise.resolve({ items: [], total: 0 });
         return this.getJson('/api/v1/music/search', {
-            keyword: normalizedQuery,
+            q: normalizedQuery,
             limit: Math.max(1, Math.min(Math.floor(limit), 50)),
             offset: Math.max(0, Math.floor(offset)),
         }, signal);
