@@ -26,6 +26,13 @@ export default {
     "footer": "播放由 Apple MusicKit 处理，不会绕过订阅或地区限制。授权令牌只保存在当前页面内存中；关闭页面后不持久化。"
   },
     "radioAgent": {
+    "shareTitle": "解析音乐分享链接",
+    "sharePlaceholder": "粘贴音乐平台分享链接（HTTPS）",
+    "shareResolve": "解析",
+    "shareUnsupported": "无法识别该链接，请使用音乐平台的标准分享地址。",
+    "shareNoMetadata": "音乐平台未返回这首歌曲的信息。",
+    "shareProviderUnavailable": "音乐平台当前不可用，或需要先登录授权。",
+    "shareOfficialLink": "前往官方音乐服务打开",
     "title": "AI 音乐电台",
     "open": "AI 电台",
     "close": "关闭电台",
