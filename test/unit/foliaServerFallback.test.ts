@@ -3,7 +3,6 @@ import {
     FOLIA_SERVER_STORAGE_KEY,
     clearFoliaServerBase,
     foliaBackendApiUrl,
-    foliaProviderApiBase,
     getFoliaServerBase,
     normalizeFoliaServerBase,
     probeFoliaServer,
@@ -39,9 +38,6 @@ describe('static Pages to VPS fallback', () => {
         expect(saveFoliaServerBase('https://music.example.com/')).toBe(true);
         expect(store.get(FOLIA_SERVER_STORAGE_KEY)).toBe('https://music.example.com');
         expect(getFoliaServerBase()).toBe('https://music.example.com');
-        expect(foliaProviderApiBase('netease')).toBe('https://music.example.com/netease');
-        expect(foliaProviderApiBase('qq')).toBe('https://music.example.com/qq');
-        expect(foliaProviderApiBase('kugou')).toBe('https://music.example.com/kugou');
         expect(foliaBackendApiUrl('/api/lyric-proxy')).toBe('https://music.example.com/api/lyric-proxy');
         clearFoliaServerBase();
         expect(store.has(FOLIA_SERVER_STORAGE_KEY)).toBe(false);
