@@ -136,6 +136,8 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const headers = new Headers({ Accept: req.headers.get("accept") || "application/json" });
+  const upstreamApiKey = process.env.MUSIC_BACKEND_UPSTREAM_API_KEY?.trim();
+  if (upstreamApiKey) headers.set("Authorization", `Bearer ${upstreamApiKey}`);
   const range = req.headers.get("range");
   if (range && path === "/api/v1/music/stream") headers.set("Range", range);
 
