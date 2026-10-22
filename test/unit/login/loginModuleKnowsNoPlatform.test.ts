@@ -41,12 +41,13 @@ describe('what each platform declares for the sign-in window', () => {
             bodian: { letter: '波', color: '#0d9488' },
             ytm: { letter: 'Y', color: '#e11d48' },
             spotify: { letter: 'S', color: '#22c55e' },
+            'music-backend': { letter: 'F', color: '#7c3aed' },
         });
     });
 
     it('its title and note, as text keys', () => {
         // The second lines a platform declares for single cases are pinned in loginView.test.ts.
-        const texts = Object.fromEntries(listOnlineMusicProviders().map(provider => {
+        const texts = Object.fromEntries(listOnlineMusicProviders().filter(provider => provider.capabilities.auth).map(provider => {
             const { title, note } = omni.getLoginTexts(provider.id)!;
             return [provider.id, { title, note }];
         }));
@@ -68,7 +69,7 @@ describe('what each platform declares for the sign-in window', () => {
     });
 
     it('a local service the window can restart: only the platform that has one', () => {
-        const withService = listOnlineMusicProviders().filter(provider => omni.getLoginLocalService(provider.id)).map(provider => provider.id);
+        const withService = listOnlineMusicProviders().filter(provider => provider.capabilities.auth).filter(provider => omni.getLoginLocalService(provider.id)).map(provider => provider.id);
         expect(withService).toEqual(['netease']);
     });
 });
