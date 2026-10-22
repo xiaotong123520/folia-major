@@ -7,6 +7,7 @@ export interface SavedAudioTrack {
     createdAt: number;
     file?: Blob;
     url?: string;
+    fallbackUrls?: string[];
 }
 
 export class ImportedAudioDatabase extends Dexie {
