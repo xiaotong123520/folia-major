@@ -39,6 +39,7 @@ jobs:
           export MUSIC_LIBRARY_ROOT="$RUNNER_TEMP/ts-media"
           export MUSIC_LIBRARY_INDEX="$RUNNER_TEMP/ts-private/index.json"
           export MUSIC_PUBLIC_ORIGINS="https://xiaotong123520.github.io"
+          export MUSIC_BACKEND_API_KEY="php-ci-not-a-real-secret"
           php -S 127.0.0.1:8092 -t deploy/php-music-api deploy/php-music-api/index.php > "$RUNNER_TEMP/ts-server.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
@@ -46,19 +47,19 @@ jobs:
             if curl -s --fail http://127.0.0.1:8092/healthz | grep -q ok; then break; fi
             sleep 0.2
           done
-          curl -fsS "http://127.0.0.1:8092/api/v1/music/search?q=Song" > "$RUNNER_TEMP/result.json"
+          curl -fsS -H "Authorization: Bearer $MUSIC_BACKEND_API_KEY" "http://127.0.0.1:8092/api/v1/music/search?q=Song" > "$RUNNER_TEMP/result.json"
           php -r '$r=json_decode(file_get_contents($argv[1]),true); if(($r["data"]["total"]??0)!==1 || ($r["data"]["songs"][0]["source"]??"")!=="local") exit(1);' "$RUNNER_TEMP/result.json"
           track_id=$(php -r '$r=json_decode(file_get_contents($argv[1]),true); echo $r["data"]["songs"][0]["id"];' "$RUNNER_TEMP/result.json")
           result=$(curl -sS -D "$RUNNER_TEMP/range-headers" -o "$RUNNER_TEMP/range-bytes" -w '%{http_code}' \
-            -H 'Range: bytes=0-4' "http://127.0.0.1:8092/api/v1/music/stream?source=local&id=$track_id")
+            -H "Authorization: Bearer $MUSIC_BACKEND_API_KEY" -H 'Range: bytes=0-4' "http://127.0.0.1:8092/api/v1/music/stream?source=local&id=$track_id")
           test "$result" = "206"
           grep -qi 'content-range: bytes 0-4/36' "$RUNNER_TEMP/range-headers"
           test "$(cat "$RUNNER_TEMP/range-bytes")" = "ABCDE"
           result=$(curl -sS -o /dev/null -w '%{http_code}' \
-            "http://127.0.0.1:8092/api/v1/music/stream?source=local&id=../../etc/passwd")
+            -H "Authorization: Bearer $MUSIC_BACKEND_API_KEY" "http://127.0.0.1:8092/api/v1/music/stream?source=local&id=../../etc/passwd")
           test "$result" = "400"
           result=$(curl -sS -o /dev/null -w '%{http_code}' \
-            -H 'Range: bytes=99999-' "http://127.0.0.1:8092/api/v1/music/stream?source=local&id=$track_id")
+            -H "Authorization: Bearer $MUSIC_BACKEND_API_KEY" -H 'Range: bytes=99999-' "http://127.0.0.1:8092/api/v1/music/stream?source=local&id=$track_id")
           test "$result" = "416"
           result=$(curl -sS -D "$RUNNER_TEMP/cors-headers" -o /dev/null -w '%{http_code}' \
             -H 'Origin: https://xiaotong123520.github.io' \
