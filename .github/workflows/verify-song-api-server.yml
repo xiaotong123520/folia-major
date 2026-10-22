@@ -1,0 +1,32 @@
+name: Verify song API server
+on:
+  pull_request:
+    paths:
+      - 'deploy/music-backend-gateway/**'
+      - '.github/workflows/verify-song-api-server.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    name: Test API adapter and deployment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check Node syntax
+        run: |
+          node --check deploy/music-backend-gateway/gateway.mjs
+          node --check deploy/music-backend-gateway/fallback/server.mjs
+          node --check deploy/music-backend-gateway/fallback/server.test.mjs
+      - name: Test three song endpoints with mock audio
+        run: node --test deploy/music-backend-gateway/fallback/server.test.mjs
+      - name: Test the existing private gateway
+        run: node --test deploy/music-backend-gateway/gateway.test.mjs
+      - name: Validate deployment configuration
+        env:
+          MUSIC_BACKEND_API_KEY: ci-only-not-a-real-secret
+          MUSIC_PUBLIC_ORIGINS: https://xiaotong123520.github.io
+        run: docker compose -f deploy/music-backend-gateway/docker-compose.yml config --quiet
