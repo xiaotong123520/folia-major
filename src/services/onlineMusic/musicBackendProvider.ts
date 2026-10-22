@@ -4,6 +4,7 @@ import {
     type AudioQualityPreference,
     type OnlineMusicProvider,
     type ProviderLyricsResult,
+    type ProviderSongAvailability,
 } from '../../../types/onlineMusic';
 import { MusicBackendClient, MusicBackendHttpError } from './musicBackendClient';
 
@@ -104,7 +105,7 @@ const normalizeBackendSong = (raw: unknown): UnifiedSong => {
             kind: 'online',
             providerId,
             mediaId: id,
-            providerData: { source, backendSongId: id },
+            providerData: { source, backendSongId: id, isVip: Boolean(song.is_vip) },
         },
         ...(song.is_invalid ? { resourceState: false } : {}),
     };
@@ -156,6 +157,30 @@ export const musicBackendProvider: OnlineMusicProvider = {
         ...(!makeClient() ? { reason: 'not-configured' as const } : {}),
     }),
     normalizeSong: normalizeBackendSong,
+    playback: {
+        async getSongDetail(id) {
+            // The backend has no dedicated song-detail endpoint. Accept only an exact source ID match.
+            const rawId = String(id).split(':').pop() ?? String(id);
+            const result = await musicBackendProvider.search!.searchSongs(rawId, 50, 0);
+            return result.items.find((song) => song.sourceRef?.kind === 'online' && song.sourceRef.mediaId === rawId) ?? null;
+        },
+        async getAudioSource(song, quality: AudioQualityPreference) {
+            const client = buildClient();
+            const item = getProviderSong(song);
+            const url = client.getPublicEndpointUrl('/api/v1/music/stream', {
+                id: item.id, source: item.source, name: item.name, artist: item.artist, album: item.album,
+                cover: item.cover,
+            });
+            return { url, fetchedAt: Date.now(), quality };
+        },
+    },
+    getAvailability(song: SongResult): ProviderSongAvailability {
+        if (song.resourceState === false) return { state: 'unavailable', reason: 'taken-down' };
+        const ref = song.sourceRef;
+        const isVip = ref?.kind === 'online' && ref.providerId === providerId && ref.providerData?.isVip === true;
+        if (isVip) return { state: 'unknown', reason: 'restricted', label: '可能需要平台会员权限' };
+        return { state: 'unknown' };
+    },
     search: {
         async searchSongs(query, limit, offset) {
             const client = buildClient();
@@ -166,26 +191,6 @@ export const musicBackendProvider: OnlineMusicProvider = {
             const total = Number((data as BackendSearchData & { total?: number; count?: number }).total
                 ?? (data as BackendSearchData & { count?: number }).count ?? items.length);
             return { items, total, hasMore: offset + items.length < total, nextOffset: offset + items.length };
-        },
-    },
-    playback: {
-        async getSongDetail(id) {
-            // The backend has no dedicated song-detail endpoint. Search by ID and accept only
-            // an exact source ID match; never guess a song by title or silently substitute audio.
-            const rawId = String(id).split(':').pop() ?? String(id);
-            const result = await musicBackendProvider.search!.searchSongs(rawId, 50, 0);
-            return result.items.find((song) => song.sourceRef?.kind === 'online' && song.sourceRef.mediaId === rawId) ?? null;
-        },
-        async getAudioSource(song, quality: AudioQualityPreference) {
-            const client = buildClient();
-            const item = getProviderSong(song);
-            // The backend's stream endpoint is the actual audio route and documents Range support.
-            // Do not append credentials to URLs; only use a server-side protected deployment.
-            const url = client.getPublicEndpointUrl('/api/v1/music/stream', {
-                id: item.id, source: item.source, name: item.name, artist: item.artist, album: item.album,
-                cover: item.cover,
-            });
-            return { url, fetchedAt: Date.now(), quality };
         },
     },
     lyrics: {
