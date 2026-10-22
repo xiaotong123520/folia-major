@@ -1,5 +1,6 @@
 import md5 from 'blueimp-md5';
 import { OnlineProviderError } from '../../../types/onlineMusic';
+import { foliaProviderApiBase } from '../../foliaServerFallback';
 import { readProviderSessionValue, removeProviderSessionValue, writeProviderSessionValue } from '../providerStorage';
 import { lyricProxyWebUrl, requestLyricProxyOnDesktop } from '../../lyricProxy';
 import { withLoginRequestLimit } from '../login/loginRequestLimit';
@@ -69,7 +70,7 @@ const getWebApiBase = (): string => {
         ? String(process.env?.VITE_KUGOU_API_BASE || '')
         : '';
     const value = viteValue || processValue;
-    return value.trim().replace(/\/$/, '');
+    return value.trim().replace(/\/$/, '') || foliaProviderApiBase('kugou') || '';
 };
 
 const isDeviceVerificationRequired = (body: any): boolean => {
