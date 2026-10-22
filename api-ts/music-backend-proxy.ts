@@ -45,6 +45,39 @@ function json(status: number, body: Record<string, unknown>): Response {
   });
 }
 
+async function readLimitedBody(response: Response, limitBytes: number): Promise<Uint8Array | null> {
+  if (!response.body) return new Uint8Array();
+  const declaredLength = Number(response.headers.get("content-length") || 0);
+  if (declaredLength > limitBytes) {
+    await response.body.cancel();
+    return null;
+  }
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > limitBytes) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const output = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    output.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return output;
+}
+
 function getUpstreamBase(): URL | null {
   const value = process.env.MUSIC_BACKEND_UPSTREAM_URL?.trim();
   if (!value) return null;
@@ -119,10 +152,15 @@ export default async function handler(req: Request): Promise<Response> {
     if (path === "/api/v1/music/stream") outHeaders.set("Cache-Control", "private, no-store");
     else outHeaders.set("Cache-Control", "no-store, max-age=0");
 
-    return new Response(req.method === "HEAD" ? null : upstreamResponse.body, {
-      status: upstreamResponse.status,
-      headers: outHeaders,
-    });
+    if (req.method === "HEAD") {
+      return new Response(null, { status: upstreamResponse.status, headers: outHeaders });
+    }
+    if (path === "/api/v1/music/stream") {
+      return new Response(upstreamResponse.body, { status: upstreamResponse.status, headers: outHeaders });
+    }
+    const body = await readLimitedBody(upstreamResponse, 2_000_000);
+    if (body === null) return json(502, { error: "Music backend response exceeds the 2 MB limit" });
+    return new Response(body, { status: upstreamResponse.status, headers: outHeaders });
   } catch {
     return json(502, { error: "Music backend upstream request failed" });
   }
