@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, Music2, Radio as RadioIcon } from 'lucide-react';
 import RadioAgent from './components/app/RadioAgent';
 import AppleMusicConnect from './components/app/AppleMusicConnect';
+import MusicLinkImport from './components/app/MusicLinkImport';
 import { loadCachedOrFetchCover } from './services/coverCache';
 import VisualizerRenderer from './components/visualizer/VisualizerRenderer';
 import CommandPalette from './components/command-palette/CommandPalette';
@@ -191,6 +192,7 @@ export default function App() {
     countRender('App');
     const { t } = useTranslation();
     const [isRadioAgentOpen, setIsRadioAgentOpen] = useState(false);
+    const [isMusicLinkImportOpen, setIsMusicLinkImportOpen] = useState(false);
     useEffect(() => {
         const openRadioAgent = () => setIsRadioAgentOpen(true);
         window.addEventListener('folia:open-radio-agent', openRadioAgent);
@@ -2886,6 +2888,17 @@ export default function App() {
                 <span>{t('appleMusic.name')}</span>
             </button>}
             {!isElectronWindow && isAppleMusicOpen && <AppleMusicConnect onClose={() => setIsAppleMusicOpen(false)} />}
+            {!isElectronWindow && <button type="button"
+                onClick={() => setIsMusicLinkImportOpen(true)}
+                aria-label="导入音乐链接"
+                title="导入音乐链接"
+                className="fixed bottom-56 right-4 z-[80] inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-[#17151f]/90 px-4 text-sm text-white shadow-xl shadow-black/30 backdrop-blur-xl hover:bg-[#211c2d] sm:bottom-40 sm:right-7">
+                <Music2 size={17} /><span>链接解析</span>
+            </button>}
+            {!isElectronWindow && isMusicLinkImportOpen && <MusicLinkImport
+                onClose={() => setIsMusicLinkImportOpen(false)}
+                onPlayOnline={handleSearchResultPlay}
+            />}
 
             {currentView === 'player' && !(isLyricMatchOpen && isLocalPlaybackSong(currentSong)) && (
                 <PlayerPanel model={playerPanelModel} />
