@@ -2905,6 +2905,7 @@ export default function App() {
                 onAddAudioUrl={url => importedAudioPlayerRef.current?.addUrl(url) ?? false}
             />}
             {!isElectronWindow && <ImportedAudioPlayer
+                onOpenImport={() => setIsMusicLinkImportOpen(true)}
                 ref={importedAudioPlayerRef}
                 pauseForMainPlayback={playerState === PlayerState.PLAYING}
                 onStartPlayback={() => {
