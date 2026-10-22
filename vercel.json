@@ -1,6 +1,13 @@
 {
   "ignoreCommand": "git rev-parse --verify -q HEAD^ >/dev/null && git diff --quiet HEAD^ HEAD -- . ':(exclude)docs/CODEMAP.md'",
   "rewrites": [
-    { "source": "/api/qq/:path*", "destination": "/api/qq?path=/:path*" }
+    {
+      "source": "/api/music-backend/:path*",
+      "destination": "/api/music-backend-proxy?path=/:path*"
+    },
+    {
+      "source": "/api/qq/:path*",
+      "destination": "/api/qq?path=/:path*"
+    }
   ]
 }
