@@ -1,14 +1,18 @@
+import type { PointSongImport } from '../../services/directPointSong';
+import { lazy, Suspense, useState } from 'react';
+import { AudioLines, ChevronRight, Disc3, Film, Home, Link2, ListMusic, Music2, Radio, Server, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import MobilePlatformLibrary, { type MobileLibraryActions } from './MobilePlatformLibrary';
-import { useState } from 'react';
-import { AudioLines, ChevronRight, Compass, Disc3, Film, Home, Link2, ListMusic, Music2, Radio, Server, Upload } from 'lucide-react';
 import { openLoginWindow } from '../login/loginWindowStore';
-import ServerAudioLibrary from './ServerAudioLibrary';
+import MobilePlatformLibrary, { type MobileLibraryActions } from './MobilePlatformLibrary';
+import MobilePlatformAccess from './MobilePlatformAccess';
 
 // A real phone landing screen replaces the cropped desktop lattice on narrow viewports.
+const HearttraceLibrary = lazy(() => import('./hearttraceLibrary/HearttraceLibrary'));
+const ServerAudioLibrary = lazy(() => import('./ServerAudioLibrary'));
 type Tab = 'home' | 'music' | 'server' | 'more';
 
-export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, onImportFiles, mobileActions }: {
+export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, onImportFiles, mobileActions, onAddServerTrack }: {
+    onAddServerTrack: (track: PointSongImport) => boolean;
     mobileActions: MobileLibraryActions;
     onImport: () => void;
     onRadio: () => void;
@@ -18,8 +22,13 @@ export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, 
 }) {
     const { t } = useTranslation();
     const [tab, setTab] = useState<Tab>('home');
+    const [serverVisited, setServerVisited] = useState(false);
     const [classic, setClassic] = useState(false);
     const [hint, setHint] = useState('');
+    const selectTab = (next: Tab) => {
+        if (next === 'server') setServerVisited(true);
+        setTab(next);
+    };
     const nav = [
         { key: 'home' as const, title: '首页', icon: Home },
         { key: 'music' as const, title: '音乐', icon: Music2 },
@@ -47,7 +56,7 @@ export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, 
                     <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-200 text-[#17101f]"><AudioLines size={22}/></span>
                     <span className="text-lg font-semibold tracking-wide">桐声音乐</span>
                 </div>
-                <span className="rounded-full border border-white/10 px-3 py-1 text-[11px] text-white/50">MOBILE</span>
+                <MobilePlatformAccess compact onSettings={mobileActions.onSettings} onOpenWorkspace={() => workspace(() => mobileActions.onLibrary('playlist'))} />
             </header>
             <main className="relative min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-5 pb-40 pt-6"
                 >
@@ -63,7 +72,7 @@ export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, 
                             <Disc3 size={32} className="text-violet-100" />
                             <span className="flex w-full items-end justify-between gap-2"><span><span className="block text-xl font-semibold">开始听音乐</span><span className="mt-1 block text-xs text-white/65">本地上传 · 在线点歌 · 音乐电台</span></span><ChevronRight size={23}/></span>
                         </button>
-                        <button type="button" onClick={() => setTab('server')}
+                        <button type="button" onClick={() => selectTab('server')}
                             className="flex min-h-36 w-full items-center justify-between gap-4 rounded-[28px] border border-violet-300/20 bg-[#1b1a25] p-6 text-left">
                             <span className="space-y-2"><Server size={29} className="text-violet-200"/><span className="block text-xl font-semibold">服务器原有音乐</span><span className="block text-xs text-white/50">直接读取宝塔里的歌曲，不用上传</span></span>
                             <ChevronRight size={23} className="text-white/50"/>
@@ -109,24 +118,30 @@ export default function MobileMediaHome({ onImport, onRadio, onApple, onVideos, 
                             </button>
                         </div>
                         {hint && <p role="status" className="text-sm text-violet-100">{hint}</p>}
-                        <button type="button" onClick={() => setTab('server')}
+                        <button type="button" onClick={() => selectTab('server')}
                             className="flex min-h-16 w-full items-center gap-3 rounded-2xl border border-violet-300/25 bg-violet-300/10 p-4 text-left">
                             <Server size={23} className="text-violet-200"/><span className="min-w-0 flex-1"><span className="block text-sm font-semibold">连接宝塔服务器原有音乐</span><span className="block text-xs text-white/55">在线读取和播放，无须重新上传</span></span><ChevronRight size={19}/>
                         </button>
                         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-xs leading-6 text-white/55">
                             手机导入的音乐只存在当前浏览器。想在手机和电脑使用同一份曲库，请连接宝塔服务器。
                         </div>
+                        <MobilePlatformAccess onSettings={mobileActions.onSettings} onOpenWorkspace={() => workspace(() => mobileActions.onLibrary('playlist'))} />
                     </>}
                     <div className={tab === 'server' ? 'space-y-4' : 'hidden'}>
                         <button type="button" onClick={() => setTab('music')} className="flex min-h-11 items-center gap-2 text-sm text-violet-200"><ChevronRight size={17} className="rotate-180"/> 返回我的音乐</button>
-                        <ServerAudioLibrary />
+                        {serverVisited && <Suspense fallback={<p role="status" className="text-sm text-white/60">{t('mobileAccess.loading')}</p>}>
+                            <div className="space-y-8">
+                                <HearttraceLibrary onAddTrack={onAddServerTrack} />
+                                <details className="rounded-2xl border border-white/10 p-4">
+                                    <summary className="min-h-11 cursor-pointer text-sm text-violet-200">{t('hearttraceLibrary.otherServer')}</summary>
+                                    <ServerAudioLibrary />
+                                </details>
+                            </div>
+                        </Suspense>}
                     </div>
                     {tab === 'more' && <>
                         <div className="space-y-2"><p className="text-xs tracking-widest text-violet-200">SETTINGS</p><h1 className="text-3xl font-semibold">{title}</h1></div>
-                        <button type="button" onClick={() => workspace(() => mobileActions.onLibrary('playlist'))}
-                            className="flex min-h-16 w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-left">
-                            <Compass size={22} className="text-violet-200"/><span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{t('mobileLibrary.fullLibrary')}</span><span className="block text-xs text-white/50">{t('mobileLibrary.fullLibraryHint')}</span></span><ChevronRight size={19}/>
-                        </button>
+                        <MobilePlatformAccess onSettings={mobileActions.onSettings} onOpenWorkspace={() => workspace(() => mobileActions.onLibrary('playlist'))} />
                         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm leading-7 text-white/60">
                             将网站添加到主屏幕：iPhone Safari → 分享 → 添加到主屏幕。电脑继续使用原有布局。
                         </div>

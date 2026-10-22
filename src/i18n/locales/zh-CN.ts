@@ -1,6 +1,31 @@
 
 
 export default {
+  "hearttraceLibrary": {
+    "title": "服务器现有音乐",
+    "description": "已收录 {{count}} 首歌曲，音频由你原网站提供。",
+    "search": "搜索歌曲或专辑",
+    "results": "找到 {{count}} 首歌曲",
+    "add": "加入队列",
+    "addNamed": "将 {{name}} 加入播放队列",
+    "added": "已加入底部播放队列，点击播放器即可收听。",
+    "failed": "加入失败，请重试。",
+    "more": "加载更多",
+    "original": "打开原网站音乐馆",
+    "snapshot": "此列表为接入时的公开曲目快照，新增歌曲请在原音乐馆查看。播放仍受原网站权限和音频可用性限制。",
+    "otherServer": "连接其他音乐服务器"
+  },
+  "mobileAccess": {
+    "title": "平台与完整功能",
+    "accounts": "平台账号",
+    "signIn": "统一登录 / 扫码登录",
+    "signInHint": "网易云、QQ 音乐等平台共用原有登录窗口，按平台选择登录方式。",
+    "settings": "设置",
+    "settingsHint": "音质、歌词、外观、播放与服务连接。",
+    "workspace": "打开完整音乐工作区",
+    "workspaceHint": "进入原有界面，使用搜索、歌单、队列与歌词功能。",
+    "loading": "正在加载服务器曲库…"
+  },
   "mobileLibrary": {
     "platforms": "音乐平台",
     "login": "登录 / 扫码",

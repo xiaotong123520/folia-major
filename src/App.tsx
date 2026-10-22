@@ -2866,6 +2866,7 @@ export default function App() {
             <PonderHost theme={theme} isDaylight={isDaylight} />
 
             {!isElectronWindow && <PersonalMusicTools
+                onAddServerTrack={request => importedAudioPlayerRef.current?.addPointSong(request) ?? false}
                 mobileActions={{
                     accountController,
                     onLibrary: tab => { chooseLibrarySuite('grid'); navigateDirectHome(); setHomeViewTab(tab); },

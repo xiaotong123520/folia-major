@@ -1,6 +1,31 @@
 
 
 export default {
+  "hearttraceLibrary": {
+    "title": "Musik yang tersedia di server",
+    "description": "{{count}} lagu, diputar dari situs asli Anda.",
+    "search": "Cari lagu atau album",
+    "results": "Ditemukan {{count}} lagu",
+    "add": "Tambahkan",
+    "addNamed": "Tambahkan {{name}} ke antrean",
+    "added": "Ditambahkan ke antrean di bawah. Ketuk Putar untuk mendengarkan.",
+    "failed": "Gagal menambahkan lagu. Coba lagi.",
+    "more": "Muat lebih banyak",
+    "original": "Buka pustaka musik asli",
+    "snapshot": "Katalog publik ini adalah salinan saat penyiapan. Lihat pustaka asli untuk lagu baru. Aturan akses situs dan ketersediaan audio tetap berlaku.",
+    "otherServer": "Hubungkan server musik lain"
+  },
+  "mobileAccess": {
+    "title": "Akun dan fitur lengkap",
+    "accounts": "Akun",
+    "signIn": "Masuk / kode QR",
+    "signInHint": "Gunakan jendela masuk bersama untuk NetEase, QQ Music dan platform lain. Pilih metode masuk yang tersedia.",
+    "settings": "Pengaturan",
+    "settingsHint": "Kualitas audio, lirik, tampilan, pemutaran dan koneksi.",
+    "workspace": "Buka ruang musik lengkap",
+    "workspaceHint": "Buka antarmuka asli untuk pencarian, daftar putar, antrean dan lirik.",
+    "loading": "Memuat pustaka server…"
+  },
   "mobileLibrary": {
     "platforms": "Platform musik",
     "login": "Masuk / kode QR",
