@@ -26,6 +26,13 @@ export default {
     "footer": "Playback is handled by Apple MusicKit and does not bypass subscription or regional restrictions. The authorization token stays in page memory and is not persisted."
   },
     "radioAgent": {
+    "shareTitle": "Parse a music share link",
+    "sharePlaceholder": "Paste a music platform URL (HTTPS)",
+    "shareResolve": "Identify",
+    "shareUnsupported": "This link is not recognized. Please use a standard music sharing URL.",
+    "shareNoMetadata": "This provider did not return the requested song.",
+    "shareProviderUnavailable": "This music provider is unavailable or requires authorization.",
+    "shareOfficialLink": "Open with the official music service",
     "title": "AI Radio",
     "open": "AI Radio",
     "close": "Close radio",
