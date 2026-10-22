@@ -64,7 +64,7 @@ const isBrief = (value: unknown): value is RadioBrief => {
 };
 
 const localLabel = (song: LocalSong) => song.title || song.fileName.replace(/\.[^.]+$/, '');
-const localArtist = (song: LocalSong) => song.onlineMetadata?.artists?.map((artist) => typeof artist === 'string' ? artist : artist.name).filter(Boolean).join(', ') || song.importedMetadata?.artists?.map((artist) => typeof artist === 'string' ? artist : artist.name).filter(Boolean).join(', ') || '本地曲库';
+const localArtist = (song: LocalSong) => song.onlineMetadata?.artists?.map((artist) => typeof artist === 'string' ? artist : artist.name).filter(Boolean).join(', ') || song.importedMetadata?.artistNames?.join(', ') || '本地曲库';
 
 export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, onPlayLocal }: Props) {
     const { t } = useTranslation();
@@ -113,6 +113,7 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
         setError('');
         setOnlineSongs([]);
         const fallback = makeFallbackBrief(prompt);
+        let activeBrief = fallback;
         try {
             const response = await fetch('/api/radio-agent', {
                 method: 'POST',
@@ -121,24 +122,27 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
             });
             if (response.ok) {
                 const data: unknown = await response.json();
-                setBrief(isBrief(data) ? data : fallback);
+                activeBrief = isBrief(data) ? data : fallback;
+                setBrief(activeBrief);
             } else {
                 const data = await response.json().catch(() => ({})) as { error?: string };
+                activeBrief = fallback;
                 setBrief(fallback);
                 if (response.status !== 404 && response.status !== 501) setError(data.error || t('radioAgent.aiFallback'));
             }
         } catch {
+            activeBrief = fallback;
             setBrief(fallback);
             setError(t('radioAgent.aiFallback'));
         }
         try {
-            const terms = fallback.searchTerms;
+            const terms = activeBrief.searchTerms;
             const found = new Map<string, UnifiedSong>();
             for (const term of terms) {
                 try {
                     const page = await omni.searchSongs(term, { limit: 8, offset: 0 });
                     for (const song of page.items ?? []) {
-                        const key = String(song.sourceRef?.providerId ?? '') + ':' + String(song.id);
+                        const key = JSON.stringify(song.sourceRef ?? {}) + ':' + String(song.id);
                         if (!found.has(key)) found.set(key, song);
                     }
                 } catch {
