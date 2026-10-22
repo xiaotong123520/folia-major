@@ -6,6 +6,7 @@ import { omni } from '../../services/onlineMusic/omni';
 import { resolveMusicLink, type MusicLinkResolution } from '../../services/musicLinkResolver';
 import { isPlayableAudioFile } from '../../services/importedAudio';
 import { findSharedMusicSong } from '../../services/musicLinkPlayback';
+import { createPointSongImport, type PointSongImport, type PointSongSource } from '../../services/directPointSong';
 
 // Importing a shared link never starts playback without an explicit user action.
 // Existing Omni adapters remain responsible for song identity, access and playable audio.
@@ -15,15 +16,17 @@ type Props = {
     onOpenAppleMusic: () => void;
     onAddFiles: (files: File[]) => number;
     onAddAudioUrl: (url: string) => boolean;
+    onAddPointSong: (request: PointSongImport) => boolean;
 };
 
-export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusic, onAddFiles, onAddAudioUrl }: Props) {
+export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusic, onAddFiles, onAddAudioUrl, onAddPointSong }: Props) {
     const { t } = useTranslation();
     const [input, setInput] = useState('');
     const [resolution, setResolution] = useState<MusicLinkResolution | null>(null);
     const [song, setSong] = useState<UnifiedSong | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [pointSongTitle, setPointSongTitle] = useState('');
     const [serverQuery, setServerQuery] = useState('');
     const [serverSongs, setServerSongs] = useState<UnifiedSong[]>([]);
     const hasServer = omni.getProviderSummaries().some(item => item.providerId === 'music-backend' && item.availability.configured);
@@ -69,6 +72,20 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
         } finally {
             setLoading(false);
         }
+    };
+
+    const playPointSong = (source: PointSongSource) => {
+        const request = createPointSongImport(pointSongTitle, source);
+        if (!request) {
+            setError('请输入 1–80 个字符的歌曲名称');
+            return;
+        }
+        if (!onAddPointSong(request)) {
+            setError('无法将点歌链接加入播放器');
+            return;
+        }
+        setError('');
+        onClose();
     };
 
     const searchServer = async () => {
@@ -126,6 +143,26 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
                             <button type="button" onClick={() => { onClose(); onOpenAppleMusic(); }} className="inline-flex items-center gap-2 rounded-xl border border-pink-200/25 bg-pink-200/10 px-4 py-2.5 text-sm text-pink-100 hover:bg-pink-200/20">{t('musicLink.openOfficialAuth')}</button>}
                         {resolution.normalizedUrl && <a href={resolution.normalizedUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-4 py-2.5 text-sm text-white/80 hover:bg-white/10"><ExternalLink size={15}/>{t('musicLink.openOriginal')}</a>}
                     </div>}
+                    <section className="space-y-3 rounded-2xl border border-white/10 bg-violet-300/[0.035] p-4">
+                        <h3 className="text-sm font-medium">在线点歌 · GitHub Pages</h3>
+                        <p className="text-xs leading-5 text-white/60">无需你的服务器。输入歌名后选择来源，链接会进入页面下方的音乐播放器。QQ 首选失败时自动尝试备用接口。</p>
+                        <form onSubmit={event => { event.preventDefault(); playPointSong('qq-primary'); }} className="flex gap-2">
+                            <input
+                                value={pointSongTitle}
+                                onChange={event => setPointSongTitle(event.target.value)}
+                                maxLength={80}
+                                aria-label="点歌歌曲名称"
+                                placeholder="歌曲名称"
+                                className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-base outline-none focus:border-violet-300/50 sm:text-sm"
+                            />
+                            <button type="submit" disabled={!pointSongTitle.trim()} className="min-h-11 rounded-xl bg-violet-200 px-4 text-sm font-medium text-black disabled:opacity-50">QQ 点歌</button>
+                        </form>
+                        <div className="grid grid-cols-2 gap-2">
+                            <button type="button" disabled={!pointSongTitle.trim()} onClick={() => playPointSong('netease')} className="min-h-11 rounded-xl border border-white/15 px-3 text-sm text-white/90 disabled:opacity-50">网易云点歌</button>
+                            <button type="button" disabled={!pointSongTitle.trim()} onClick={() => playPointSong('qq-backup')} className="min-h-11 rounded-xl border border-white/15 px-3 text-sm text-white/90 disabled:opacity-50">QQ 备用接口</button>
+                        </div>
+                        <p className="text-xs leading-5 text-amber-100/75">仅当接口直接输出音频或重定向至允许播放的音频链接时才能播放。如果返回 JSON、页面文本、限制访问或需要平台会员授权，GitHub Pages 无法代替服务端解析，播放器会提示失败。</p>
+                    </section>
                     <section className="space-y-3 rounded-2xl border border-white/10 p-4">
                         <h3 className="text-sm font-medium">{t('personal.serverMusic')}</h3>
                         <p className="text-xs leading-5 text-white/60">{t(hasServer ? 'personal.serverReady' : 'personal.serverMissing')}</p>
