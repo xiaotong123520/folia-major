@@ -48,3 +48,19 @@ source 是平台 ID，如 netease、qq、kugou。详情兜底只接收搜索结�
 ## 上游同步
 
 每日定时任务只生成审查分支/PR，保留个人代码和 AGPL 版权声明。有合并冲突时需处理冲突；不会使用强制覆盖 main 的方式“同步”。生产前应核对 PR 的类型检查、单测和浏览器播放结果。
+
+## 已核实的额外方案与待测点歌接口（2026-10-23）
+
+当前推荐使用仓库已整合的 go-music-api：它有明确的 `/api/v1/music/search`、`/api/v1/music/stream`、`/api/v1/music/lyric` 契约，并支持网易云、QQ、酷狗、酷我等平台。仓库中还加入了 [PHP 8.0–8.4 自有曲库接口](../deploy/php-music-api/README.md)，可以作为**自有服务器音乐来源**；不能把标题相近的其他录音自动冒充原曲目。
+
+研究候选：
+- https://github.com/guohuiyuan/go-music-api （当前主线路线，已有适配代码；部署前仍需实播测试）
+- https://github.com/ELDment/Meting-Agent （搜索/单曲/歌词能力，需另写服务器适配）
+- https://github.com/Yuncan050115/ourcraft-music-api （网易云、酷狗、酷我；其维护文档注明 2026 年 QQ provider 已移除）
+
+以下由用户提供的点歌接口**尚未验证 DNS、响应格式和可持续可播放性**，不直接添加到公开浏览器或强制当作可用音频源：
+- `https://api.lxink.cn/api-qqmusic/?action=play&type=vip&songName=`
+- `https://cer.luckying.love/music/LuckyWYY.php?Love=`
+- `https://cer.luckying.love/music/Lucky.php?Love=`
+
+服务器侧的检查工具：`node deploy/music-backend-gateway/probe-point-song-endpoints.mjs "测试歌名"`。它只读取有上限的响应信息及 JSON 键，不跟随跳转、不下载媒体。待确认返回格式、访问授权以及能否支持 Range/206 后才能考虑编写可靠适配；普通 200 或返回 URL 都不等于可播放。平台会员及 DRM 访问限制仍应由原平台合法授权决定。
