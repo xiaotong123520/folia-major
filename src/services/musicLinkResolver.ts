@@ -34,6 +34,8 @@ export function resolveMusicLink(input: string): MusicLinkResolution {
   };
 
   const host = url.hostname.toLowerCase().replace(/^www\./, '');
+  // Local/private URLs must never be forwarded to an external metadata service.
+  // This parser performs no network requests.
   // Some NetEase share links put their resource ID inside the URL fragment.
   const hashQuery = new URLSearchParams(url.hash.replace(/^#\/?/, '').replace(/^.*?\?/, ''));
   // Keep fragments: NetEase share routes commonly encode the resource ID in #/song?id=...
@@ -82,7 +84,7 @@ export function resolveMusicLink(input: string): MusicLinkResolution {
   if (hostIs(host, 'soundcloud.com') || hostIs(host, 'on.soundcloud.com')) {
     return make('soundcloud', 'track', 'official-embed', 'SoundCloud 链接已识别；应使用官方嵌入或授权 API，部分曲目可能受限制。', undefined, true, true);
   }
-  if (url.pathname.includes('/rest/')) return make('navidrome', 'server', 'server-library', '看起来是 Subsonic/Navidrome 接口；请在 Folia 服务器音乐设置中配置可信服务器。', undefined, false, true);
+  if (/\/rest\/(?:stream|download|search|ping|scrobble)(?:\.view)?$/i.test(url.pathname)) return make('navidrome', 'server', 'server-library', '看起来是 Subsonic/Navidrome 接口；请在 Folia 服务器音乐设置中配置可信服务器。', undefined, false, true);
   if (/\.(mp3|m4a|aac|ogg|opus|wav|flac|mp4|webm)$/i.test(url.pathname)) {
     return make('direct-audio', 'audio', 'direct-audio', '识别为媒体直链；仅在来源可信且访问权限、跨域设置允许时播放。', undefined, false, true);
   }
