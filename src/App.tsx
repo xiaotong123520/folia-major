@@ -191,6 +191,11 @@ export default function App() {
     countRender('App');
     const { t } = useTranslation();
     const [isRadioAgentOpen, setIsRadioAgentOpen] = useState(false);
+    useEffect(() => {
+        const openRadioAgent = () => setIsRadioAgentOpen(true);
+        window.addEventListener('folia:open-radio-agent', openRadioAgent);
+        return () => window.removeEventListener('folia:open-radio-agent', openRadioAgent);
+    }, []);
     const [isAppleMusicOpen, setIsAppleMusicOpen] = useState(false);
     const {
         navidromeEnabled, setNavidromeEnabledState,
