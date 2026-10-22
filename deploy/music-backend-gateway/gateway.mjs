@@ -78,7 +78,8 @@ const server = http.createServer((req, res) => {
   try {
     target = new URL(upstream);
     if (!['http:', 'https:'].includes(target.protocol) || target.username || target.password) throw new Error('invalid upstream');
-    target.pathname = `${target.pathname.replace(/\\/+$/, '')}${parsed.pathname}`.replace(/\\/{2,}/g, '/');
+    while (target.pathname.endsWith('/')) target.pathname = target.pathname.slice(0, -1);
+    target.pathname += parsed.pathname;
     target.search = parsed.search;
   } catch {
     return json(res, 503, { error: 'Music backend upstream is not configured' });
