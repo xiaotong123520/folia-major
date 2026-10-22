@@ -42,7 +42,7 @@ function normalizeBaseUrl(input: string): URL {
     }
     url.search = '';
     url.hash = '';
-        url.pathname = `${this.baseUrl.pathname}${endpoint}`.replace(/\/{2,}/g, '/');
+    url.pathname = url.pathname.replace(/\/+$/, '');
     return url;
 }
 
