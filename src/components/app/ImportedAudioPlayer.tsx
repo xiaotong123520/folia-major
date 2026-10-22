@@ -217,7 +217,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
         return (
             <section
                 aria-label={t('musicImport.queue')}
-                className={`fixed bottom-[max(12px,env(safe-area-inset-bottom))] left-[max(12px,env(safe-area-inset-left))] z-[95] w-[calc(100%-1.5rem)] max-w-sm overflow-y-auto rounded-2xl border border-white/20 bg-[#17151f]/95 p-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl sm:bottom-5 sm:left-5 sm:max-h-[70dvh] ${mobileExpanded ? "max-h-[85dvh]" : "max-h-28"}`}
+                className={`fixed bottom-[calc(82px+env(safe-area-inset-bottom))] left-[max(12px,env(safe-area-inset-left))] z-[95] w-[calc(100%-1.5rem)] max-w-sm overflow-y-auto rounded-2xl border border-white/20 bg-[#17151f]/95 p-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl sm:bottom-5 sm:left-5 sm:max-h-[70dvh] ${mobileExpanded ? "max-h-[calc(100dvh-110px-env(safe-area-inset-bottom))] sm:max-h-[70dvh]" : "max-h-28"}`}
             >
                 <div className="flex items-center gap-2">
                     <Music2 size={18} className="shrink-0 text-violet-200" />

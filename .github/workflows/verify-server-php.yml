@@ -40,6 +40,9 @@ jobs:
           export MUSIC_LIBRARY_INDEX="$RUNNER_TEMP/ts-private/index.json"
           export MUSIC_PUBLIC_ORIGINS="https://xiaotong123520.github.io"
           export MUSIC_BACKEND_API_KEY="php-ci-not-a-real-secret"
+          export MUSIC_BROWSER_READ_TOKEN="test-read-only-token-0123456789-abcdef"
+          export MUSIC_STREAM_SIGNING_KEY="test-media-signing-secret-0123456789-abcdef"
+          export MUSIC_BROWSER_ORIGINS="https://example.vercel.app"
           php -S 127.0.0.1:8092 -t deploy/php-music-api deploy/php-music-api/index.php > "$RUNNER_TEMP/ts-server.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
@@ -66,3 +69,19 @@ jobs:
             "http://127.0.0.1:8092/api/v1/music/search?q=Song")
           test "$result" = "200"
           grep -qi 'access-control-allow-origin: https://xiaotong123520.github.io' "$RUNNER_TEMP/cors-headers"
+          # Read-only clients get a short-lived, signed URL instead of filesystem paths.
+          curl -fsS -H "Authorization: Bearer $MUSIC_BROWSER_READ_TOKEN" \
+            "http://127.0.0.1:8092/api/v1/music/search?q=Song" > "$RUNNER_TEMP/private-index.json"
+          stream_path=$(php -r '$r=json_decode(file_get_contents($argv[1]),true); $url=$r["data"]["songs"][0]["streamUrl"]??""; if(!str_starts_with($url,"/api/v1/music/stream?")) exit(1); echo $url;' "$RUNNER_TEMP/private-index.json")
+          result=$(curl -sS -D "$RUNNER_TEMP/signed-range-headers" -o "$RUNNER_TEMP/signed-range-body" -w '%{http_code}' \
+            -H 'Range: bytes=5-9' "http://127.0.0.1:8092$stream_path")
+          test "$result" = "206"
+          test "$(cat "$RUNNER_TEMP/signed-range-body")" = "FGHIJ"
+          result=$(curl -sS -o /dev/null -w '%{http_code}' \
+            "http://127.0.0.1:8092/api/v1/music/stream?source=local&id=$track_id&expires=0000000000&sig=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+          test "$result" = "401"
+          result=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H 'Origin: https://example.vercel.app' -H 'Access-Control-Request-Method: GET' \
+            -H 'Access-Control-Request-Headers: Authorization' -X OPTIONS \
+            "http://127.0.0.1:8092/api/v1/music/search")
+          test "$result" = "204"
