@@ -8,7 +8,7 @@ import {
     type ImportedAudioTrack,
 } from '../../services/importedAudio';
 import { importedAudioDatabase, writeImportedAudio } from '../../services/importedAudioStorage';
-import type { PointSongImport } from '../../services/directPointSong';
+import { resolvePointSongMediaUrl, type PointSongImport } from '../../services/directPointSong';
 
 /** Persistent browser audio queue. Unlike the import dialog it stays mounted while songs play. */
 export interface ImportedAudioPlayerHandle {
@@ -30,6 +30,7 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
         const [error, setError] = useState('');
         const [fallbackRetry, setFallbackRetry] = useState<{ id: string; url: string } | null>(null);
         const fallbackAttemptsRef = useRef(new Map<string, number>());
+        const resolvingUrlRef = useRef<string | null>(null);
         const playWasStartedRef = useRef(false);
         const audioRef = useRef<HTMLAudioElement | null>(null);
         const ownedUrlsRef = useRef(new Set<string>());
@@ -210,17 +211,35 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                     onPlay={() => { playWasStartedRef.current = true; setError(''); onStartPlayback(); }}
                     onPause={() => { if (!audioRef.current?.error) playWasStartedRef.current = false; }}
                     onError={() => {
-                        const attempt = fallbackAttemptsRef.current.get(activeTrack.id) ?? 0;
-                        const candidate = activeTrack.fallbackUrls?.[attempt];
-                        if (candidate) {
-                            fallbackAttemptsRef.current.set(activeTrack.id, attempt + 1);
-                            playAfterSelectionRef.current = playWasStartedRef.current;
-                            setFallbackRetry({ id: activeTrack.id, url: candidate });
-                            setError('首个点歌地址不可用，正在尝试备用接口');
-                        } else {
-                            playWasStartedRef.current = false;
-                            setError(t('musicImport.audioError') + '；接口可能返回 JSON、拒绝跨域访问或无播放权限');
-                        }
+                        const failedUrl = fallbackRetry?.id === activeTrack.id ? fallbackRetry.url : activeTrack.url;
+                        const tryFallback = () => {
+                            const attempt = fallbackAttemptsRef.current.get(activeTrack.id) ?? 0;
+                            const candidate = activeTrack.fallbackUrls?.[attempt];
+                            if (candidate) {
+                                fallbackAttemptsRef.current.set(activeTrack.id, attempt + 1);
+                                playAfterSelectionRef.current = playWasStartedRef.current;
+                                setFallbackRetry({ id: activeTrack.id, url: candidate });
+                                setError('当前接口无法播放，正在尝试 QQ 备用接口');
+                            } else {
+                                playWasStartedRef.current = false;
+                                setError(t('musicImport.audioError') + '；接口可能返回 JSON、禁止跨域读取或无播放权限');
+                            }
+                        };
+                        // Some endpoints respond with a JSON {data:{url}}. This is only readable if
+                        // the vendor explicitly allows browser CORS; never attempt to evade that policy.
+                        if (resolvingUrlRef.current === failedUrl) return;
+                        resolvingUrlRef.current = failedUrl;
+                        void resolvePointSongMediaUrl(failedUrl).then(url => {
+                            resolvingUrlRef.current = null;
+                            if (audioRef.current?.src !== failedUrl) return;
+                            if (url && url !== failedUrl) {
+                                playAfterSelectionRef.current = playWasStartedRef.current;
+                                setFallbackRetry({ id: activeTrack.id, url });
+                                setError('已读取点歌接口返回的音频地址，尝试播放');
+                                return;
+                            }
+                            tryFallback();
+                        });
                     }}
                     onEnded={() => {
                         if (activeIndex + 1 < tracks.length) switchTo(tracks[activeIndex + 1].id, true);
