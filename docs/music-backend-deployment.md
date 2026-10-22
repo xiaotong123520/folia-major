@@ -9,6 +9,8 @@ This branch contains an optional Folia provider adapter, a bounded HTTP client, 
 - `src/services/onlineMusic/musicBackendClient.ts`: bounded JSON transport, HTTPS enforcement, request timeout/cancellation, endpoint validation and size limits.
 - `src/services/onlineMusic/musicBackendProvider.ts`: maps the candidate API's search and lyrics response into Folia's provider contract; uses the backend stream endpoint for audio.
 - `src/services/onlineMusic/providerRegistry.ts`: registers the optional provider. It reports not configured until the base URL is set.
+- `api-ts/music-backend-proxy.ts`: same-origin, read-only allowlist proxy for search, lyrics, stream, inspect/switch, album and playlist detail. It forwards Range headers and selected audio response headers; it does not expose cookie/QR-login routes.
+- `vercel.json`: routes `/api/music-backend/*` to the allowlisted proxy.
 - `test/unit/musicBackendClient.test.ts`: transport validation tests.
 - `.env.example`: optional public backend URL.
 - `docs/music-backend-evaluation.md`: candidate and security review.
@@ -16,16 +18,21 @@ This branch contains an optional Folia provider adapter, a bounded HTTP client, 
 ## Configure for local development
 
 1. Copy `.env.example` to `.env.local` in your local checkout.
-2. Set `VITE_MUSIC_BACKEND_BASE_URL` to a locally running, hardened backend, for example `http://127.0.0.1:8090` for local-only development.
+2. For direct local development, set `VITE_MUSIC_BACKEND_BASE_URL` to a locally running, hardened backend, for example `http://127.0.0.1:8090`. For a Vercel deployment, set it to the Folia site's same-origin proxy base, e.g. `https://your-folia-domain.example/api/music-backend`.
 3. Restart the Vite development server after changing environment variables.
 4. Keep the value empty to leave the provider unavailable.
 5. Do not put cookies, API secrets, private keys, or bearer tokens in any `VITE_*` variable. Vite variables are delivered to the browser.
 
 ## Production requirements
 
-The browser adapter requests search/lyrics and receives a stream URL from the configured backend. Therefore the URL is public. Before production use, the service must be designed so public requests cannot read or alter platform cookies, initiate QR login, or access administrative configuration.
+The browser adapter uses the same-origin Vercel proxy when `VITE_MUSIC_BACKEND_BASE_URL` points at `/api/music-backend`. Set these server-side Vercel environment variables:
 
-The stock `go-music-api` router currently mounts cookie read/write and QR-login routes without visible route-level authentication, and uses permissive CORS. Do not expose the stock service directly to the internet. Minimum acceptable deployment design:
+- `MUSIC_BACKEND_UPSTREAM_URL`: URL of the private, hardened music API. Prefer an internal/private address; the proxy accepts remote HTTPS URLs only.
+- `FOLIA_ALLOWED_ORIGINS`: comma-separated exact origin(s), e.g. `https://your-folia-domain.example`.
+
+Do not prefix either server variable with `VITE_`. The proxy is read-only and has a best-effort per-IP rate limit, but in-memory limits are not a substitute for a durable edge/WAF rate limit. Before production use, the upstream must be configured so public requests cannot read or alter platform cookies, initiate QR login, or access administrative configuration.
+
+The stock `go-music-api` router currently mounts cookie read/write and QR-login routes without visible route-level authentication, and uses permissive CORS. Do not expose the stock service directly to the internet. The Folia proxy does not expose those management routes, but the upstream must still be private or independently hardened. Minimum acceptable deployment design:
 
 - Run it on a private network or bind it to loopback behind a gateway.
 - Allowlist only the Folia web origin at the gateway; do not combine wildcard origin with credentialed CORS.
