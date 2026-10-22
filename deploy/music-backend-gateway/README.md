@@ -21,3 +21,29 @@ This stack keeps the upstream Go API off host-published ports. Only the gateway 
 - Rate limiting is process-local; retain a Baota/Nginx or edge-level rate limit for production.
 - The upstream project is AGPL-3.0 and its built-in cookie/QR-login routes are not protected by the stock router. Do not expose the upstream container directly. Review the license and platform terms before any hosted use.
 - This gateway is an access-control layer, not permission to bypass DRM, paywalls, or provider membership checks. Playback is only expected for resources the user is authorized to access.
+
+
+## 桐声音乐：启用你提供的三个点歌接口
+
+本分支把三个第三方点歌来源部署在**私有 Node.js 后端**，不在浏览器直连：
+
+- QQ 主源：`api.lxink.cn/api-qqmusic/`（`action=play&type=vip&songName=...`）
+- QQ 备用：`cer.luckying.love/music/Lucky.php?Love=...`
+- 网易云：`cer.luckying.love/music/LuckyWYY.php?Love=...`
+
+`docker-compose.yml` 使用三个容器：`go-music-api`、`music-source-fallback`、`music-backend-gateway`。服务端请求链路是浏览器 → 宝塔 HTTPS → 仅对本机开放的 8090 网关 → 私网 8093 聚合接口 → Go / 点歌接口。不会向公网开放 Go API 的 cookie 登录等管理路由，也不会把服务器 token 发送到前端。
+
+**启用状态**：`.env.example` 中 `MUSIC_ENABLE_NAME_LOOKUP=true`；Docker Compose 同样默认 true。网页搜索结果会增加「QQ点歌接口（版本待验证）」和「网易云点歌接口（版本待验证）」两个可选来源；QQ 会先尝试 lxink，失败后尝试 Lucky.php，网易云尝试 LuckyWYY.php。只接受实际音频响应或经允许的 HTTPS 音频地址。若返回的是微信点歌卡片、HTML 或不可播放数据，不会错误地把它当成音频，也不会保证 VIP 歌曲可用。
+
+服务器部署（需要你在宝塔终端／Termius 上操作，当前连接无法直接登录服务器）：
+
+1. 把此目录及 `fallback/server.mjs` 上传/拉取到服务器，执行 `cp .env.example .env`，用 `openssl rand -hex 32` 创建专用 `MUSIC_BACKEND_API_KEY`，写入服务器的 `.env`（不要上传到 GitHub）。
+2. 若使用示例 Go API 容器，执行 `printf '{}' > cookies.json && chmod 600 cookies.json`，只在服务器保留此文件。
+3. 按实际返回音频的 HTTPS 主机，核对 `MUSIC_AUDIO_ALLOW_HOSTS`。默认列出的音频 CDN 是候选值，不代表点歌接口一定返回这些域名；遇到不同域名需先确认安全及授权再增加。禁止加 `*`、内网 IP 或未知任意域名。
+4. `docker compose config --quiet && docker compose up -d --build`。检查 `docker compose ps` 和 `docker compose logs --tail=100 music-source-fallback`。
+5. 本机执行 `curl http://127.0.0.1:8090/healthz`。通过宝塔把独立 HTTPS 音乐 API 域名反代到 `127.0.0.1:8090`。
+6. 若是**面向公众且有权开放**的曲库，可以配置 `MUSIC_PUBLIC_ORIGINS=https://xiaotong123520.github.io`，在 GitHub Actions Variables 设 `VITE_MUSIC_BACKEND_BASE_URL=https://你的API域名` 并重新构建 Pages。**Origin/CORS 不能保护私人内容**。若需私有访问，请通过 Vercel 服务端代理和鉴权，而不是公开 Pages 模式。
+
+验证步骤：在网页搜索一首可公开播放的歌曲 → 手动选择「QQ点歌」或「网易云点歌」 → 点击播放并拖动进度；同时在浏览器开发者工具查看 `/api/v1/music/stream` 是否返回 `audio/*` 和 200/206。当前外部三方 API 未能直接取得可核实音频响应，必须在实际运行服务器上进行测试。
+
+本仓库附带不联网的模拟音频测试：`node --test deploy/music-backend-gateway/fallback/server.test.mjs`，以及 `.github/workflows/verify-song-api-server.yml`。这些测试证明代码调用顺序与接口兼容逻辑，不能证明第三方服务真的在线或有会员播放授权。
