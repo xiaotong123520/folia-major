@@ -2865,6 +2865,7 @@ export default function App() {
 
             {!isElectronWindow && <PersonalMusicTools
                 onImport={() => setIsMusicLinkImportOpen(true)}
+                onImportFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
                 onRadio={() => setIsRadioAgentOpen(true)}
                 onApple={() => setIsAppleMusicOpen(true)}
             />}
