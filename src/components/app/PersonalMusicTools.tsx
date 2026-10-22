@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { AudioLines, Link2, Music2, Radio, X, Upload, ChevronRight, Smartphone } from 'lucide-react';
+import { AudioLines, Link2, Music2, Radio, X, Upload, ChevronRight, Smartphone, Film } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 // A mobile-first music entry; on desktop retain the compact original toolbar.
-export default function PersonalMusicTools({ onImport, onRadio, onApple, onImportFiles }: {
+export default function PersonalMusicTools({ onImport, onRadio, onApple, onImportFiles, onVideos }: {
     onImport: () => void;
     onRadio: () => void;
     onApple: () => void;
+    onVideos: () => void;
     onImportFiles: (files: File[]) => number;
 }) {
     const { t } = useTranslation();
@@ -15,6 +16,7 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onImpor
         { icon: Link2, label: t('personal.import'), run: onImport },
         { icon: Radio, label: t('radioAgent.open'), run: onRadio },
         { icon: Music2, label: t('appleMusic.name'), run: onApple },
+        { icon: Film, label: '我的视频库', run: onVideos },
     ];
     const runAndClose = (action: () => void) => { setOpen(false); action(); };
     return <>
@@ -47,7 +49,7 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onImpor
                     <header className="space-y-2">
                         <p className="flex items-center gap-2 text-xs tracking-[0.22em] text-violet-200"><Smartphone size={15}/> TONGSHENG MOBILE</p>
                         <h2 className="text-3xl font-semibold tracking-tight">你的随身音乐空间</h2>
-                        <p className="text-sm leading-6 text-white/60">搜索点歌、导入本地歌曲和打开音乐电台。使用 GitHub Pages，无需自己部署服务器。</p>
+                        <p className="text-sm leading-6 text-white/60">搜索点歌、导入本地歌曲和打开音乐电台。网页由 GitHub 托管；视频库可选连接你的宝塔服务器。</p>
                     </header>
                     <nav className="grid grid-cols-2 gap-3" aria-label="移动端音乐功能">
                         <button type="button" onClick={() => runAndClose(onImport)}
@@ -72,6 +74,11 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onImpor
                         <button type="button" onClick={() => runAndClose(onApple)}
                             className="flex min-h-32 flex-col items-start justify-between rounded-3xl border border-white/15 bg-white/[0.08] p-5 text-left focus-visible:outline-2 focus-visible:outline-violet-200">
                             <Music2 size={25} className="text-violet-200"/><span className="text-lg font-semibold">Apple Music</span>
+                        </button>
+                        <button type="button" onClick={() => runAndClose(onVideos)}
+                            className="col-span-2 flex min-h-24 items-center justify-between rounded-3xl border border-violet-200/20 bg-violet-200/[0.08] p-5 text-left focus-visible:outline-2 focus-visible:outline-violet-200">
+                            <span className="flex items-center gap-3 text-lg font-semibold"><Film size={25} className="text-violet-200"/> 视频库 · 宝塔服务器</span>
+                            <ChevronRight size={20} className="text-white/50"/>
                         </button>
                     </nav>
                     <section className="space-y-2 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
