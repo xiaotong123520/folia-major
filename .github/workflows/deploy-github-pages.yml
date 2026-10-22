@@ -44,7 +44,7 @@ jobs:
         run: npm run typecheck
 
       - name: Focused music feature tests
-        run: npx vitest run -c vitest.config.ts test/unit/musicLinkResolver.test.ts test/unit/importedAudio.test.ts test/unit/radioAgent.test.ts test/unit/workerAiRoutes.test.ts
+        run: npx vitest run -c vitest.config.ts test/unit/musicLinkResolver.test.ts test/unit/importedAudio.test.ts test/unit/foliaServerFallback.test.ts test/unit/radioAgent.test.ts test/unit/workerAiRoutes.test.ts
 
       - name: Build Pages assets (no server-side secrets)
         env:
