@@ -1,0 +1,105 @@
+name: Baota PHP video API checks
+
+on:
+  pull_request:
+    paths:
+      - 'deploy/php-video-api/**'
+      - 'src/services/serverVideoLibrary.ts'
+      - 'src/components/app/VideoLibrary.tsx'
+      - 'test/unit/serverVideoLibrary.test.ts'
+      - '.github/workflows/verify-php-video-api.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.0', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: fileinfo, session
+      - name: Validate PHP syntax
+        run: |
+          php -l deploy/php-video-api/index.php
+          php -l deploy/php-video-api/config.example.php
+      - name: Smoke-test login, authenticated upload, list and HTTP 206
+        shell: bash
+        run: |
+          set -euo pipefail
+          export TEST_VIDEO_STORAGE="$RUNNER_TEMP/private-video-files"
+          export TONGSHENG_VIDEO_CONFIG="$RUNNER_TEMP/video-config.php"
+          mkdir -p "$TEST_VIDEO_STORAGE"
+          cat > "$TONGSHENG_VIDEO_CONFIG" <<'PHP'
+          <?php
+          return [
+            'storage_dir' => getenv('TEST_VIDEO_STORAGE'),
+            'admin_password_hash' => password_hash('unit-test-admin', PASSWORD_DEFAULT),
+            'public_gallery' => getenv('TEST_PUBLIC_FLAG') === 'true',
+            'allowed_origin' => 'https://xiaotong123520.github.io',
+            'max_upload_bytes' => 1000000,
+          ];
+          PHP
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          Path(os.environ['RUNNER_TEMP'], 'sample.mp4').write_bytes(b'\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isomiso2')
+          PY
+          # Private gallery: nobody can enumerate files or stream until intentionally public.
+          TEST_PUBLIC_FLAG=false php -S 127.0.0.1:8098 -t deploy/php-video-api deploy/php-video-api/index.php > "$RUNNER_TEMP/private-video.log" 2>&1 &
+          private_pid=$!
+          TEST_PUBLIC_FLAG=true php -S 127.0.0.1:8099 -t deploy/php-video-api deploy/php-video-api/index.php > "$RUNNER_TEMP/public-video.log" 2>&1 &
+          public_pid=$!
+          trap 'kill "$private_pid" "$public_pid" 2>/dev/null || true' EXIT
+          for i in {1..40}; do
+            if curl -fsS 'http://127.0.0.1:8099/index.php?action=admin' >/dev/null; then break; fi
+            sleep 0.2
+          done
+          status=$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8098/index.php?action=list')
+          test "$status" = 403
+
+          # Anonymous uploads are rejected and cannot write storage.
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -F "video=@$RUNNER_TEMP/sample.mp4" 'http://127.0.0.1:8099/index.php?action=upload')
+          test "$status" = 403
+
+          curl -fsS -c "$RUNNER_TEMP/cookies" 'http://127.0.0.1:8099/index.php?action=admin' > "$RUNNER_TEMP/login.html"
+          csrf=$(grep -o 'name="csrf" value="[^"]*"' "$RUNNER_TEMP/login.html" | head -1 | sed -E 's/.*value="([^"]*)"/\1/')
+          test -n "$csrf"
+          status=$(curl -s -b "$RUNNER_TEMP/cookies" -c "$RUNNER_TEMP/cookies" -o /dev/null -w '%{http_code}' \
+            -d "csrf=$csrf" --data-urlencode 'password=unit-test-admin' 'http://127.0.0.1:8099/index.php?action=login')
+          test "$status" = 303
+
+          curl -fsS -b "$RUNNER_TEMP/cookies" 'http://127.0.0.1:8099/index.php?action=admin' > "$RUNNER_TEMP/admin.html"
+          csrf=$(grep -o 'name="csrf" value="[^"]*"' "$RUNNER_TEMP/admin.html" | head -1 | sed -E 's/.*value="([^"]*)"/\1/')
+          status=$(curl -s -b "$RUNNER_TEMP/cookies" -o /dev/null -w '%{http_code}' \
+            -F "csrf=$csrf" -F "title=Unit Video" -F "video=@$RUNNER_TEMP/sample.mp4;type=video/mp4" \
+            'http://127.0.0.1:8099/index.php?action=upload')
+          test "$status" = 303
+
+          curl -fsS -D "$RUNNER_TEMP/list-headers" -H 'Origin: https://xiaotong123520.github.io' \
+            'http://127.0.0.1:8099/index.php?action=list' > "$RUNNER_TEMP/list.json"
+          grep -qi '^access-control-allow-origin: https://xiaotong123520.github.io' "$RUNNER_TEMP/list-headers"
+          php -r '$j=json_decode(file_get_contents($argv[1]),true); if(($j["data"]["videos"][0]["title"]??"") !== "Unit Video") exit(1);' "$RUNNER_TEMP/list.json"
+          video_id=$(php -r '$j=json_decode(file_get_contents($argv[1]),true); echo $j["data"]["videos"][0]["id"];' "$RUNNER_TEMP/list.json")
+          test -n "$video_id"
+
+          status=$(curl -s -D "$RUNNER_TEMP/headers" -o "$RUNNER_TEMP/bytes" -w '%{http_code}' \
+            -H 'Range: bytes=0-7' "http://127.0.0.1:8099/index.php?action=stream&id=$video_id")
+          test "$status" = 206
+          grep -qi 'content-range: bytes 0-7/24' "$RUNNER_TEMP/headers"
+          test "$(wc -c < "$RUNNER_TEMP/bytes")" -eq 8
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -H 'Range: bytes=99999-' "http://127.0.0.1:8099/index.php?action=stream&id=$video_id")
+          test "$status" = 416
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            'http://127.0.0.1:8099/index.php?action=stream&id=../../etc/passwd')
+          test "$status" = 400
