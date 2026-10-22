@@ -55,7 +55,7 @@ jobs:
       - name: Verify output and provide SPA refresh fallback
         run: |
           test -s dist/index.html
-          test -s dist/assets/*.js
+          find dist/assets -maxdepth 1 -type f -name '*.js' -print -quit | grep -q .
           cp dist/index.html dist/404.html
 
       - name: Configure GitHub Pages
