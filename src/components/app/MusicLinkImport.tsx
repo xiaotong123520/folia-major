@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link2, LoaderCircle, Music2, Play, ExternalLink, X } from 'lucide-react';
+import { Link2, LoaderCircle, Music2, Play, ExternalLink, Upload, X } from 'lucide-react';
 import type { UnifiedSong } from '../../types';
 import { omni } from '../../services/onlineMusic/omni';
 import { resolveMusicLink, type MusicLinkResolution } from '../../services/musicLinkResolver';
+import { isPlayableAudioFile } from '../../services/importedAudio';
 
 // Importing a shared link never starts playback without an explicit user action.
 // Existing Omni adapters remain responsible for song identity, access and playable audio.
@@ -11,9 +12,11 @@ type Props = {
     onClose: () => void;
     onPlayOnline: (song: UnifiedSong) => void;
     onOpenAppleMusic: () => void;
+    onAddFiles: (files: File[]) => number;
+    onAddAudioUrl: (url: string) => boolean;
 };
 
-export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusic }: Props) {
+export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusic, onAddFiles, onAddAudioUrl }: Props) {
     const { t } = useTranslation();
     const [input, setInput] = useState('');
     const [resolution, setResolution] = useState<MusicLinkResolution | null>(null);
@@ -25,6 +28,24 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
         setResolution(resolveMusicLink(input));
         setSong(null);
         setError('');
+    };
+
+    const importFiles = (files: File[]) => {
+        const supported = files.filter(isPlayableAudioFile);
+        const added = supported.length ? onAddFiles(supported) : 0;
+        if (added > 0) {
+            onClose();
+            return;
+        }
+        setError(t('musicLink.invalidFiles'));
+    };
+
+    const importAudioUrl = () => {
+        if (!resolution?.normalizedUrl || !onAddAudioUrl(resolution.normalizedUrl)) {
+            setError(t('musicLink.httpsRequired'));
+            return;
+        }
+        onClose();
     };
 
     const findTrack = async () => {
@@ -54,6 +75,22 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
                     <button type="button" onClick={onClose} aria-label={t('musicLink.close')} className="rounded-full p-2 hover:bg-white/10"><X size={18}/></button>
                 </header>
                 <div className="space-y-4 overflow-y-auto p-5">
+                    <div className="rounded-2xl border border-violet-200/20 bg-violet-200/5 p-4">
+                        <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-violet-200 px-4 py-3 text-sm font-medium text-black">
+                            <Upload size={16}/>{t('musicLink.chooseFiles')}
+                            <input
+                                type="file"
+                                multiple
+                                accept="audio/*,.mp3,.m4a,.aac,.flac,.wav,.ogg,.opus,.webm"
+                                className="sr-only"
+                                onChange={event => {
+                                    importFiles(Array.from(event.currentTarget.files ?? []));
+                                    event.currentTarget.value = '';
+                                }}
+                            />
+                        </label>
+                        <p className="mt-2 text-xs leading-5 text-white/60">{t('musicLink.fileHint')}</p>
+                    </div>
                     <form onSubmit={event => { event.preventDefault(); inspect(); }} className="flex gap-2">
                         <input value={input} onChange={event => setInput(event.target.value)} placeholder={t('musicLink.placeholder')} aria-label={t('musicLink.inputLabel')} className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm outline-none focus:border-violet-300/50" />
                         <button type="submit" disabled={!input.trim()} className="rounded-xl bg-violet-200 px-4 text-sm font-medium text-black disabled:opacity-50">{t('musicLink.inspect')}</button>
@@ -62,6 +99,8 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
                         <p className="text-xs uppercase tracking-wide text-violet-200">{resolution.platform} · {resolution.kind}</p>
                         <p className="text-sm leading-6 text-white/70">{resolution.note}</p>
                         {resolution.resourceId && <p className="break-all text-xs text-white/40">{t('musicLink.resourceId')}: {resolution.resourceId}</p>}
+                        {(resolution.access === 'direct-audio' || resolution.platform === 'unknown' && resolution.normalizedUrl) &&
+                            <button type="button" onClick={importAudioUrl} className="inline-flex items-center gap-2 rounded-xl bg-emerald-200 px-4 py-2.5 text-sm font-medium text-black"><Play size={15}/>{t('musicLink.addAudioUrl')}</button>}
                         {resolution.access === 'existing-provider-adapter' && resolution.kind === 'track' && resolution.resourceId && !song &&
                             <button type="button" onClick={() => void findTrack()} disabled={loading} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-black disabled:opacity-50">{loading && <LoaderCircle size={15} className="animate-spin"/>}{t('musicLink.fetchSong')}</button>}
                         {resolution.access === 'official-embed' && resolution.requiresUserEntitlement &&
