@@ -8,6 +8,8 @@ import {
 } from '../../../types/onlineMusic';
 import { MusicBackendClient, MusicBackendHttpError } from './musicBackendTransport';
 
+// Adapts the self-hosted multi-source backend to Folia's shared OnlineMusicProvider contract.
+
 type BackendSong = {
     id?: string | number;
     source?: string;
