@@ -42,7 +42,7 @@ function normalizeBaseUrl(input: string): URL {
     }
     url.search = '';
     url.hash = '';
-    url.pathname = url.pathname.replace(/\/+$/, '');
+        url.pathname = `${this.baseUrl.pathname}${endpoint}`.replace(/\/{2,}/g, '/');
     return url;
 }
 
@@ -145,7 +145,7 @@ export class MusicBackendClient {
             throw new MusicBackendHttpError('Invalid music backend endpoint');
         }
         const url = new URL(this.baseUrl.toString());
-        url.pathname = `${this.baseUrl.pathname}${endpoint}`.replace(/\\/{2,}/g, '/');
+        url.pathname = `${this.baseUrl.pathname}${endpoint}`.replace(/\/{2,}/g, '/');
         for (const [key, value] of Object.entries(query)) {
             if (value !== undefined) url.searchParams.set(key, String(value));
         }
