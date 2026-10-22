@@ -297,6 +297,10 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
           navigateFallbackDenylist: [/^\/api(?:\/|$)/, /^\/__folia_cover\//]
         },
         manifest: {
+          id: process.env.GITHUB_PAGES === 'true' ? '/folia-major/' : '/',
+          start_url: process.env.GITHUB_PAGES === 'true' ? '/folia-major/' : '/',
+          scope: process.env.GITHUB_PAGES === 'true' ? '/folia-major/' : '/',
+          categories: ['music', 'entertainment'],
           name: '桐声音乐',
           short_name: '桐声',
           description: '手机与电脑共用的私人音乐空间',
