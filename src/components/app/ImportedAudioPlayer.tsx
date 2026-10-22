@@ -49,7 +49,12 @@ const ImportedAudioPlayer = forwardRef<ImportedAudioPlayerHandle, Props>(
                 if (cancelled || version !== restoreVersionRef.current) return;
                 const restored = saved.flatMap(item => {
                     if (!item.file && !item.url) return [];
-                    const url = item.file ? URL.createObjectURL(item.file) : validatePlayableUrl(item.url ?? '');
+                    // IndexedDB may restore a File as an untyped Blob on iOS; recover
+                    // its stored filename and MIME even for imports from older releases.
+                    const restoredFile = item.file
+                        ? normalizeImportedAudioFile(new File([item.file], item.name, { type: item.file.type }))
+                        : null;
+                    const url = restoredFile ? URL.createObjectURL(restoredFile) : validatePlayableUrl(item.url ?? '');
                     if (!url) return [];
                     if (item.file) ownedUrlsRef.current.add(url);
                     return [{ id: item.id, name: item.name, url, temporary: Boolean(item.file), fallbackUrls: item.fallbackUrls?.map(value => validatePlayableUrl(value)).filter((value): value is string => Boolean(value)) ?? [] }];
