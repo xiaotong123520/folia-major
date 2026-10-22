@@ -8,6 +8,7 @@ import { qqProvider } from './qq/qqProvider';
 import { bodianProvider } from './bodian/bodianProvider';
 import { ytmProvider } from './ytm/ytmProvider';
 import { spotifyProvider } from './spotify/spotifyProvider';
+import { musicBackendProvider } from './musicBackendProvider';
 
 // src/services/onlineMusic/providerRegistry.ts
 
@@ -110,3 +111,6 @@ registerOnlineMusicProvider(qqProvider);
 registerOnlineMusicProvider(bodianProvider);
 registerOnlineMusicProvider(ytmProvider);
 registerOnlineMusicProvider(spotifyProvider);
+
+// Optional self-hosted backend; it stays unavailable until configured explicitly.
+registerOnlineMusicProvider(musicBackendProvider);
