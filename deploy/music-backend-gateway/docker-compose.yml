@@ -11,6 +11,32 @@ services:
       - music-private
     # No host port is published. Cookie/QR-login administration is not exposed through the gateway.
 
+
+  music-source-fallback:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tongsheng-music-fallback
+    restart: unless-stopped
+    command: ["node", "fallback/server.mjs"]
+    depends_on:
+      - go-music-api
+    environment:
+      PORT: "8093"
+      MUSIC_PRIMARY_BACKEND_URL: "http://go-music-api:8080"
+      MUSIC_METING_BASE_URL: "${MUSIC_METING_BASE_URL:-}"
+      MUSIC_METING_TOKEN: "${MUSIC_METING_TOKEN:-}"
+      MUSIC_METING_PUBLIC_URL: "${MUSIC_METING_PUBLIC_URL:-}"
+      MUSIC_SEARCH_SOURCES: "${MUSIC_SEARCH_SOURCES:-netease,qq,kugou,kuwo}"
+      MUSIC_ENABLE_NAME_LOOKUP: "${MUSIC_ENABLE_NAME_LOOKUP:-true}"
+      MUSIC_AUDIO_ALLOW_HOSTS: "${MUSIC_AUDIO_ALLOW_HOSTS:-}"
+    expose:
+      - "8093"
+    networks:
+      - music-private
+    # Do not publish 8093: only the authenticated gateway can access this service.
+
+
   music-backend-gateway:
     build:
       context: .
@@ -18,10 +44,10 @@ services:
     container_name: folia-music-gateway
     restart: unless-stopped
     depends_on:
-      - go-music-api
+      - music-source-fallback
     environment:
       PORT: "8090"
-      MUSIC_BACKEND_INTERNAL_URL: "http://go-music-api:8080"
+      MUSIC_BACKEND_INTERNAL_URL: "http://music-source-fallback:8093"
       MUSIC_BACKEND_API_KEY: "${MUSIC_BACKEND_API_KEY:?Set a long random bearer key in .env}"
       MUSIC_PUBLIC_ORIGINS: "${MUSIC_PUBLIC_ORIGINS:-}"
       GATEWAY_MAX_REQUESTS_PER_MINUTE: "120"
