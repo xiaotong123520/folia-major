@@ -8,7 +8,7 @@ import { qqProvider } from './qq/qqProvider';
 import { bodianProvider } from './bodian/bodianProvider';
 import { ytmProvider } from './ytm/ytmProvider';
 import { spotifyProvider } from './spotify/spotifyProvider';
-import { musicBackendProvider } from './musicBackendProvider';
+import { musicBackendProvider } from './music-backend/musicBackendProvider';
 
 // src/services/onlineMusic/providerRegistry.ts
 
