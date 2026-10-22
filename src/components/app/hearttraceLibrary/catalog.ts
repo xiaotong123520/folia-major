@@ -1,7 +1,7 @@
 import type { PointSongImport } from '../../../services/directPointSong';
 
 // Build owner-hosted audio URLs; this catalog is separate from online platform song identity.
-export const HEARTTRACE_ORIGIN = 'https://xn--1lqq7iexp1vp.com';
+export const HEARTTRACE_ORIGIN = new URL('https://我爱南京.com').origin;
 
 export type CatalogEntry = { album: string; directory: string; file: string; title: string };
 
