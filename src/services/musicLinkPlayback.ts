@@ -16,7 +16,19 @@ export async function findSharedMusicSong(link: MusicLinkResolution): Promise<Un
     }
     const backend = omni.getProviderSummaries().find(item => item.providerId === 'music-backend');
     if (backend?.availability.configured) {
-        const song = await omni.getSongDetail('music-backend', `${link.platform}:${link.resourceId}`);
+        const expectedId = `${link.platform}:${link.resourceId}`;
+        let song = await omni.getSongDetail('music-backend', expectedId);
+        // go-music-api also supports share links in its search endpoint. ID-only keyword search
+        // can be empty even when the actual shared track is indexed by the backend.
+        if (!song && link.normalizedUrl) {
+            const page = await omni.searchProviderSongs('music-backend', link.normalizedUrl, { limit: 30, offset: 0 });
+            const matches = page.items.filter(item =>
+                item.sourceRef?.kind === 'online'
+                && item.sourceRef.providerId === 'music-backend'
+                && item.sourceRef.mediaId === expectedId,
+            );
+            if (matches.length === 1) song = matches[0];
+        }
         if (song && (await omni.getAudioSource(song, 'standard'))?.url) return song;
     }
     if (originalFailure) throw originalFailure;
