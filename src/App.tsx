@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import RadioAgent from './components/app/RadioAgent';
 import PersonalMusicTools from './components/app/PersonalMusicTools';
+import VideoLibrary from './components/app/VideoLibrary';
 import AppleMusicConnect from './components/app/AppleMusicConnect';
 import MusicLinkImport from './components/app/MusicLinkImport';
 import ImportedAudioPlayer, { type ImportedAudioPlayerHandle } from './components/app/ImportedAudioPlayer';
@@ -195,6 +196,7 @@ export default function App() {
     const { t } = useTranslation();
     const [isRadioAgentOpen, setIsRadioAgentOpen] = useState(false);
     const [isMusicLinkImportOpen, setIsMusicLinkImportOpen] = useState(false);
+    const [isVideoLibraryOpen, setIsVideoLibraryOpen] = useState(false);
     const importedAudioPlayerRef = useRef<ImportedAudioPlayerHandle | null>(null);
     useEffect(() => {
         const openRadioAgent = () => setIsRadioAgentOpen(true);
@@ -2868,7 +2870,9 @@ export default function App() {
                 onImportFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
                 onRadio={() => setIsRadioAgentOpen(true)}
                 onApple={() => setIsAppleMusicOpen(true)}
+                onVideos={() => setIsVideoLibraryOpen(true)}
             />}
+            {!isElectronWindow && isVideoLibraryOpen && <VideoLibrary onClose={() => setIsVideoLibraryOpen(false)} />}
             {!isElectronWindow && <RadioAgent
                 open={isRadioAgentOpen}
                 onClose={() => setIsRadioAgentOpen(false)}

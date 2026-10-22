@@ -54,3 +54,12 @@ GITHUB_PAGES=true npm run build
 - `https://cer.luckying.love/music/Lucky.php?Love=`
 
 **重要边界**：纯静态 GitHub Pages 不能执行 PHP、Node 服务端代理，也无法绕过 CORS、需要私钥的音频地址、VIP/DRM 访问限制。如果第三方接口直接返回音频、重定向到音频，或返回**允许浏览器跨域读取（CORS）的 JSON 音频地址**，播放器会尝试播放；若 JSON 不允许跨域读取、接口返回 HTML、需要 Cookies/签名或缺少授权，不能保证播放。此功能是可测试的直连点歌入口，不代表这三个第三方接口已通过真实音频验收，也不等于会员解锁。请勿把含凭据的私密 URL 粘贴到公共分享场景。
+
+
+## 宝塔视频库（可选）
+
+桐声音乐现在可以使用 **GitHub Pages 托管的手机 / 电脑前端 + 宝塔 PHP 视频上传服务**。网页菜单中「视频库」负责视频浏览和原生 HTML5 播放；「管理员上传视频」打开服务器独立的 HTTPS 后台，在 iPhone、安卓或电脑选取 MP4 / WebM / MOV 上传。推荐 H.264/AAC 的 MP4 以获得最好的兼容性。
+
+服务器原始视频存储在宝塔**网站根目录外**，不会提交到 GitHub，也不会移动原音乐文件。播放 API 支持 Range/206 拖动进度。默认是**禁用公众访问**：只对有公开传播授权的视频，在管理员确认后开启 `public_gallery=true`。这是公开视频库，不是仅自己可见的私有鉴权影院。
+
+部署步骤与安全细节见 [宝塔 PHP 视频服务文档](deploy/php-video-api/README.md)。GitHub Actions Variables 变量 `VITE_TONGSHENG_VIDEO_API_URL` 应填成服务器的 HTTPS `index.php` 地址，不能包含密码或私钥。只更新前端并不会把 PHP 服务部署到你的实际服务器。
