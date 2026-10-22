@@ -146,7 +146,7 @@ export default async function handler(req: Request): Promise<Response> {
     const upstreamResponse = await fetch(upstreamUrl, {
       method: req.method,
       headers,
-      redirect: "follow",
+      redirect: "error",
       signal: AbortSignal.timeout(25_000),
     });
 
