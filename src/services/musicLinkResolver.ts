@@ -59,12 +59,12 @@ export function resolveMusicLink(input: string): MusicLinkResolution {
   if (hostIs(host, 'y.qq.com') || hostIs(host, 'c.y.qq.com') || hostIs(host, 'i.y.qq.com')) {
     const id = url.searchParams.get('songmid') ?? url.searchParams.get('id') ?? pathId(url, /\/(?:songDetail|albumDetail|playlist)\/([^/?]+)/);
     const kind: MusicLinkKind = /playlist/.test(url.pathname) ? 'playlist' : /album/i.test(url.pathname) ? 'album' : 'track';
-    return make('qq', kind, 'existing-provider-adapter', 'QQ 音乐链接已识别；会员标识不会自动解锁版权曲目。', id ?? undefined, true, true);
+    return make('qq', kind, 'existing-provider-adapter', 'QQ 音乐链接已识别；会员标识不会自动解锁版权曲目。', id ?? undefined, Boolean(id), Boolean(id && kind === 'track'));
   }
   if (hostIs(host, 'kugou.com')) {
     const id = url.searchParams.get('hash') ?? url.searchParams.get('album_id') ?? hashQuery.get('hash') ?? pathId(url, /\/(?:song|album|yy)\/([^/?]+)/);
     const kind: MusicLinkKind = /album/.test(url.pathname) ? 'album' : /playlist|special/.test(url.pathname) ? 'playlist' : 'track';
-    return make('kugou', kind, 'existing-provider-adapter', '酷狗链接已识别；播放需由现有适配器确认资源可用。', id ?? undefined, true, true);
+    return make('kugou', kind, 'existing-provider-adapter', '酷狗链接已识别；播放需由现有适配器确认资源可用。', id ?? undefined, Boolean(id), Boolean(id && kind === 'track'));
   }
   if (hostIs(host, 'kuwo.cn')) {
     const id = url.searchParams.get('mid') ?? pathId(url, /\/(?:play_detail|album_detail|artist|playlist)\/([^/?]+)/);
