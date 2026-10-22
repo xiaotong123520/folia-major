@@ -1,11 +1,11 @@
-import type { SongResult, UnifiedSong } from '../../../types';
+import type { SongResult, UnifiedSong } from '../../types';
 import {
     OnlineProviderError,
     type AudioQualityPreference,
     type OnlineMusicProvider,
     type ProviderLyricsResult,
     type ProviderSongAvailability,
-} from '../../../types/onlineMusic';
+} from '../../types/onlineMusic';
 import { MusicBackendClient, MusicBackendHttpError } from './musicBackendClient';
 
 type BackendSong = {
