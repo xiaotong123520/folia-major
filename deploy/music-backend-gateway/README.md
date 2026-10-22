@@ -93,3 +93,20 @@ The development branch is not production. It does not modify existing server mus
 ### Verification
 
 The CI workflow `.github/workflows/verify-song-api-server.yml` checks Node syntax, mocked endpoint fallback cases, Range handling, the original gateway, and Docker Compose. Unit tests prove request/response handling, **not that the three live upstreams are operational**.
+
+
+## GitHub Actions 一键更新宝塔服务器（无需电脑）
+
+仓库另有 `.github/workflows/deploy-music-server.yml`，仅支持在 GitHub Actions 页面**手动触发**，不会在每次提交后自动连接你的服务器。首次使用请先在 GitHub 仓库 Settings → Secrets and variables → Actions → Repository secrets 建立以下密钥：
+
+| 名称 | 含义 |
+| --- | --- |
+| `MUSIC_SERVER_HOST` | 你的服务器公网 IP 或已解析的 SSH 域名，不是网站播放域名 |
+| `MUSIC_SERVER_USER` | 用于 SSH 的单独部署账号（需要 docker compose 执行权限） |
+| `MUSIC_SERVER_PORT` | SSH 端口；一般为 22 |
+| `MUSIC_SERVER_SSH_KEY` | 专用部署 SSH 私钥（不要发在聊天里） |
+| `MUSIC_SERVER_KNOWN_HOSTS` | 独立验证指纹后写入的 SSH known_hosts 行；不能省略校验 |
+
+请在服务器用户的 `$HOME/tongsheng-gateway/.env` 中放置真正的 `MUSIC_BACKEND_API_KEY`。这个文件**只留服务器，不存到仓库**。GitHub 工作流只上传源代码到 `~/tongsheng-gateway/`，在服务器执行 `docker compose up -d --build` 并检查 `http://127.0.0.1:8090/healthz`，不会触碰你的原有音乐目录。请确保该用户能执行 Docker 命令、服务器已安装 Docker Compose、HTTPS 子域名在宝塔反向代理到 `127.0.0.1:8090`。
+
+合并开发 PR 到 `main` 以后，在 GitHub Actions 里选择 **Deploy private music gateway to Baota server → Run workflow**。真实播放还需从手机、电脑分别测试，而且不能仅凭模拟单测就认定三个外部 API 可用。
