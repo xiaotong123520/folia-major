@@ -1,5 +1,3 @@
-import type { IncomingMessage } from "node:http";
-
 const responseHeaders = {
   "Cache-Control": "no-store, max-age=0",
   "X-Content-Type-Options": "nosniff",
