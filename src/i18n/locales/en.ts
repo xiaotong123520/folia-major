@@ -25,7 +25,22 @@ export default {
     "playSong": "Play {{song}}",
     "footer": "Playback is handled by Apple MusicKit and does not bypass subscription or regional restrictions. The authorization token stays in page memory and is not persisted."
   },
-    "radioAgent": {
+    "musicLink": {
+    "title": "Import music link",
+    "close": "Close",
+    "placeholder": "Paste a song or music sharing link",
+    "inputLabel": "Music sharing link",
+    "inspect": "Inspect",
+    "resourceId": "Resource ID",
+    "fetchSong": "Fetch song information",
+    "openOriginal": "Open original link",
+    "unknownArtist": "Unknown artist",
+    "playExisting": "Play using Folia",
+    "noSong": "The current music service did not return this track. Check provider login or use the in-app search.",
+    "lookupFailed": "Could not fetch the song. This source may require login, music API configuration, or a working connection.",
+    "disclaimer": "Only existing music providers and authorized APIs are used. Recognizing a link does not unlock subscription tracks or generate unauthorized audio streams. Configure your music server in the existing server library."
+  },
+  "radioAgent": {
     "shareTitle": "Parse a music share link",
     "sharePlaceholder": "Paste a music platform URL (HTTPS)",
     "shareResolve": "Identify",
