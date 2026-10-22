@@ -55,6 +55,7 @@ jobs:
           VITE_AI_PROVIDER: google
           VITE_TONGSHENG_VIDEO_API_URL: ${{ vars.VITE_TONGSHENG_VIDEO_API_URL }}
           VITE_MUSIC_BACKEND_BASE_URL: ${{ vars.VITE_MUSIC_BACKEND_BASE_URL }}
+          VITE_AUDIO_LIBRARY_BASE_URL: ${{ vars.VITE_AUDIO_LIBRARY_BASE_URL }}
         run: npm run build
 
       - name: Verify output and provide SPA refresh fallback

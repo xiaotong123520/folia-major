@@ -5,21 +5,24 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
-  pull-requests: write
+  pull-requests: read
 concurrency:
   group: sync-folia-upstream
   cancel-in-progress: false
 jobs:
-  propose-update:
-    if: github.repository == 'xiaotong123520/folia-major'
+  prepare-review:
+    if: github.repository == 'xiaotong123520/folia-major' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-      - name: Merge upstream into a review branch
-        id: sync
+          persist-credentials: false
+      - name: Prepare an upstream review branch
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
@@ -27,23 +30,27 @@ jobs:
           git remote add upstream https://github.com/chthollyphile/folia-major.git
           git fetch upstream main
           if git merge-base --is-ancestor upstream/main HEAD; then
-            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'Already up to date.' >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          git fetch origin sync/folia-upstream || true
-          git switch -c sync/folia-upstream
+          upstream_sha=$(git rev-parse upstream/main)
+          review_branch="sync/folia-upstream-${upstream_sha:0:12}"
+          if git ls-remote --exit-code --heads origin "$review_branch" >/dev/null; then
+            echo "An upstream review branch already exists: $review_branch" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git switch -c "$review_branch"
           if ! git merge upstream/main --no-edit; then
+            echo 'Merge conflicts; main and the published website were not changed:' >> "$GITHUB_STEP_SUMMARY"
             git diff --name-only --diff-filter=U >> "$GITHUB_STEP_SUMMARY"
-            echo 'Upstream conflicts need manual resolution. Personal changes were not overwritten.' >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          git push --force-with-lease origin sync/folia-upstream
-          echo 'changed=true' >> "$GITHUB_OUTPUT"
-      - name: Open or update review PR
-        if: steps.sync.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if ! gh pr list --head sync/folia-upstream --base main --json number --jq '.[0].number' | grep -q '[0-9]'; then
-            gh pr create --head sync/folia-upstream --base main --title 'Update Folia upstream while preserving Tongsheng changes' --body 'Daily upstream synchronization. Review branding, audio imports and mobile layout; run CI before merging. Merging to main publishes the shared mobile/desktop website.'
-          fi
+          # Fetch and merge Git data only. Do not execute upstream code or publish it with this token.
+          gh auth setup-git
+          git push origin "HEAD:refs/heads/$review_branch"
+          {
+            echo "Prepared upstream review branch: $review_branch"
+            echo "Open a pull request, run checks and review before merging:"
+            echo "https://github.com/${GITHUB_REPOSITORY}/compare/main...${review_branch}"
+            echo 'The default branch, deployment rules and live website were not changed.'
+          } >> "$GITHUB_STEP_SUMMARY"
