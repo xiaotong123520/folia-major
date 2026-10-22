@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Apple, CheckCircle2, LoaderCircle, Music2, Play, Search, ShieldCheck, X } from 'lucide-react';
 
 type MusicKitSong = {
@@ -43,6 +44,7 @@ const loadMusicKit = async (): Promise<NonNullable<MusicKitWindow['MusicKit']>> 
 type Props = { onClose: () => void };
 
 export default function AppleMusicConnect({ onClose }: Props) {
+    const { t } = useTranslation();
     const [music, setMusic] = useState<MusicKitInstance | null>(null);
     const [authorized, setAuthorized] = useState(false);
     const [busy, setBusy] = useState(false);
@@ -61,15 +63,15 @@ export default function AppleMusicConnect({ onClose }: Props) {
         try {
             const response = await fetch('/api/apple-music-token', { cache: 'no-store' });
             const data = await response.json() as { token?: string; error?: string };
-            if (!response.ok || !data.token) throw new Error(data.error || 'Apple Music developer token is unavailable.');
+            if (!response.ok || !data.token) throw new Error(data.error || t('appleMusic.tokenUnavailable'));
             const kit = await loadMusicKit();
             const instance = await kit.configure({ developerToken: data.token, app: { name: 'Folia', build: '0.7.21' } });
             await instance.authorize();
             setMusic(instance);
             setAuthorized(true);
-            setNotice('已通过 Apple Music 官方授权。音乐资料库和播放权限仍受订阅、地区及浏览器支持范围限制。');
+            setNotice(t('appleMusic.authorizedNotice'));
         } catch (reason) {
-            setError(reason instanceof Error ? reason.message : 'Apple Music 授权失败，请重试。');
+            setError(reason instanceof Error ? reason.message : t('appleMusic.authorizationFailed'));
         } finally {
             setBusy(false);
         }
@@ -82,10 +84,10 @@ export default function AppleMusicConnect({ onClose }: Props) {
         try {
             const result = await music.api.search(query.trim(), { types: ['songs'], limit: 12 });
             setSongs(result.songs?.data ?? []);
-            if (!result.songs?.data?.length) setNotice('没有找到歌曲，请尝试其他关键词。');
+            if (!result.songs?.data?.length) setNotice(t('appleMusic.noResults'));
             else setNotice('');
         } catch {
-            setError('搜索失败。请检查授权状态、网络、Apple Music 地区和订阅权限。');
+            setError(t('appleMusic.searchFailed'));
         } finally {
             setBusy(false);
         }
@@ -100,7 +102,7 @@ export default function AppleMusicConnect({ onClose }: Props) {
             await music.play();
             setPlayingId(song.id);
         } catch {
-            setError('无法播放这首歌曲。请确认 Apple Music 订阅有效，且该歌曲在当前地区可用。');
+            setError(t('appleMusic.playFailed'));
         } finally {
             setBusy(false);
         }
@@ -113,7 +115,7 @@ export default function AppleMusicConnect({ onClose }: Props) {
         setMusic(null);
         setSongs([]);
         setPlayingId('');
-        setNotice('已退出 Apple Music 授权。');
+        setNotice(t('appleMusic.signedOut'));
         setBusy(false);
     }, [music]);
 
@@ -131,7 +133,7 @@ export default function AppleMusicConnect({ onClose }: Props) {
                     {!authorized ? <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
                         <div className="mb-3 flex items-center gap-2 text-emerald-200"><ShieldCheck size={18} /><span className="text-sm font-medium">使用苹果官方授权登录</span></div>
                         <p className="mb-4 text-sm leading-6 text-white/55">Folia 不会收集或保存你的 Apple ID 密码。点击后将加载 Apple Music 官方授权流程。若尚未配置服务端开发者凭据，页面会明确提示。</p>
-                        <button type="button" onClick={() => void signIn()} disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-medium text-black hover:bg-pink-50 disabled:opacity-50">{busy ? <LoaderCircle size={17} className="animate-spin" /> : <Apple size={17} />}{busy ? '正在连接 Apple Music…' : '登录 Apple Music'}</button>
+                        <button type="button" onClick={() => void signIn()} disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-medium text-black hover:bg-pink-50 disabled:opacity-50">{busy ? <LoaderCircle size={17} className="animate-spin" /> : <Apple size={17} />}{busy ? t('appleMusic.connecting') : t('appleMusic.signIn')}</button>
                     </div> : <div className="flex items-center justify-between rounded-2xl border border-emerald-200/20 bg-emerald-200/5 p-4">
                         <div className="flex items-center gap-2 text-emerald-100"><CheckCircle2 size={18} /><span className="text-sm">Apple Music 已授权</span></div>
                         <button type="button" onClick={() => void signOut()} disabled={busy} className="rounded-lg border border-white/10 px-3 py-2 text-xs text-white/65 hover:bg-white/10">退出授权</button>
@@ -146,8 +148,8 @@ export default function AppleMusicConnect({ onClose }: Props) {
                     <div className="space-y-2">
                         {songs.map(song => <div key={song.id} className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.025] p-3">
                             {song.attributes?.artwork?.url ? <img src={song.attributes.artwork.url.replace('{w}', '96').replace('{h}', '96')} alt="" className="h-11 w-11 rounded-lg object-cover" /> : <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-pink-200/10"><Music2 size={17} /></div>}
-                            <div className="min-w-0 flex-1"><p className="truncate text-sm">{song.attributes?.name || '未知歌曲'}</p><p className="mt-1 truncate text-xs text-white/45">{song.attributes?.artistName || song.attributes?.albumName || 'Apple Music'}</p></div>
-                            <button type="button" onClick={() => void play(song)} disabled={busy} aria-label={'播放 ' + (song.attributes?.name || '歌曲')} className="rounded-full border border-white/10 p-2.5 text-white/75 hover:bg-white/10 disabled:opacity-40">{playingId === song.id ? <CheckCircle2 size={15} /> : <Play size={15} />}</button>
+                            <div className="min-w-0 flex-1"><p className="truncate text-sm">{song.attributes?.name || t('appleMusic.unknownSong')}</p><p className="mt-1 truncate text-xs text-white/45">{song.attributes?.artistName || song.attributes?.albumName || t('appleMusic.name')}</p></div>
+                            <button type="button" onClick={() => void play(song)} disabled={busy} aria-label={t('appleMusic.playSong', { song: song.attributes?.name || t('appleMusic.song') })} className="rounded-full border border-white/10 p-2.5 text-white/75 hover:bg-white/10 disabled:opacity-40">{playingId === song.id ? <CheckCircle2 size={15} /> : <Play size={15} />}</button>
                         </div>)}
                     </div>
                     <p className="text-[11px] leading-5 text-white/35">播放由 Apple MusicKit 处理，不会绕过订阅或地区限制。授权令牌只保存在当前页面内存中；关闭页面后不持久化。</p>
