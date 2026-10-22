@@ -161,7 +161,7 @@ export default function MusicLinkImport({ onClose, onPlayOnline, onOpenAppleMusi
                             <button type="button" disabled={!pointSongTitle.trim()} onClick={() => playPointSong('netease')} className="min-h-11 rounded-xl border border-white/15 px-3 text-sm text-white/90 disabled:opacity-50">网易云点歌</button>
                             <button type="button" disabled={!pointSongTitle.trim()} onClick={() => playPointSong('qq-backup')} className="min-h-11 rounded-xl border border-white/15 px-3 text-sm text-white/90 disabled:opacity-50">QQ 备用接口</button>
                         </div>
-                        <p className="text-xs leading-5 text-amber-100/75">仅当接口直接输出音频或重定向至允许播放的音频链接时才能播放。如果返回 JSON、页面文本、限制访问或需要平台会员授权，GitHub Pages 无法代替服务端解析，播放器会提示失败。</p>
+                        <p className="text-xs leading-5 text-amber-100/75">浏览器支持直接音频、音频重定向及允许跨域读取（CORS）的 JSON 音频地址。若接口拒绝跨域读取、返回 HTML 或歌曲无授权，GitHub Pages 无法代替服务端解析，播放器会提示失败。</p>
                     </section>
                     <section className="space-y-3 rounded-2xl border border-white/10 p-4">
                         <h3 className="text-sm font-medium">{t('personal.serverMusic')}</h3>
