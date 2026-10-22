@@ -160,9 +160,16 @@ export const musicBackendProvider: OnlineMusicProvider = {
     playback: {
         async getSongDetail(id) {
             // The backend has no dedicated song-detail endpoint. Accept only an exact source ID match.
-            const rawId = String(id).split(':').pop() ?? String(id);
+            const inputId = String(id);
+            const separator = inputId.indexOf(':');
+            const sourceHint = separator > 0 ? inputId.slice(0, separator) : null;
+            const rawId = separator > 0 ? inputId.slice(separator + 1) : inputId;
             const result = await musicBackendProvider.search!.searchSongs(rawId, 50, 0);
-            return result.items.find((song) => song.sourceRef?.kind === 'online' && song.sourceRef.mediaId === rawId) ?? null;
+            const matches = result.items.filter((song) => {
+                if (song.sourceRef?.kind !== 'online' || song.sourceRef.mediaId !== rawId) return false;
+                return !sourceHint || song.sourceRef.providerData?.source === sourceHint;
+            });
+            return matches.length === 1 ? matches[0] : null;
         },
         async getAudioSource(song, quality: AudioQualityPreference) {
             const client = buildClient();
