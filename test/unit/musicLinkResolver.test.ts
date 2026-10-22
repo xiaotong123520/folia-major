@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isSupportedMusicLink, resolveMusicLink } from '../../src/services/musicLinkResolver';
+import { isRecognizedMusicLink, isSupportedMusicLink, resolveMusicLink } from '../../src/services/musicLinkResolver';
 
 describe('resolveMusicLink', () => {
   it.each([
@@ -20,7 +20,9 @@ describe('resolveMusicLink', () => {
   });
 
   it('reads NetEase song IDs from the share URL fragment', () => {
-    expect(resolveMusicLink('https://music.163.com/#/song?id=123456').resourceId).toBe('123456');
+    const result = resolveMusicLink('https://music.163.com/#/song?id=123456');
+    expect(result.resourceId).toBe('123456');
+    expect(result.normalizedUrl).toContain('#/song?id=123456');
   });
 
   it('does not imply Apple Music playback from URL recognition', () => {
@@ -35,6 +37,9 @@ describe('resolveMusicLink', () => {
     expect(resolveMusicLink('file:///private/song.mp3').platform).toBe('unknown');
     expect(resolveMusicLink('https://user:pass@example.com/song.mp3').platform).toBe('unknown');
     expect(isSupportedMusicLink('not a url')).toBe(false);
+    expect(isRecognizedMusicLink('https://www.kuwo.cn/play_detail/12345')).toBe(true);
+    expect(isSupportedMusicLink('https://www.kuwo.cn/play_detail/12345')).toBe(false);
+    expect(isSupportedMusicLink('https://music.apple.com/us/album/example/123456789')).toBe(false);
   });
 
   it('does not claim Kuwo is wired to playback', () => {
