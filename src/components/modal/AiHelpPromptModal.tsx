@@ -12,9 +12,9 @@ import { iconLabel } from './settings/pages/iconLabel';
 // The 遇到问题？ dialog of the Help page: where to read and where to ask, and a prompt to copy for
 // an AI model, which names the guide and the repository.
 
-const FOLIA_GUIDE_URL = 'https://folia-site.cielaniska.top/guide/llm-routing';
-const FOLIA_DOCS_URL = 'https://folia-site.cielaniska.top/guide/';
-const FOLIA_REPOSITORY_URL = 'https://github.com/chthollyphile/folia-major';
+const FOLIA_GUIDE_URL = 'https://github.com/xiaotong123520/folia-major/tree/main/docs';
+const FOLIA_DOCS_URL = 'https://github.com/xiaotong123520/folia-major/tree/main/docs';
+const FOLIA_REPOSITORY_URL = 'https://github.com/xiaotong123520/folia-major';
 
 const LINKS: SettingsGroupDef = { id: 'aiHelpLinks', titleKey: 'aiHelp.title' };
 const ASK_AI: SettingsGroupDef = { id: 'aiHelpPrompt', titleKey: 'aiHelp.askAiTitle' };

@@ -3,6 +3,8 @@ import { handleGenerateTheme } from "./generate-theme.ts";
 import { handleGenerateOpenAITheme } from "./generate-theme_openai.ts";
 import { handleLyricProxy } from "./lyric-proxy.ts";
 import { handleSegmentLyrics } from "./segment-lyrics.ts";
+import { handleAppleMusicToken } from "./apple-music-token.ts";
+import { handleRadioAgent } from "./radio-agent.ts";
 import { QQ_API_PREFIX, type QqServerlessEnv, handleQq } from "./qq.ts";
 
 // qq-music-api uses Buffer during requests; Workers do not expose it without nodejs_compat.
@@ -24,10 +26,14 @@ type Env = {
   };
   AI_PROVIDER?: string;
   GEMINI_API_KEY?: string;
+  GEMINI_MODEL?: string;
   OPENAI_API_KEY?: string;
   OPENAI_API_URL?: string;
   OPENAI_API_MODEL?: string;
   OPENAI_API_TEMPERATURE?: string;
+  APPLE_MUSICKIT_TEAM_ID?: string;
+  APPLE_MUSICKIT_KEY_ID?: string;
+  APPLE_MUSICKIT_PRIVATE_KEY?: string;
 } & QqServerlessEnv;
 
 export default {
@@ -48,6 +54,14 @@ export default {
 
     if (url.pathname === "/api/segment-lyrics") {
       return handleSegmentLyrics(request, env);
+    }
+
+    if (url.pathname === "/api/apple-music-token") {
+      return handleAppleMusicToken(request, env);
+    }
+
+    if (url.pathname === "/api/radio-agent") {
+      return handleRadioAgent(request, env);
     }
 
     // QQ 路由必须自己兜住异常：这个 worker 同时负责静态资源与既有三条 API，

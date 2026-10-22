@@ -339,7 +339,7 @@ describe('the texts the window can ask for', () => {
     });
 
     it('declares a second line of its own only where the sentence names that platform\'s own thing', () => {
-        const notes = Object.fromEntries(listOnlineMusicProviders().map(provider => [provider.id, omni.getLoginTexts(provider.id)?.caseNotes ?? null]));
+        const notes = Object.fromEntries(listOnlineMusicProviders().filter(provider => provider.capabilities.auth).map(provider => [provider.id, omni.getLoginTexts(provider.id)?.caseNotes ?? null]));
         expect(notes).toEqual({
             netease: null, kugou: null, bodian: null,
             // 扫错 App 的那一句按后端有没有 QQ 音乐 App 扫码说（这里还没问到后端）。

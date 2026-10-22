@@ -15,7 +15,7 @@ import { Group, Link, Reveal, Row, Segmented, Toggle, option, useSettingsKitThem
 // which parts of the interface play reduced motion.
 
 /** Docs page behind the "Fix lyric animation freeze on Linux" switch. */
-const CHROMIUM_FD_EXHAUSTION_DOCS_URL = 'https://folia-site.cielaniska.top/guide/chromium-fd-exhaustion';
+const CHROMIUM_FD_EXHAUSTION_DOCS_URL = 'https://github.com/xiaotong123520/folia-major/tree/main/docs';
 
 /** The rate the frame-rate cap starts at when it is switched on. */
 const FRAME_RATE_WHEN_SWITCHED_ON = 120;

@@ -1,0 +1,85 @@
+name: Deploy Tongsheng Music to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: folia-github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and validate GitHub Pages site
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Restore node_modules
+        id: node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-ubuntu-latest-node24-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Focused music feature tests
+        run: npx vitest run -c vitest.config.ts test/unit/musicLinkResolver.test.ts test/unit/importedAudio.test.ts test/unit/radioAgent.test.ts test/unit/workerAiRoutes.test.ts test/unit/importedAudioStorage.test.ts test/unit/musicLinkPlayback.test.ts test/unit/music-backend
+
+      - name: Validate server gateway
+        run: node --test deploy/music-backend-gateway/gateway.test.mjs
+
+      - name: Build Pages assets (no server-side secrets)
+        env:
+          GITHUB_PAGES: 'true'
+          VITE_AI_PROVIDER: google
+          VITE_MUSIC_BACKEND_BASE_URL: ${{ vars.VITE_MUSIC_BACKEND_BASE_URL }}
+        run: npm run build
+
+      - name: Verify output and provide SPA refresh fallback
+        run: |
+          test -s dist/index.html
+          find dist/assets -maxdepth 1 -type f -name '*.js' -print -quit | grep -q .
+          cp dist/index.html dist/404.html
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Publish site
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: folia-pages-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

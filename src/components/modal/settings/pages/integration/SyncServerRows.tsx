@@ -11,7 +11,7 @@ import { useSyncServer } from './useSyncServer';
 // export and import, the test and the save. The rows stay open while there is something unsaved,
 // so a switch just turned off can still be saved.
 
-const DEPLOY_DOCS_URL = 'https://folia-site.cielaniska.top/guide/deploy-sync';
+const DEPLOY_DOCS_URL = 'https://github.com/xiaotong123520/folia-major/tree/main/sync-server';
 
 export const SyncServerRows: React.FC = () => {
     const { t } = useTranslation();

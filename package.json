@@ -1,11 +1,11 @@
 {
   "name": "folia-major",
-  "productName": "Folia",
+  "productName": "桐声音乐",
   "desktopName": "folia-major.desktop",
-  "description": "Lyrics Reimagine",
+  "description": "桐声音乐 · 手机与电脑共用的音乐空间",
   "author": {
-    "name": "chthollyphile",
-    "email": "chthollyphile@users.noreply.github.com"
+    "name": "xiaotong123520",
+    "email": "174346993+xiaotong123520@users.noreply.github.com"
   },
   "private": true,
   "version": "0.7.21",
@@ -64,7 +64,7 @@
   },
   "build": {
     "appId": "top.izuna.foliamajor",
-    "productName": "Folia",
+    "productName": "桐声音乐",
     "beforePack": "build/beforePack.cjs",
     "afterPack": "build/afterPack.cjs",
     "electronLanguages": [
@@ -79,7 +79,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "chthollyphile",
+        "owner": "xiaotong123520",
         "repo": "folia-major"
       }
     ],
@@ -206,6 +206,7 @@
       "include": "build/installer.nsh"
     },
     "linux": {
+      "maintainer": "xiaotong123520 <174346993+xiaotong123520@users.noreply.github.com>",
       "artifactName": "${name}-${version}-linux-${arch}.${ext}",
       "target": [
         "tar.gz",

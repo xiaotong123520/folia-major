@@ -203,7 +203,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
     .slice(0, 12)}`;
 
   return {
-    base: process.env.ELECTRON === 'true' ? './' : '/',
+    base: process.env.ELECTRON === 'true' ? './' : (process.env.GITHUB_PAGES === 'true' ? '/folia-major/' : '/'),
     worker: {
       format: 'es'
     },
@@ -297,13 +297,15 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
           navigateFallbackDenylist: [/^\/api(?:\/|$)/, /^\/__folia_cover\//]
         },
         manifest: {
-          name: 'Folia Music',
-          short_name: 'Folia',
-          description: 'A beautiful AI-themed music player',
+          name: '桐声音乐',
+          short_name: '桐声',
+          description: '手机与电脑共用的私人音乐空间',
           theme_color: '#09090b',
           background_color: '#09090b',
           display: 'standalone',
           icons: [
+            { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+            { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
             {
               src: 'icon.svg',
               sizes: '512x512',

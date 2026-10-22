@@ -1,6 +1,127 @@
 
 
 export default {
+  "personal": {
+    "brand": "Tongsheng Music",
+    "tools": "Open music tools",
+    "import": "Import music / share link",
+    "openSource": "Open source",
+    "license": "Folia · AGPL-3.0 / source",
+    "serverMusic": "Server music",
+    "serverReady": "Server connected. If the platform is unavailable, try the exact track on the server, or search and select a recording.",
+    "serverMissing": "Server music is not connected yet. Import local files or an HTTPS audio URL to listen.",
+    "serverSearch": "Search songs or artists",
+    "serverFailed": "Cannot reach the music server. Please try again.",
+    "search": "Search"
+},
+  "appleMusic": {
+    "name": "Apple Music",
+    "tokenUnavailable": "Apple Music developer token is unavailable.",
+    "authorizedNotice": "Authorized with Apple Music. Library and playback access still depend on subscription, region, and browser support.",
+    "authorizationFailed": "Apple Music authorization failed. Please try again.",
+    "noResults": "No songs found. Try another search term.",
+    "searchFailed": "Search failed. Check authorization, network, region, and subscription access.",
+    "playFailed": "This song could not be played. Check your subscription and regional availability.",
+    "signedOut": "Apple Music authorization has been revoked.",
+    "subtitle": "Official account authorization · Tongsheng Music",
+    "close": "Close",
+    "signInHeading": "Sign in with Apple authorization",
+    "signInDescription": "Tongsheng Music never collects or stores your Apple ID password. This opens Apple's official MusicKit authorization. Server developer credentials must be configured first.",
+    "connecting": "Connecting to Apple Music…",
+    "signIn": "Sign in to Apple Music",
+    "authorized": "Apple Music authorized",
+    "signOut": "Revoke authorization",
+    "searchLabel": "Search Apple Music songs",
+    "searchPlaceholder": "Search songs, artists, or albums",
+    "unknownSong": "Unknown song",
+    "song": "song",
+    "playSong": "Play {{song}}",
+    "footer": "Playback is handled by Apple MusicKit and does not bypass subscription or regional restrictions. The authorization token stays in page memory and is not persisted."
+  },
+    "musicImport": {
+    "storageError": "Browser storage is unavailable or full. You can still play this session; keep the original files.",
+    "queue": "Imported audio queue",
+    "clear": "Clear imported tracks",
+    "tapPlay": "Tap Play in the audio controls to continue.",
+    "audioError": "Audio could not play. Check the browser's codec support, server media response, HTTPS and cross-origin restrictions.",
+    "previous": "Previous track",
+    "next": "Next track",
+    "browserPlayback": "Saved in this browser; audio is not uploaded",
+    "remove": "Remove"
+  },
+  "musicLink": {
+    "chooseFiles": "Choose music files from your device",
+    "fileHint": "Import multiple MP3, M4A, AAC, WAV, FLAC, and other audio files. Tap Play in the bottom player. Files are not uploaded.",
+    "invalidFiles": "No supported audio files selected. Choose MP3, M4A, or other audio files.",
+    "httpsRequired": "Use a valid HTTPS audio URL. GitHub Pages cannot load insecure HTTP media.",
+    "addAudioUrl": "Add to playback queue",
+    "openOfficialAuth": "Open Apple Music official authorization",
+    "title": "Import music link",
+    "close": "Close",
+    "placeholder": "Paste a song or music sharing link",
+    "inputLabel": "Music sharing link",
+    "inspect": "Inspect",
+    "resourceId": "Resource ID",
+    "fetchSong": "Fetch song information",
+    "openOriginal": "Open original link",
+    "unknownArtist": "Unknown artist",
+    "playExisting": "Play using Tongsheng Music",
+    "noSong": "The current music service did not return this track. Check provider login or use the in-app search.",
+    "lookupFailed": "Could not fetch the song. This source may require login, music API configuration, or a working connection.",
+    "disclaimer": "Only existing music providers and authorized APIs are used. Recognizing a link does not unlock subscription tracks or generate unauthorized audio streams. Configure your music server in the existing server library."
+  },
+  "radioAgent": {
+    "shareTitle": "Parse a music share link",
+    "sharePlaceholder": "Paste a music platform URL (HTTPS)",
+    "shareResolve": "Identify",
+    "shareUnsupported": "This link is not recognized. Please use a standard music sharing URL.",
+    "shareNoMetadata": "This provider did not return the requested song.",
+    "shareProviderUnavailable": "This music provider is unavailable or requires authorization.",
+    "shareOfficialLink": "Open with the official music service",
+    "title": "AI Radio",
+    "open": "AI Radio",
+    "close": "Close radio",
+    "yourMood": "YOUR MOMENT",
+    "headline": "Let music understand you.",
+    "description": "Tell me your mood, the weather, or a sound you want to hear. I'll curate a personal radio session.",
+    "chipRain": "Rainy-night folk",
+    "chipFolk": "Gentle folk",
+    "chipFocus": "Quiet focus",
+    "promptLabel": "Describe your listening mood",
+    "promptPlaceholder": "For example: rainy midnight, alone, quiet folk music…",
+    "voiceInput": "Voice input",
+    "stopListening": "Stop listening",
+    "narrationToggle": "Toggle DJ narration",
+    "working": "Curating",
+    "makeStation": "Create radio",
+    "listening": "Listening… say what you'd like to hear",
+    "voiceUnsupported": "Speech recognition is not supported here. Please type instead.",
+    "voicePermission": "Microphone permission was denied. Allow microphone access in browser settings.",
+    "voiceFailed": "Voice input is unavailable right now. Try typing instead.",
+    "aiFallback": "AI service is unavailable. A local fallback was used; check server-side AI configuration.",
+    "narrationUnavailable": "No narration is available, or speech synthesis is not supported.",
+    "stationBrief": "STATION BRIEF",
+    "energyLow": "Low-key",
+    "energyMedium": "Moderate",
+    "energyHigh": "Energetic",
+    "playIntro": "Play DJ intro",
+    "stopIntro": "Stop narration",
+    "curation": "CURATED FOR YOU",
+    "tracks": "tracks",
+    "queueTitle": "Candidate tracks",
+    "emptyTitle": "Your next listening journey",
+    "emptyDescription": "Describe a mood to search online catalogs and match your local library.",
+    "searching": "Searching for real, playable tracks…",
+    "noResults": "No matching tracks yet. Try another prompt or check your music-service configuration.",
+    "searchFailed": "Online catalog search failed. Check whether your music service is available.",
+    "localLibraryFallback": "Local library",
+    "localSource": "Server / local library",
+    "onlineSource": "Online music",
+    "unknownArtist": "Unknown artist",
+    "play": "Play this track",
+    "footerHint": "Only tracks returned by music services are shown. AI never invents playback URLs; online music requires a configured provider.",
+    "status": "Personal radio · Always adjustable"
+  },
   "libraryBravais": {
     "suiteName": "Bravais wall",
     "homeTitle": "Library",
@@ -242,8 +363,8 @@ export default {
     "closeToQuit": "Closing the window will quit the app",
     "wallpaperModeOn": "Wallpaper mode enabled",
     "wallpaperModeOff": "Wallpaper mode disabled",
-    "macWallpaperInputMonitoringNeeded": "Wallpaper mode needs Input Monitoring: allow Folia in System Settings → Privacy & Security → Input Monitoring, then toggle wallpaper mode again",
-    "macWallpaperAccessibilitySuggested": "With Stage Manager on, a click on the wallpaper also counts as a desktop click and moves your windows aside. Allow Folia in System Settings → Privacy & Security → Accessibility, then restart Folia, to stop that; desktop icons stay clickable",
+    "macWallpaperInputMonitoringNeeded": "Wallpaper mode needs Input Monitoring: allow Tongsheng Music in System Settings → Privacy & Security → Input Monitoring, then toggle wallpaper mode again",
+    "macWallpaperAccessibilitySuggested": "With Stage Manager on, a click on the wallpaper also counts as a desktop click and moves your windows aside. Allow Tongsheng Music in System Settings → Privacy & Security → Accessibility, then restart Tongsheng Music, to stop that; desktop icons stay clickable",
     "macWallpaperAutohideDockOn": "Auto-hide Dock enabled",
     "macWallpaperAutohideDockOff": "Auto-hide Dock disabled",
     "voiceInputPauseOn": "Pause on voice input enabled",
@@ -576,6 +697,7 @@ export default {
       }
     },
     "commands": {
+      "open-ai-radio-agent": { "title": "Open AI Radio", "description": "Create a mood-based personal radio station" },
       "settings-ponder-hints": { "title": "Ponder tutorial hints", "description": "Choose when the hold-G tutorial hint appears" },
       "ponder-hints-always": { "title": "Ponder hints: always show", "description": "Show the hold-G hint on every teachable control" },
       "ponder-hints-unseen": { "title": "Ponder hints: only where I have not looked", "description": "Stop hinting a control once its tutorial has been watched" },
@@ -611,8 +733,8 @@ export default {
       "settings-local-lyric-format-order": { "title": "Local lyric file format priority", "description": "Choose which format wins when a track has several lyric files" },
       "settings-integration": { "title": "Integration settings", "description": "Open Stage, Now Playing, and Navidrome settings" },
       "automix-toggle": { "title": "Smart transition", "description": "Turn FOLIA smart transitions on or off" },
-      "transition-mode-crossfade": { "title": "Transition mode: Folia Crossfade", "description": "Use the simple one-out one-in crossfade" },
-      "transition-mode-automix": { "title": "Transition mode: Folia Automix", "description": "Analyse both tracks and mix them automatically" },
+      "transition-mode-crossfade": { "title": "Transition mode: Tongsheng Music Crossfade", "description": "Use the simple one-out one-in crossfade" },
+      "transition-mode-automix": { "title": "Transition mode: Tongsheng Music Automix", "description": "Analyse both tracks and mix them automatically" },
       "transition-performance-toggle": { "title": "Transition performance mode", "description": "Toggle the more aggressive transition (needs the stem model)" },
       "settings-discord-presence": { "title": "Discord playback status", "description": "Open Discord Rich Presence settings" },
       "lyric-staff-policy-cycle": { "title": "Opening credits handling", "description": "Cycle how the credit block at the start of the lyrics is handled" },
@@ -625,7 +747,7 @@ export default {
       "settings-r2-sync": { "title": "Sync server settings", "description": "Open sync server settings" },
       "sync-now": { "title": "Sync now", "description": "Sync AI themes" },
       "export-lyric-cache": { "title": "Export cached lyrics", "description": "Save every lyric on this device as .fia and enhanced LRC in one zip" },
-      "export-current-lyrics-fia": { "title": "Export current lyrics as .fia", "description": "Save this song’s lyrics in Folia’s lossless format, saved word segmentation included" },
+      "export-current-lyrics-fia": { "title": "Export current lyrics as .fia", "description": "Save this song’s lyrics in Tongsheng Music’s lossless format, saved word segmentation included" },
       "export-current-lyrics-lrc": { "title": "Export current lyrics as LRC", "description": "Save this song’s lyrics as an enhanced LRC other players can read" },
       "settings-local-library-watch": { "title": "Local folder watch settings", "description": "Open the auto scan settings for imported local folders" },
       "local-library-auto-scan-toggle": { "title": "Auto scan local folders", "description": "Turn automatic rescanning of imported local folders on or off" },
@@ -995,10 +1117,10 @@ export default {
     "scopeOnlineDesc": "Lyrics cached for online songs you have played",
     "scopeLocal": "Local library",
     "scopeLocalDesc": "Lyrics matched online for local songs, named after each audio file in its original folder, ready to drop beside it",
-    "formatFia": ".fia (Folia, lossless)",
-    "formatFiaDesc": "Keeps word timing, translations, background vocals and your saved segmentation; imports straight back into Folia",
+    "formatFia": ".fia (Tongsheng Music, lossless)",
+    "formatFiaDesc": "Keeps word timing, translations, background vocals and your saved segmentation; imports straight back into Tongsheng Music",
     "formatLrc": "Enhanced LRC",
-    "formatLrcDesc": "Readable by other players; Folia-only data such as background vocals and segmentation is dropped",
+    "formatLrcDesc": "Readable by other players; Tongsheng Music-only data such as background vocals and segmentation is dropped",
     "includeTranslationDesc": "Written as the next line with the same timestamp as the original",
     "includeRomanizationDesc": "Written after the translation",
     "resolveOnline": "Look up missing titles online",
@@ -1028,7 +1150,7 @@ export default {
     "descriptionExportOnly": "Save the lyrics on screen for this song as a file.",
     "importHeading": "Import",
     "importChoose": "Choose a lyric file",
-    "importFormats": "lrc, vtt, ttml, qrc, yrc, krc, txt, or a .fia exported from Folia",
+    "importFormats": "lrc, vtt, ttml, qrc, yrc, krc, txt, or a .fia exported from Tongsheng Music",
     "exportHeading": "Export this song",
     "batchTitle": "Export every lyric on this device",
     "batchDesc": "Opens the batch export in the command palette"
@@ -1070,13 +1192,13 @@ export default {
     "market": "Mod market",
     "trustRevoked": "This mod's files changed since you last confirmed it, so it was disabled automatically. Check the source, then enable it again.",
     "devSourceHint": "Development source mod: once confirmed, editing its files keeps the approval (development builds only).",
-    "platformReadHint": "Can read data on {{platforms}} with the account you signed in to Folia with, such as your listening records (experimental platform.raw).",
+    "platformReadHint": "Can read data on {{platforms}} with the account you signed in to Tongsheng Music with, such as your listening records (experimental platform.raw).",
     "platformWriteHint": "Can also change what your {{platforms}} account holds, such as likes, playlists and follows.",
     "queueReplaced": "“{{name}}” replaced the play queue",
     "queueReplaceUndo": "Undo",
     "queueReplaceUndone": "The play queue from before the replacement is back",
     "queueReplaceUndoGone": "The queue has changed since it was replaced, so there is nothing to undo",
-    "queueReplaceHint": "Can replace the whole play queue at once and end Personal FM; Folia then says which mod did it, and you can undo it until the queue changes again.",
+    "queueReplaceHint": "Can replace the whole play queue at once and end Personal FM; Tongsheng Music then says which mod did it, and you can undo it until the queue changes again.",
     "equalizerControlHint": "Changes your sound settings: can switch your sound preset, or put its own equalizer curve in place.",
     "signatureVerified": "Verified",
     "signatureVerifiedDetail": "Carries a valid official Folium signature ({{key}}): its source and content were reviewed by Folium and have not changed since signing. Once enabled it still runs with the app's full privileges.",
@@ -1139,8 +1261,8 @@ export default {
     "faultNoticeOpen": "View",
     "faultNoticeMute": "Don't show failures or slow starts",
     "faultNoticeSwitch": "Tell me when this mod fails or is slow to start",
-    "skippedThisRun": "Not started this time. It starts as usual the next time Folia opens.",
-    "startSkippedBanner": "No mod is running this time. They start as usual the next time Folia opens.",
+    "skippedThisRun": "Not started this time. It starts as usual the next time Tongsheng Music opens.",
+    "startSkippedBanner": "No mod is running this time. They start as usual the next time Tongsheng Music opens.",
     "cost": {
       "title": "Time it takes",
       "start": "Started in {{seconds}} s",
@@ -1156,7 +1278,7 @@ export default {
       "noFailures": "No failures",
       "main": "Background part: {{total}} ms in total, longest call {{longest}} ms",
       "slow": "Slow",
-      "slowHint": "This mod starts slowly or takes a lot of time while running. Folia does not switch it off for that."
+      "slowHint": "This mod starts slowly or takes a lot of time while running. Tongsheng Music does not switch it off for that."
     },
     "commandUnavailable": "This mod command is no longer available.",
     "cancelExport": "Cancel",
@@ -1190,7 +1312,7 @@ export default {
       "install-too-many-files": "The mod package has too many files (2000 max)",
       "install-main-missing": "The package is missing the main file declared in mod.json",
       "install-client-missing": "The package is missing the client file declared in mod.json",
-      "host-version-mismatch": "This mod uses internal APIs and does not support this Folia version",
+      "host-version-mismatch": "This mod uses internal APIs and does not support this Tongsheng Music version",
       "enable-failed": "Could not enable the mod: {{value}}",
       "mod-not-found": "Mod not found",
       "mod-content-unverifiable": "The mod's files could not be verified (too many or too large), so it will not be enabled",
@@ -1394,7 +1516,7 @@ export default {
     "audioUnplayable": "The audio cannot be played",
     "refused": "Request refused by {{provider}}",
     "noteCheckNetwork": "Check your network",
-    "noteRestartApp": "Restart Folia",
+    "noteRestartApp": "Restart Tongsheng Music",
     "noteRetryLater": "Try again later",
     "noteSignIn": "Sign in again",
     "noteUnknown": "Unknown error",
@@ -1405,7 +1527,7 @@ export default {
     "signIn": "Sign in"
   },
   "home": {
-    "welcome": "Welcome to Folia",
+    "welcome": "Welcome to Tongsheng Music",
     "lattice": "Queue collage",
     "latticeLabel": "Queue collage",
     "latticeExplore": "Explore collage",
@@ -1452,7 +1574,7 @@ export default {
     "loginCaseSpotifyDenied": "Choose Agree on the Spotify page",
     "loginCaseSpotifyPort": "Port 5588 is already in use",
     "loginCaseYtmUnfinished": "Sign in before closing the browser",
-    "loginCaseQqRestart": "Restart Folia, then try again",
+    "loginCaseQqRestart": "Restart Tongsheng Music, then try again",
     "loginCaseQqWrongScanApp": "To scan with the QQ Music app, choose “QQ Music app scan” instead, or scan this code with mobile QQ",
     "loginCaseQqWrongScanAppMobileOnly": "QQ scan here works with mobile QQ only: scan this code with mobile QQ",
     "loginCaseQqDeviceLimit": "Open the QQ Music app, go to Settings, scroll to the bottom, tap Device Management and remove devices you no longer use, then scan again",
@@ -1484,13 +1606,13 @@ export default {
     "restartingBackend": "Restarting…",
     "retryQr": "Refresh QR code",
     "qrTipsTitle": "Try these first",
-    "qrTipRestart": "Restart Folia, then scan again.",
-    "qrTipSwitchNetwork": "Switch to another network (for example a phone hotspot), then restart Folia.",
+    "qrTipRestart": "Restart Tongsheng Music, then scan again.",
+    "qrTipSwitchNetwork": "Switch to another network (for example a phone hotspot), then restart Tongsheng Music.",
     "qrDeviceLimit": "This QQ Music account has reached its limit of signed-in devices. Remove an old device first.",
     "qrDeviceLimitTipsTitle": "Remove a signed-in device first",
     "qrDeviceLimitTipRemove": "Open the official QQ Music app, go to Settings → Device Management (at the bottom of Settings), and remove devices you no longer use.",
     "qrDeviceLimitTipQuota": "QQ Music limits how many devices can stay signed in: 1 for free accounts, 3 for Green Diamond, 5 for Super VIP.",
-    "qrDeviceLimitTipRescan": "Then come back to Folia and scan again.",
+    "qrDeviceLimitTipRescan": "Then come back to Tongsheng Music and scan again.",
     "qrDiagnosticsToggle": "Still not working? Send us the diagnostics",
     "qrDiagnosticsToggleElsewhere": "Still not working? See diagnostics",
     "qrDiagnosticsPrompt": "Copy the diagnostics and send them to us so we can find the cause.",
@@ -1498,20 +1620,20 @@ export default {
     "qrDiagnosticsDisclosure": "The diagnostics include app and system versions, network adapters and IP addresses, proxy settings, the login request log with raw error text, and the network check results. They contain no passwords, cookies or tokens.",
     "qrDiagnosticsCopy": "Copy diagnostics",
     "qrDiagnosticsReport": "Report on GitHub",
-    "qrDiagnosticsPasteHint": "Paste the diagnostics Folia copied here, and briefly describe what happened (network, whether a proxy was on, etc.).",
-    "qrReportWebDeployment": "This is a problem with this web deployment: the site has no music platform API configured, or cannot reach it. Please give the diagnostics to whoever deployed this site; if that is you, check VITE_*_API_BASE against the deployment docs and rebuild. If you just want to use Folia, download the official desktop app.",
-    "qrReportUnofficialBuild": "You are not using an official Folia build or one of the documented self-hosting setups (it may be repackaged or modified by someone else). Please report problems to whoever provided it. Official builds are on GitHub Releases.",
+    "qrDiagnosticsPasteHint": "Paste the diagnostics Tongsheng Music copied here, and briefly describe what happened (network, whether a proxy was on, etc.).",
+    "qrReportWebDeployment": "This is a problem with this web deployment: the site has no music platform API configured, or cannot reach it. Please give the diagnostics to whoever deployed this site; if that is you, check VITE_*_API_BASE against the deployment docs and rebuild. If you just want to use Tongsheng Music, download the official desktop app.",
+    "qrReportUnofficialBuild": "You are not using an official Tongsheng Music build or one of the documented self-hosting setups (it may be repackaged or modified by someone else). Please report problems to whoever provided it. Official builds are on GitHub Releases.",
     "qrSelfCheckTitle": "Automatic check",
     "qrSelfCheckRunning": "Checking the network and the local service…",
     "qrSelfCheckFailed": "The automatic check could not finish: {{message}}",
-    "qrSelfCheckBackendDown": "The local {{provider}} service is not running properly ({{detail}}). Restart Folia and try again.",
+    "qrSelfCheckBackendDown": "The local {{provider}} service is not running properly ({{detail}}). Restart Tongsheng Music and try again.",
     "qrSelfCheckRemoteUnreachable": "Cannot reach the API server ({{detail}}). Check the deployment address and your network.",
-    "qrSelfCheckCredentialStore": "The system keyring is unavailable ({{detail}}), so the QQ Music session cannot be stored encrypted. Install and unlock GNOME Keyring or KWallet, then restart Folia.",
-    "qrSelfCheckDnsFailed": "Cannot resolve the {{provider}} server names ({{detail}}). Check your network or DNS settings, or switch networks and restart Folia.",
-    "qrSelfCheckTlsReset": "The connection to the {{provider}} servers was cut during the encryption handshake ({{detail}}). This is usually caused by a proxy, accelerator, firewall or the network itself: switch networks or turn off the proxy, then restart Folia and try again.",
-    "qrSelfCheckUnreachable": "Cannot reach the {{provider}} servers ({{detail}}). Check your network connection, or switch networks and restart Folia.",
+    "qrSelfCheckCredentialStore": "The system keyring is unavailable ({{detail}}), so the QQ Music session cannot be stored encrypted. Install and unlock GNOME Keyring or KWallet, then restart Tongsheng Music.",
+    "qrSelfCheckDnsFailed": "Cannot resolve the {{provider}} server names ({{detail}}). Check your network or DNS settings, or switch networks and restart Tongsheng Music.",
+    "qrSelfCheckTlsReset": "The connection to the {{provider}} servers was cut during the encryption handshake ({{detail}}). This is usually caused by a proxy, accelerator, firewall or the network itself: switch networks or turn off the proxy, then restart Tongsheng Music and try again.",
+    "qrSelfCheckUnreachable": "Cannot reach the {{provider}} servers ({{detail}}). Check your network connection, or switch networks and restart Tongsheng Music.",
     "qrSelfCheckIpv6Failed": "Connecting to the {{provider}} servers over IPv6 fails while IPv4 works ({{detail}}). Turn off IPv6 or Teredo in your system settings and try again.",
-    "qrSelfCheckHttpsFailed": "The {{provider}} servers can be reached, but the request failed ({{detail}}). Switch networks, restart Folia and try again.",
+    "qrSelfCheckHttpsFailed": "The {{provider}} servers can be reached, but the request failed ({{detail}}). Switch networks, restart Tongsheng Music and try again.",
     "qrSelfCheckClockSkew": "Your system clock is about {{detail}} minutes off the server time. Correct the system time and try again.",
     "qrSelfCheckNetworkOk": "The network check found no problems.",
     "qrSelfCheckProxyFakeIp": "A TUN-mode proxy (fake-ip) is handling the connections. If it still fails, let the {{provider}} domains connect directly and try again.",
@@ -1564,7 +1686,7 @@ export default {
     "gridFolderRemoveSelectedTitle": "Remove selected tracks?",
     "gridFolderRemoveSelectedDescription": "Remove {{count}} tracks. Roots are removed; fully selected subfolders are ignored during scans. Disk files stay unchanged.",
     "gridFolderRemoveRootTitle": "Remove imported root?",
-    "gridFolderRemoveRootDescription": "Remove {{path}} and all its tracks from Folia? Files on disk will not be deleted.",
+    "gridFolderRemoveRootDescription": "Remove {{path}} and all its tracks from Tongsheng Music? Files on disk will not be deleted.",
     "login": "Login",
     "welcomeBack": "Welcome Back",
     "guestTitle": "Try searching a few songs first",
@@ -1678,7 +1800,7 @@ export default {
     "releaseNotesDescription": "Review the changes in this version",
     "majorUpdateLabel": "{{codename}} Update · Major update",
     "ponder": "Ponder Help",
-    "ponderDescription": "Learn Folia's basic controls and operating model",
+    "ponderDescription": "Learn Tongsheng Music's basic controls and operating model",
     "version": "Version"
   },
   "lyricProvider": {
@@ -1843,7 +1965,7 @@ export default {
     "customShortcutTaken": "That key is already taken by another shortcut",
     "customShortcutLettersOnly": "Letters A\u2013Z only",
     "globalShortcuts": "Global shortcuts",
-    "globalShortcutsDesc": "Keys that work while Folia is in the background: playback controls, and commands that mods provide.",
+    "globalShortcutsDesc": "Keys that work while Tongsheng Music is in the background: playback controls, and commands that mods provide.",
     "globalShortcutsNote": "The modifiers are fixed at Ctrl+Alt+Shift (Control+Option+Shift on macOS); you pick the last key. A combination another program already uses is marked on its row.",
     "globalShortcutsPortalDesc": "On Wayland, your desktop assigns the keys.",
     "globalShortcutsPortalNote": "After registering, bind a key to each entry as your desktop's documentation describes. The key each entry suggests:",
@@ -1862,12 +1984,12 @@ export default {
     "globalShortcutModCommandMissing": "The mod does not offer this command right now",
     "replayGainMode": "ReplayGain mode( Loudness Balancing )",
     "replayGainModeDesc": "Normalize playback loudness using track or album ReplayGain metadata when available.",
-    "transitionSettings": "Folia transitions",
+    "transitionSettings": "Tongsheng Music transitions",
     "transitionEnable": "Blend",
     "transitionMode": "Transition mode",
-    "transitionCrossfade": "Folia Crossfade",
+    "transitionCrossfade": "Tongsheng Music Crossfade",
     "transitionCrossfadeDesc": "One fade out into one fade in.",
-    "transitionAutomix": "Folia Automix",
+    "transitionAutomix": "Tongsheng Music Automix",
     "transitionAutomixDesc": "Analyses both tracks and mixes them automatically.",
     "transitionFellBack": "Using crossfade",
     "crossfadeMaxSeconds": "Maximum transition length",
@@ -1876,9 +1998,9 @@ export default {
     "transitionEngineFull": "Full",
     "transitionEngineLite": "Compatible",
     "transitionEngineLiteDesc": "In the browser the mix is about half as good as in the desktop app.",
-    "transitionEngineNeedsModels": "The analysis models are missing from this install. Reinstall Folia to run the full engine.",
+    "transitionEngineNeedsModels": "The analysis models are missing from this install. Reinstall Tongsheng Music to run the full engine.",
     "legacyModelsTitle": "Clean up the old automix models",
-    "legacyModelsDesc": "Automix's analysis models now ship with Folia, so the models and runtime earlier versions downloaded are no longer used. The models folder you chose still holds {{files}} of them, {{size}} in all: {{dir}}. Deleting removes only those old files, nothing else in the folder.",
+    "legacyModelsDesc": "Automix's analysis models now ship with Tongsheng Music, so the models and runtime earlier versions downloaded are no longer used. The models folder you chose still holds {{files}} of them, {{size}} in all: {{dir}}. Deleting removes only those old files, nothing else in the folder.",
     "legacyModelsDelete": "Delete",
     "legacyModelsOpen": "Open folder",
     "legacyModelsKeep": "Keep them, don't ask again",
@@ -1886,7 +2008,7 @@ export default {
     "transitionPerformance": "Performance mode",
     "transitionPerformanceDesc": "A more aggressive transition.",
     "transitionPerformanceNeedsStems": "Not available in the browser build.",
-    "transitionPerformanceNeedsModel": "The stem separation model is missing from this install. Reinstall Folia to use it.",
+    "transitionPerformanceNeedsModel": "The stem separation model is missing from this install. Reinstall Tongsheng Music to use it.",
     "transitionAnimation": "Transition animation",
     "transitionAnimationDesc": "Draws the mix while it runs. Not shown for transitions under 5 seconds.",
     "transitionAnimationRing": "Screen ring",
@@ -2070,7 +2192,7 @@ export default {
     "memoryByProcess": "By process",
     "memorySeriesUnavailable": "Not reported on this platform",
     "reduceMotionSection": "Reduce motion",
-    "reduceMotionSectionDesc": "Folia plays full animation by default. Turn an item on to reduce motion there.",
+    "reduceMotionSectionDesc": "Tongsheng Music plays full animation by default. Turn an item on to reduce motion there.",
     "reduceMotionFollowSystem": "Follow system setting",
     "reduceMotionFollowSystemDesc": "The system's animation setting decides all motion",
     "reduceMotionForcedBySystem": "Currently reduced by the system setting above.",
@@ -2160,7 +2282,7 @@ export default {
     "enablePlayerPageNativeBlurHint": "System blur replaces the player backgrounds; uses more resources",
     "enablePlayerPageNativeBlurDesc": "Applies only in the desktop app in non-transparent mode; moving the window may lag.",
     "nativeBlurConfirmTitle": "System glass effect",
-    "nativeBlurConfirmDesc": "This changes the window to a translucent background using the system glass effect. Folia backgrounds will not be shown.",
+    "nativeBlurConfirmDesc": "This changes the window to a translucent background using the system glass effect. Tongsheng Music backgrounds will not be shown.",
     "nativeBlurConfirmAction": "I understand",
     "nativeBlurBackgroundNotice": "Native glassmorphism blur is enabled; lyrics animation background settings are currently overridden.",
     "autoHidePlayerChrome": "Auto-hide player controls",
@@ -2211,7 +2333,7 @@ export default {
     "closeToTrayDesc": "The close button hides the window to the tray instead of quitting",
     "hideTaskbarIcon": "Hide taskbar icon",
     "hideTaskbarIconDesc": "Hide the app from the taskbar even while the main window is still open. The tray icon remains the primary way to get back to it.",
-    "hideTaskbarIconNotice": "The window can only be brought back from the Folia icon in the system tray",
+    "hideTaskbarIconNotice": "The window can only be brought back from the Tongsheng Music icon in the system tray",
     "remoteControlGroup": "Remote Control",
     "remoteControlGroupDefault": "Default",
     "remoteControlGroupOn": "{{count}} changed",
@@ -2228,9 +2350,9 @@ export default {
     "openPlayerOnLaunchDesc": "Opens the playback view when the app starts. Follows \"View opened by Play\": with Lattice selected, launch opens the queue collage.",
     "wallpaperMode": "Wallpaper mode",
     "wallpaperModeDesc": "Sinks the window under the desktop as a lyrics wallpaper. No keyboard input",
-    "wallpaperModeMacPermissionHint": "Mac wallpaper mode needs Input Monitoring: enable Folia in System Settings → Privacy & Security → Input Monitoring, then restart the app.",
+    "wallpaperModeMacPermissionHint": "Mac wallpaper mode needs Input Monitoring: enable Tongsheng Music in System Settings → Privacy & Security → Input Monitoring, then restart the app.",
     "wallpaperEnterConfirmTitle": "Enter wallpaper mode?",
-    "wallpaperEnterConfirmDesc": "The window will sink to the bottom of the desktop and stay there as a lyrics wallpaper. It can no longer be closed, minimized or moved, and the keyboard cannot reach the app.\n\nTo leave, open the Folia menu in the system tray (the menu bar on macOS) and click \"Wallpaper Mode\" again.",
+    "wallpaperEnterConfirmDesc": "The window will sink to the bottom of the desktop and stay there as a lyrics wallpaper. It can no longer be closed, minimized or moved, and the keyboard cannot reach the app.\n\nTo leave, open the Tongsheng Music menu in the system tray (the menu bar on macOS) and click \"Wallpaper Mode\" again.",
     "wallpaperEnterConfirmAction": "Enter wallpaper mode",
     "wallpaperDisplay": "Wallpaper display",
     "wallpaperDisplayDesc": "The display wallpaper mode uses",
@@ -2283,7 +2405,7 @@ export default {
     "stageConnectionError": "Could not connect to ws://localhost:9863/api/ws/lyric. Please make sure the now-playing service is running.",
     "stageNotRunning": "Please start the now-playing service on this machine and ensure the player is playing.",
     "discordRichPresence": "Discord Rich Presence",
-    "discordRichPresenceDesc": "Show the current Folia track in Discord desktop.",
+    "discordRichPresenceDesc": "Show the current Tongsheng Music track in Discord desktop.",
     "discordPresenceDisabled": "Disabled",
     "discordPresenceConnected": "Connected",
     "discordPresenceDisconnected": "Disconnected",
@@ -2295,7 +2417,7 @@ export default {
     "obsBrowserSourceGuideStep1": "In OBS, add a Browser source under Sources.",
     "obsBrowserSourceGuideStep2": "Paste the OBS URL above into the URL field.",
     "obsBrowserSourceGuideStep3": "Set the size to 1920x1080 (1080x1920 for portrait). A larger size such as 3840x2160 scales the layout up proportionally for sharper text.",
-    "obsBrowserSourceGuideStep4": "The browser source only renders the picture and plays no sound. To capture audio, use OBS desktop audio or application audio capture on Folia.",
+    "obsBrowserSourceGuideStep4": "The browser source only renders the picture and plays no sound. To capture audio, use OBS desktop audio or application audio capture on Tongsheng Music.",
     "obsBrowserSourceGuideStep5": "Visual settings such as theme, fonts and animation are synced to OBS. The OBS background is transparent when the main window uses a transparent player background or the native blur player background.",
     "obsBrowserSourceGuideStep6": "A client count above 0 means OBS is connected. Regenerating the token invalidates the old URL, so update it in OBS.",
     "obsBrowserSourceAddress": "OBS URL",
@@ -2494,7 +2616,7 @@ export default {
     "beatEffectsNeedSmartBeat": "Turn on smart beat mode on the Global tab for these effects to play.",
     "beatEffectsOpenSmartBeat": "Go to Global",
     "beatEffectStrength": "Strength",
-    "beatEffectNeedsDrums": "The HTDemucs model is missing from this install; reinstall Folia. On a song without drums there is no effect either.",
+    "beatEffectNeedsDrums": "The HTDemucs model is missing from this install; reinstall Tongsheng Music. On a song without drums there is no effect either.",
     "beatEffect_sonnetLensTear": "Lens Tear",
     "beatEffect_sonnetLensTearDesc": "On the beats beat_this detects: every beat punches the camera in; each bar's first beat tears and flares.",
     "beatEffect_dioramaRipple": "Mirror Ripples",
@@ -3011,8 +3133,8 @@ export default {
     "macManualUpdateNotice": "Note: macOS requires downloading the full installer manually to update.",
     "linuxManualUpdateNotice": "Linux does not support automatic updates. Download the complete deb, rpm, or tar.gz package to upgrade manually; only stable AUR installations should upgrade folia-major-bin through the package manager.",
     "manualUpdateNotice": "Note: Automatic update is not supported on this platform. Please download the package manually.",
-    "unofficialBuildNotice": "Unofficial build: this version was neither built by the Folia repository's CI nor deployed through a documented self-hosting setup (Docker, Vercel, Cloudflare), and may be modified or missing its backend services. Please contact whoever provided it first; official builds are on GitHub Releases.",
-    "selfHostedBuildNotice": "Self-hosted: built and hosted by whoever deployed it, including the music platform backends. Please contact the deployer first, and report on GitHub once it is clearly a Folia problem.",
+    "unofficialBuildNotice": "Unofficial build: this version was neither built by the Tongsheng Music repository's CI nor deployed through a documented self-hosting setup (Docker, Vercel, Cloudflare), and may be modified or missing its backend services. Please contact whoever provided it first; official builds are on GitHub Releases.",
+    "selfHostedBuildNotice": "Self-hosted: built and hosted by whoever deployed it, including the music platform backends. Please contact the deployer first, and report on GitHub once it is clearly a Tongsheng Music problem.",
     "nowPlayingStatusHint": "Connects to ws://localhost:9863/api/ws/lyric. Start the now-playing service first.",
     "globalLyricTimelineOffset": "Global Timing Offset",
     "settingsHeadingLyricTiming": "Timing & filtering",
@@ -3045,8 +3167,8 @@ export default {
     "v0_7_1": {
       "intro": "Welcome to 0.7.1, the Pleiades Update—a major release spanning playback, extensions, desktop integration, and visuals.",
       "pleiadesAutomix": {
-        "title": "Folia Automix Smart Transitions",
-        "description": "Folia analyzes beats, tempo, key, loudness, and song sections to choose beat cuts, bass swaps, tail rides, or blends. Desktop users can download optional models for precise beat grids, stem handoffs, and Performance mode."
+        "title": "Tongsheng Music Automix Smart Transitions",
+        "description": "Tongsheng Music analyzes beats, tempo, key, loudness, and song sections to choose beat cuts, bass swaps, tail rides, or blends. Desktop users can download optional models for precise beat grids, stem handoffs, and Performance mode."
       },
       "modsPlatform": {
         "title": "Forge-style Mods (Experimental)",
@@ -3054,7 +3176,7 @@ export default {
       },
       "windowsWallpaper": {
         "title": "Windows Desktop Wallpaper Mode",
-        "description": "Folia can now sit beneath desktop icons on Windows as a persistent lyrics wallpaper, with tray and command-palette controls, mouse forwarding, and automatic failure recovery. Keyboard input is unavailable in this mode."
+        "description": "Tongsheng Music can now sit beneath desktop icons on Windows as a persistent lyrics wallpaper, with tray and command-palette controls, mouse forwarding, and automatic failure recovery. Keyboard input is unavailable in this mode."
       },
       "sleepTimer": {
         "title": "Restart-safe Sleep Timer",
@@ -3123,7 +3245,7 @@ export default {
       },
       "macWallpaperMode": {
         "title": "Wallpaper Mode on macOS",
-        "description": "Mac can now sink Folia below the desktop icons as a lyric wallpaper, switching in place without relaunching, with an option to auto-hide the Dock while it is on. Mouse forwarding needs Folia enabled under System Settings → Privacy & Security → Input Monitoring; the keyboard stays unavailable in this mode."
+        "description": "Mac can now sink Tongsheng Music below the desktop icons as a lyric wallpaper, switching in place without relaunching, with an option to auto-hide the Dock while it is on. Mouse forwarding needs Tongsheng Music enabled under System Settings → Privacy & Security → Input Monitoring; the keyboard stays unavailable in this mode."
       },
       "transcodeFallback": {
         "title": "Undecodable Audio Plays Anyway",
@@ -3131,7 +3253,7 @@ export default {
       },
       "localFolderAutoScan": {
         "title": "Imported Folders Rescan Themselves",
-        "description": "Turn it on and Folia watches your imported local folders, running an incremental scan whenever files are added, changed, or removed — no more manual re-import. It is off by default, and storage settings show the watch state per folder; some environments can only watch the top level of a folder."
+        "description": "Turn it on and Tongsheng Music watches your imported local folders, running an incremental scan whenever files are added, changed, or removed — no more manual re-import. It is off by default, and storage settings show the watch state per folder; some environments can only watch the top level of a folder."
       },
       "lyricFilterPersistence": {
         "title": "Lyric Filter Patterns Stick Around",
@@ -3146,7 +3268,7 @@ export default {
       "intro": "Version 0.7.5 gives you more control over where playback opens, brings grid and settings actions into the command palette, and improves desktop reliability.",
       "playbackEntryChoice": {
         "title": "Choose Where Playback Opens",
-        "description": "Choose whether pressing Play opens the visualizer player or the Lattice queue collage. Folia asks once after the release notes, and the choice remains available in Interface settings. Personal FM still opens the standard player because Lattice cannot host it."
+        "description": "Choose whether pressing Play opens the visualizer player or the Lattice queue collage. Tongsheng Music asks once after the release notes, and the choice remains available in Interface settings. Personal FM still opens the standard player because Lattice cannot host it."
       },
       "commandPaletteGridActions": {
         "title": "Grid Actions in the Command Palette",
@@ -3162,7 +3284,7 @@ export default {
       },
       "desktopReliability": {
         "title": "Clearer Desktop Updates and Crash Reports",
-        "description": "macOS and Linux builds can now check for new versions and lead you to a full installer or AUR, while Windows keeps automatic updating. When Folia crashes it saves a diagnostic log and can open its folder; the Windows uninstaller can also remove user data on request."
+        "description": "macOS and Linux builds can now check for new versions and lead you to a full installer or AUR, while Windows keeps automatic updating. When Tongsheng Music crashes it saves a diagnostic log and can open its folder; the Windows uninstaller can also remove user data on request."
       },
       "visualizerRefinements": {
         "title": "Lighter, Clearer Visualizers",
@@ -3200,7 +3322,7 @@ export default {
       },
       "motionControls": {
         "title": "Per-Surface Motion Controls",
-        "description": "Folia now plays its full animations by default instead of collapsing them into instant jumps when the system animation setting is off. A new Reduce motion section in Lab settings lets you tone down the queue lattice, automix transitions, the collection opening transition, Monet background drift, interface micro-motion, and smooth scrolling in Settings individually. Turn on Follow system setting if you prefer the previous behavior."
+        "description": "Tongsheng Music now plays its full animations by default instead of collapsing them into instant jumps when the system animation setting is off. A new Reduce motion section in Lab settings lets you tone down the queue lattice, automix transitions, the collection opening transition, Monet background drift, interface micro-motion, and smooth scrolling in Settings individually. Turn on Follow system setting if you prefer the previous behavior."
       },
       "wallpaperMultiMonitor": {
         "title": "Wallpaper Mode on Any Monitor",
@@ -3215,7 +3337,7 @@ export default {
       "intro": "Welcome to 0.7.21, the Sabbat-of-the-witch Update—a major release. The desktop app adds Spotify and YouTube Music, and every platform now signs in through one login window; the home screen gains an Explore tab; Sonnet, Diorama and Pendolo get Smart beat mode, moving with the beats and drums; QQ Music can sign in with the QQ Music app, and the interface is now available in Traditional Chinese.",
       "newPlatforms": {
         "title": "Spotify and YouTube Music",
-        "description": "Two new platforms on desktop. Sign in to Spotify through your system browser to search, browse, like, save and edit playlists; playback needs Spotify Premium, goes up to 320k, and isn't available on Intel Macs yet. YouTube Music searches and plays without signing in; to sign in, Folia opens Chrome, Edge, Chromium or Brave on your computer for your Google account, and Premium members can pick a higher quality. Both platforms bring line-synced lyrics only, and neither is available on the web version yet."
+        "description": "Two new platforms on desktop. Sign in to Spotify through your system browser to search, browse, like, save and edit playlists; playback needs Spotify Premium, goes up to 320k, and isn't available on Intel Macs yet. YouTube Music searches and plays without signing in; to sign in, Tongsheng Music opens Chrome, Edge, Chromium or Brave on your computer for your Google account, and Premium members can pick a higher quality. Both platforms bring line-synced lyrics only, and neither is available on the web version yet."
       },
       "loginWindow": {
         "title": "One Login Window",
@@ -3231,7 +3353,7 @@ export default {
       },
       "qqMusic": {
         "title": "QQ Music: App Sign-in and More",
-        "description": "QQ Music can now sign in by scanning with the QQ Music app (on desktop, Docker and Node, the same code also works with mobile QQ and WeChat); on the web version with a Serverless backend, sign-in renews itself for up to 30 days. Signed-in search is steadier, and when the platform refuses a search you see an error instead of \"no results\". New: the music cloud drive (only songs that can play), membership level, playlist play counts and creating empty playlists; when no full-length source is available, Folia plays the preview and says so. These need qq-music-api 3.3.3 on the backend."
+        "description": "QQ Music can now sign in by scanning with the QQ Music app (on desktop, Docker and Node, the same code also works with mobile QQ and WeChat); on the web version with a Serverless backend, sign-in renews itself for up to 30 days. Signed-in search is steadier, and when the platform refuses a search you see an error instead of \"no results\". New: the music cloud drive (only songs that can play), membership level, playlist play counts and creating empty playlists; when no full-length source is available, Tongsheng Music plays the preview and says so. These need qq-music-api 3.3.3 on the backend."
       },
       "moreDetails": {
         "title": "More Improvements",
@@ -3242,7 +3364,7 @@ export default {
       "intro": "0.7.20 fills in QQ Music with recommendations, likes, favorites and playlist editing; adds \"Skip songs that can't be played\"; makes desktop video export reliable for large files and on Linux; brings stem separation to Intel Macs; and lets mods add their own pages to the home screen.",
       "qqMusic": {
         "title": "QQ Music Catches Up",
-        "description": "Signed in to QQ Music, you now get daily recommendations, Personal FM and recommended playlists (recommended playlists work without signing in too). You can like songs, save playlists and albums, and add or remove songs in playlists you created; removing a song from \"Liked\" unlikes it. When a failed song may be blocked by membership or region, Folia says so as a likely cause. QQ doesn't support \"dislike\" yet, so the Personal FM trash button is greyed out."
+        "description": "Signed in to QQ Music, you now get daily recommendations, Personal FM and recommended playlists (recommended playlists work without signing in too). You can like songs, save playlists and albums, and add or remove songs in playlists you created; removing a song from \"Liked\" unlikes it. When a failed song may be blocked by membership or region, Tongsheng Music says so as a likely cause. QQ doesn't support \"dislike\" yet, so the Personal FM trash button is greyed out."
       },
       "autoSkip": {
         "title": "Skip Songs That Can't Be Played",
@@ -3250,7 +3372,7 @@ export default {
       },
       "videoExport": {
         "title": "More Reliable Video Export",
-        "description": "Desktop video export now writes to disk while recording, so large files such as 4K no longer fail at the last step. It also records Folia's own page directly: Linux (including Wayland) no longer fails to find a capture source, covered windows still record correctly, and 4K recording runs at a much higher frame rate. Exported MP4 files now show the right duration."
+        "description": "Desktop video export now writes to disk while recording, so large files such as 4K no longer fail at the last step. It also records Tongsheng Music's own page directly: Linux (including Wayland) no longer fails to find a capture source, covered windows still record correctly, and 4K recording runs at a much higher frame rate. Exported MP4 files now show the right duration."
       },
       "automixIntelMac": {
         "title": "Stem Separation on Intel Macs",
@@ -3258,7 +3380,7 @@ export default {
       },
       "modHomePages": {
         "title": "Mods Can Add Home Pages",
-        "description": "Folium 1.5: mods can add their own pages to the home screen, next to the built-in tabs. They can read and change volume, mute and loop mode, view and play from the queue, and react to playback failures. The mod panel shows how much space each mod uses and can clear its cache; dropdowns in mod settings now match the rest of Folia. Mods from the community Beta channel are marked in purple and warn you before you enable them."
+        "description": "Folium 1.5: mods can add their own pages to the home screen, next to the built-in tabs. They can read and change volume, mute and loop mode, view and play from the queue, and react to playback failures. The mod panel shows how much space each mod uses and can clear its cache; dropdowns in mod settings now match the rest of Tongsheng Music. Mods from the community Beta channel are marked in purple and warn you before you enable them."
       },
       "stabilityFixes": {
         "title": "Polish and Fixes",
@@ -3266,7 +3388,7 @@ export default {
       }
     },
     "v0_7_19": {
-      "intro": "0.7.19 turns the artist and album pages in Bravais into Tempera-style posters. When an online song fails to play, Folia now tells you the real reason instead of always saying it was removed; word-by-word visualizers such as Tempera split Chinese and Japanese lyrics more naturally; and the web version starts up offline again.",
+      "intro": "0.7.19 turns the artist and album pages in Bravais into Tempera-style posters. When an online song fails to play, Tongsheng Music now tells you the real reason instead of always saying it was removed; word-by-word visualizers such as Tempera split Chinese and Japanese lyrics more naturally; and the web version starts up offline again.",
       "artistPoster": {
         "title": "Artist Pages Become Posters",
         "description": "The full info strip on a Bravais artist page is now drawn as a Tempera-style poster pinned to the left of the wall. Its layout is fixed per artist, its colours come from the artist's three most popular albums, and the name scales to fit instead of overflowing. The album wall to the right tilts to meet it, and you can still drag and scroll while it is tilted."
@@ -3277,7 +3399,7 @@ export default {
       },
       "playbackFailure": {
         "title": "Playback Failures Explain Themselves",
-        "description": "An online song that fails to play no longer always shows \"song removed\". Folia now tells apart removed songs, network drops or timeouts, service errors or rate limits, songs that need sign-in, a membership or a purchase, and regional restrictions. Only truly removed songs count down to the next track and look for another version; when the network drops, playback stops and keeps your queue so you can retry or skip; sign-in, membership and purchase cases are shown without retrying again and again. Works with NetEase, QQ Music, KuGou and Bodian."
+        "description": "An online song that fails to play no longer always shows \"song removed\". Tongsheng Music now tells apart removed songs, network drops or timeouts, service errors or rate limits, songs that need sign-in, a membership or a purchase, and regional restrictions. Only truly removed songs count down to the next track and look for another version; when the network drops, playback stops and keeps your queue so you can retry or skip; sign-in, membership and purchase cases are shown without retrying again and again. Works with NetEase, QQ Music, KuGou and Bodian."
       },
       "lyricSegmenter": {
         "title": "More Natural Chinese and Japanese Word Splits",
@@ -3320,14 +3442,14 @@ export default {
       }
     },
     "v0_7_17": {
-      "intro": "Welcome to 0.7.17, the Spica Update—a major release. The library gets a brand-new interface, Bravais: a poster wall you can drag around. After updating, Folia asks once whether you want Bravais or the classic grid; the view opened by Play gains a \"Stay here\" option, and local songs can now be marked as instrumental.",
+      "intro": "Welcome to 0.7.17, the Spica Update—a major release. The library gets a brand-new interface, Bravais: a poster wall you can drag around. After updating, Tongsheng Music asks once whether you want Bravais or the classic grid; the view opened by Play gains a \"Stay here\" option, and local songs can now be marked as instrumental.",
       "bravais": {
         "title": "Bravais, a New Library Interface",
         "description": "The library becomes a poster wall: opening a playlist, album or artist flips the posters over to the new content, while the page details and actions live in a strip that opens in the wall. Drag to browse, move with the arrow keys, or just type to filter the current page. The classic grid is still available under Options → Interface → Library interface."
       },
       "chooseLibrary": {
         "title": "Pick Your Interface, Stay Where You Are",
-        "description": "After updating, Folia asks once whether you want Bravais or the classic grid (new installs are also asked which view Play should open). The new \"Stay here\" option keeps you where you pressed Play, and the playing card turns into pause / resume."
+        "description": "After updating, Tongsheng Music asks once whether you want Bravais or the classic grid (new installs are also asked which view Play should open). The new \"Stay here\" option keeps you where you pressed Play, and the playing card turns into pause / resume."
       },
       "wallLook": {
         "title": "A Tunable Wall",
@@ -3335,7 +3457,7 @@ export default {
       },
       "pureMusic": {
         "title": "Mark Local Songs as Instrumental",
-        "description": "In a lyric match window (Match Online in the Local tab of the player panel, or Manual Online Match in the library), choose \"Mark as instrumental\" and Folia stops matching lyrics for that song automatically; choose it again to undo. The command palette can toggle it too."
+        "description": "In a lyric match window (Match Online in the Local tab of the player panel, or Manual Online Match in the library), choose \"Mark as instrumental\" and Tongsheng Music stops matching lyrics for that song automatically; choose it again to undo. The command palette can toggle it too."
       },
       "navidromePreset": {
         "title": "Preset Navidrome Account for Docker",
@@ -3369,7 +3491,7 @@ export default {
       "intro": "0.7.15 improves Chinese text handling in local lyrics and MP3 tags, makes QR login steadier with clearer help when it fails, supports shortcuts from simulated input, and fixes ever-growing back history between artist and album pages and transcoding on Apple Silicon.",
       "localLyrics": {
         "title": "Better Local Lyric Files",
-        "description": "KRC lyrics are now decrypted, GBK encoding is detected, and line endings are normalized, so lyrics from older tools no longer parse as empty. Blank lines no longer push original lines into the translation track. When a bilingual LRC puts translations on the wrong timestamps, Folia tells you during playback and explains the fix on the Local tab of the playback panel."
+        "description": "KRC lyrics are now decrypted, GBK encoding is detected, and line endings are normalized, so lyrics from older tools no longer parse as empty. Blank lines no longer push original lines into the translation track. When a bilingual LRC puts translations on the wrong timestamps, Tongsheng Music tells you during playback and explains the fix on the Local tab of the playback panel."
       },
       "mp3Tags": {
         "title": "No More Garbled Chinese MP3 Tags",
@@ -3377,7 +3499,7 @@ export default {
       },
       "qrLogin": {
         "title": "Steadier QR Login with Better Help",
-        "description": "NetEase QR login retries with a fresh identity when the connection is reset mid-login and shows the real reason when it fails. After a failure, simple fixes such as restarting Folia or switching networks appear next to the QR code, with diagnostics tucked below. QQ Music diagnostics are back, and after you cancel on your phone, retry waits until the backend cooldown ends."
+        "description": "NetEase QR login retries with a fresh identity when the connection is reset mid-login and shows the real reason when it fails. After a failure, simple fixes such as restarting Tongsheng Music or switching networks appear next to the QR code, with diagnostics tucked below. QQ Music diagnostics are back, and after you cancel on your phone, retry waits until the backend cooldown ends."
       },
       "injectedShortcuts": {
         "title": "Shortcuts Work with Simulated Input",
@@ -3622,7 +3744,7 @@ export default {
     "exportPlaylist": "Export M3U8",
     "playlistImportSuccess": "Imported “{{name}}” with {{count}} track(s).",
     "playlistImportPartial": "Imported {{count}} track(s) into “{{name}}”; {{skipped}} path(s) were missing or ambiguous.",
-    "playlistImportNoMatches": "No playlist paths matched the local songs currently imported into Folia.",
+    "playlistImportNoMatches": "No playlist paths matched the local songs currently imported into Tongsheng Music.",
     "playlistImportFailed": "Playlist import failed. Make sure the file is a valid M3U or M3U8 playlist.",
     "playlistExportSuccess": "Exported “{{name}}”.",
     "entityInfo": "{{kind}} Info",
@@ -3759,8 +3881,8 @@ export default {
     "qqCloudDriveDesc": "Weiyun Music Drive",
   },
   "unifiedPanel": {
-    "nowPlayingStageDescription": "Now Playing is being controlled by an external player. Folia is only responsible for displaying lyrics and visual effects.",
-    "stageLocalInputDescription": "Stage is in local single-input mode. External devices can push lyrics or media, but playback and display are controlled by Folia itself.",
+    "nowPlayingStageDescription": "Now Playing is being controlled by an external player. Tongsheng Music is only responsible for displaying lyrics and visual effects.",
+    "stageLocalInputDescription": "Stage is in local single-input mode. External devices can push lyrics or media, but playback and display are controlled by Tongsheng Music itself.",
   },
   "libraryBravaisArtist": {
     "playTopSongs": "Play top songs",
@@ -3794,8 +3916,8 @@ export default {
     "noTopSongsToQueue": "No top songs available to queue",
   },
   "obs": {
-    "connecting": "Connecting to Folia",
-    "waitingForPlayback": "Waiting for Folia playback"
+    "connecting": "Connecting to Tongsheng Music",
+    "waitingForPlayback": "Waiting for Tongsheng Music playback"
   },
   "queue": {
     "remove": "Remove from queue",
@@ -3891,7 +4013,7 @@ export default {
     }
   },
   "userGuide": {
-    "title": "Welcome to Folia",
+    "title": "Welcome to Tongsheng Music",
     "subtitle": "Here are some tips to help you navigate.",
     "commandPalette": {
       "title": "Command Palette",
@@ -3913,15 +4035,15 @@ export default {
     },
     "theme": {
       "title": "Color themes",
-      "desc": "Customize Folia with your own light and dark color themes, or generate an AI theme from the current song.",
+      "desc": "Customize Tongsheng Music with your own light and dark color themes, or generate an AI theme from the current song.",
       "customDesc": "Open Theme Park from visual settings or the command palette to edit and save custom light and dark colors.",
-      "aiDesc": "When AI theme settings are configured, Folia can create song-aware colors and optionally auto-apply cached song themes."
+      "aiDesc": "When AI theme settings are configured, Tongsheng Music can create song-aware colors and optionally auto-apply cached song themes."
     },
     "clickThrough": {
       "title": "Click-through recovery",
       "desc": "When click-through is enabled, you can use the system tray icon to switch it if the window controls are hidden or hard to reach.",
       "trayTitle": "Use the tray icon",
-      "trayDesc": "Right-click the Folia system tray icon, then choose the click-through option to turn it on or off.",
+      "trayDesc": "Right-click the Tongsheng Music system tray icon, then choose the click-through option to turn it on or off.",
       "lockTitle": "Use the lock button",
       "lockDesc": "You can also move to the top titlebar hotspot to reveal the lock button, then click it to turn click-through off."
     },
@@ -3940,7 +4062,7 @@ export default {
     "commandsDesc": "You can trigger commands by typing English, Chinese characters, or Pinyin.",
     "ready": {
       "title": "Ready to Go",
-      "subtitle": "Enjoy your music journey with Folia."
+      "subtitle": "Enjoy your music journey with Tongsheng Music."
     }
   },
   "remote": {
@@ -4009,7 +4131,7 @@ export default {
   "aiHelp": {
     "openButton": "Need help?",
     "title": "Need help?",
-    "docsTitle": "Read the Folia documentation",
+    "docsTitle": "Read the Tongsheng Music documentation",
     "openDocs": "Open docs",
     "discordTitle": "Ask in the Discord community",
     "openDiscord": "Join",
@@ -4018,7 +4140,7 @@ export default {
     "copyPrompt": "Copy prompt",
     "copyPromptTitle": "1. Copy AI Prompt",
     "importJsonTitle": "2. Paste JSON Result",
-    "prompt": "I am using the folia-major music player on GitHub and need help with a problem.\n\nFolia Guide: {{guideUrl}}\nFolia repository: {{repoUrl}}\n\nPlease use these references as context, then help me understand and solve the problem I describe next. If any information is missing, ask what I should provide before making uncertain assumptions."
+    "prompt": "I am using the folia-major music player on GitHub and need help with a problem.\n\nTongsheng Music Guide: {{guideUrl}}\nTongsheng Music repository: {{repoUrl}}\n\nPlease use these references as context, then help me understand and solve the problem I describe next. If any information is missing, ask what I should provide before making uncertain assumptions."
   },
   "ponder": {
     "openPage": "Ponder this page",
@@ -4033,7 +4155,7 @@ export default {
     },
     "summaries": {
       "bravais_seam": "The gap down the middle of the wall: its three widths, the home tabs and tools, and filtering vs. searching.",
-      "queue_shuffle": "Folia has no shuffle mode; it shuffles the queue instead. Here are the four ways to do it.",
+      "queue_shuffle": "Tongsheng Music has no shuffle mode; it shuffles the queue instead. Here are the four ways to do it.",
       "audio_equalizer": "Ten bands and an effect chain \u2014 and one drag rewrites a custom slot.",
       "vis_playground": "Three invisible click regions sit on the preview.",
       "lyric_style": "Each style's own settings, hiding Monet's extras, pairing backgrounds, and the shared subtitle.",
@@ -4351,8 +4473,8 @@ export default {
       "transition": {
         "panel": "Settings \u00b7 Transitions",
         "enable": "Transition switch",
-        "crossfade": "Folia Crossfade",
-        "automix": "Folia Automix",
+        "crossfade": "Tongsheng Music Crossfade",
+        "automix": "Tongsheng Music Automix",
         "badge": "Running state",
         "detail": "Settings for this mode",
         "notice": "Unmet-requirement notice"
@@ -4550,7 +4672,7 @@ export default {
         "palette": "Command palette"
       },
       "grid": {
-        "help": "Folia and Help entry",
+        "help": "Tongsheng Music and Help entry",
         "tabs": "Content source tabs",
         "search": "Song search",
         "map": "All-collections map",
@@ -4643,7 +4765,7 @@ export default {
       "panelAccountTab": "Panel \u00b7 Quality tab",
       "latticePage": "Lattice page",
       "bravaisWall": "Bravais wall",
-      "helpPage": "Getting to know Folia",
+      "helpPage": "Getting to know Tongsheng Music",
       "ponderBasics": "How Ponder works",
       "foliaTransport": "Playback and media keys",
       "foliaShortcuts": "The shortcuts you will use",
@@ -4839,7 +4961,7 @@ export default {
         "toolsAppearance": "At the bottom is the wall appearance: transparency cycles through three levels, plus poster tint and lights on / off. Swipe the button left to open the command palette directly."
       },
       "queueShuffle": {
-        "noMode": "Folia has no traditional shuffle mode, and the loop button never switches to one. To listen in random order, shuffle the current queue.",
+        "noMode": "Tongsheng Music has no traditional shuffle mode, and the loop button never switches to one. To listen in random order, shuffle the current queue.",
         "once": "Shuffling is a single action: the current queue is reordered in place and plays in the new order. Shuffle again for a different order.",
         "command": "The quickest way is a command: with the command window closed and no text field focused, press the colon key to open execute mode, then press r. You can also search “Shuffle queue” in the command window.",
         "slot": "If you use it often, choose “Shuffle queue” under “Progress bar buttons” in Settings · Player page to get a shuffle button on the control bar.",
@@ -4905,7 +5027,7 @@ export default {
       "customShortcut": {
         "alt": "The left half of this row is two key caps, and only the second one is yours. Alt is drawn already pressed because it cannot be changed: this shortcut is always Alt plus one letter, so there is no way to record Ctrl+Shift+X or any other chord here.",
         "capture": "Click the second cap and it starts listening; the next key you press becomes the letter. Modifiers held on the way there are ignored, and Esc backs out without recording anything.",
-        "taken": "A letter that already opens something is refused on the spot, with the reason in red under the caps. S and Ctrl+K belong to the command window itself, and every hotkey in the registry reserves its own \u2014 so the list of taken letters grows on its own as Folia gains shortcuts.",
+        "taken": "A letter that already opens something is refused on the spot, with the reason in red under the caps. S and Ctrl+K belong to the command window itself, and every hotkey in the registry reserves its own \u2014 so the list of taken letters grows on its own as Tongsheng Music gains shortcuts.",
         "clear": "Once a letter is recorded, a small \u2715 appears beside the caps. It clears the binding, and the shortcut then runs nothing until you record another one.",
         "filtered": "The select on the right does not list every command. A shortcut fires from anywhere, so only commands that work anywhere may be bound to one \u2014 anything that needs a particular page or panel is left out. That is why a command you can find in the command window may simply not be here, and nothing on screen explains the gap.",
         "goesQuiet": "The same check runs when the key is pressed, not only when you pick. If a command later grows a requirement, or the registry claims your letter, the binding goes quiet rather than doing something else \u2014 so a shortcut that stopped working is worth re-picking here."
@@ -4918,14 +5040,14 @@ export default {
         "empty": "So the two are worth using for different things: the list handles whatever you happen to need, the three buttons handle what you want in the same place every time."
       },
       "replayGain": {
-        "off": "ReplayGain is a loudness tag written into the file itself. With this off, Folia ignores it and plays every song at whatever level it was mastered at \u2014 which is why one album can be far louder than the next.",
+        "off": "ReplayGain is a loudness tag written into the file itself. With this off, Tongsheng Music ignores it and plays every song at whatever level it was mastered at \u2014 which is why one album can be far louder than the next.",
         "trackAlbum": "“Track” levels every song against every other song, so a shuffled queue stays even. “Album” applies one figure to the whole album, keeping the quiet track quiet and the loud one loud the way the record was mixed. Neither re-encodes anything — it is playback volume only.",
         "sameValue": "The control panel\u2019s source tab carries the same three buttons, and they are not a second setting: both read and write one value, so changing it in either place changes it everywhere. Neither place says so.",
         "summary": "The source tab also shows the track and album gain the song carries; without tags it says “No ReplayGain detected”."
       },
       "importExport": {
-        "scope": "This section carries the way Folia looks: the colour theme, the lyric animation and every renderer\u2019s tuning, subtitles and fonts, the background, and the track card. That is the whole list.",
-        "notBackup": "So despite the name, it is not a backup of Folia. Playlists, the local library, playback settings, shortcuts and accounts are all outside it \u2014 restoring from one of these and expecting your music back is the mistake the name invites.",
+        "scope": "This section carries the way Tongsheng Music looks: the colour theme, the lyric animation and every renderer\u2019s tuning, subtitles and fonts, the background, and the track card. That is the whole list.",
+        "notBackup": "So despite the name, it is not a backup of Tongsheng Music. Playlists, the local library, playback settings, shortcuts and accounts are all outside it \u2014 restoring from one of these and expecting your music back is the mistake the name invites.",
         "themeChoice": "Before exporting, pick which theme rides along: the AI one, the one you built yourself, or none at all. “No Theme” still carries the visual settings and leaves your colours out, which is what you want when sharing a lyric animation setup rather than a palette.",
         "clipboard": "The buttons copy rather than save a file: one gives a short code, the other the same thing as readable JSON. Paste it anywhere \u2014 a message, a note \u2014 and that is the whole config.",
         "paste": "Importing goes the other way through the same box: paste someone\u2019s code here and the import button on the right lights up.",
@@ -4948,13 +5070,13 @@ export default {
         "hold": "Keep holding and the wipe fills the capsule from left to right; when it reaches the end you are inside that component\u2019s tutorial \u2014 a full screen like this one. Let go too early and it cancels with nothing happening.",
         "wholePage": "You do not have to find a component: hold Ctrl + G anywhere and you get the whole page \u2014 what is on it, where each thing sits, what you can do with it.",
         "touchBulb": "A touch screen has no hover, so that whole route is unavailable. In its place is this lightbulb in the top-right corner, and it only appears on touch devices \u2014 not finding it with a mouse is expected. It shows itself for a few seconds when you land or change pages and then folds away so it is not in the way; tap the top-right corner to call it back.",
-        "mediaKeys": "Playback goes through the system media session \u2014 SMTC on Windows, MPRIS on Linux. That means the play / previous / next keys on your keyboard work directly, so you never have to switch back to Folia while you are working in another window. The system media popup shows the current track too.",
+        "mediaKeys": "Playback goes through the system media session \u2014 SMTC on Windows, MPRIS on Linux. That means the play / previous / next keys on your keyboard work directly, so you never have to switch back to Tongsheng Music while you are working in another window. The system media popup shows the current track too.",
         "inAppTransport": "Inside the app: Space plays and pauses, {{mod}} + \u2190 / \u2192 move between tracks. On the player page the bare arrow keys seek five seconds. Everything else lives in the command window, or a colon away in execute mode.",
-        "shortcutK": "{{mod}} + K opens the command window. Folia keeps the whole of \u201cfinding a feature\u201d in here \u2014 commands and settings are both searchable by name, so you never have to remember which level something is filed under.",
+        "shortcutK": "{{mod}} + K opens the command window. Tongsheng Music keeps the whole of \u201cfinding a feature\u201d in here \u2014 commands and settings are both searchable by name, so you never have to remember which level something is filed under.",
         "shortcutP": "{{mod}} + P opens the play queue. It is a command window too: the input line is the queue\u2019s search box, and things like @artist: narrow it down before a bulk action.",
         "shortcutB": "{{mod}} + B goes to Lattice, which lays the whole play queue out as a poster wall. Press it inside Lattice and it goes back.",
         "shortcutG": "Ctrl + G is what you just did: it opens the tutorial for the current page. Whenever you are lost, press it first.",
-        "hintSettings": "Know your way around Folia already? You can turn the Ponder hints off in settings, or keep them only where you have not looked yet \u2014 the switch is under Settings \u00b7 General, \u201cPonder tutorial hints\u201d, with three positions: always show, only where you have not looked yet, and off. The button below takes you straight there.",
+        "hintSettings": "Know your way around Tongsheng Music already? You can turn the Ponder hints off in settings, or keep them only where you have not looked yet \u2014 the switch is under Settings \u00b7 General, \u201cPonder tutorial hints\u201d, with three positions: always show, only where you have not looked yet, and off. The button below takes you straight there.",
         "docs": "These four chapters are only the opening. Commands, shortcuts, online sources, the local library, visualizers and themes all have fuller write-ups on the docs site \u2014 the button below opens it."
       },
       "pages": {
@@ -4995,7 +5117,7 @@ export default {
         "playerCommandArgument": "A command that needs an argument does not run immediately. Type its name, press space, and it folds into a pill in the input line with the cursor waiting behind it. Fill in the argument, then Enter.",
         "playerExecuteCloseFirst": "Execute mode is entered with the command window closed. Press Esc to close it first: with the window open, a colon only lands in the input line.",
         "playerExecuteMode": "Back on the player page, with focus outside any text box, press the colon key: the command window opens straight into execute mode. Inside, one key runs one command: r shuffles the queue, v volume, o settings, h help.",
-        "playerShuffleNoSwitch": "Folia has no shuffle switch. You cannot find one on the control bar because shuffle is not a mode that stays on \u2014 it is a single action: deal the current queue again, in place.",
+        "playerShuffleNoSwitch": "Tongsheng Music has no shuffle switch. You cannot find one on the control bar because shuffle is not a mode that stays on \u2014 it is a single action: deal the current queue again, in place.",
         "playerShuffleHow": "The quickest route is to open nothing at all: press the colon key on the player page \u2014 the window opens in execute mode \u2014 then press r. The new order then stands; run it again for another one.",
         "playerShuffleSlot": "If you use it often, put \u201cShuffle queue\u201d in one of the two places on the right of the control bar and it becomes one press.",
         "lattice": "Lattice lays the play queue out as one poster field. Move through the field to inspect the queue, and select a poster to act on that song. Opened from the Explore tab, it lays out that tab's albums, playlists, artists and songs instead.",
@@ -5009,15 +5131,15 @@ export default {
         "latticeLights": "Lights Off dims the wall while retaining its structure. It is only a display setting: playback and queue order are unchanged.",
         "latticePosterKeys": "Enter or Space expands a closed poster. Once open, Enter plays or pauses, Space toggles controls, and Escape collapses and clears focus first.",
         "latticePageKeys": ": + C locates the playing song, {{mod}} + P opens the queue, {{mod}} + B goes back, {{mod}} + K opens the command window; arrow keys move poster focus.",
-        "help": "Folia separates browsing, playback, commands, and options. Ctrl+G explains the page currently in front of you; component guides appear separately when that component has special behavior.",
+        "help": "Tongsheng Music separates browsing, playback, commands, and options. Ctrl+G explains the page currently in front of you; component guides appear separately when that component has special behavior.",
         "helpCommands": "{{mod}} + K searches every command and setting. For options buried deep, searching the name is usually faster than remembering which level it sits on.",
         "helpOperatingModel": "Choose music in a grid, then playback continues independently in Player or Lattice. The bottom bar controls transport everywhere; Help and Options are overlays above the current page.",
         "settings": "The left side lists the categories under Interface, Music, App and Advanced. The right side contains the settings of the selected category.",
-        "settingsDirectNavigation": "You rarely need to browse every category: search the setting name in the command palette and Folia opens the exact section and anchor."
+        "settingsDirectNavigation": "You rarely need to browse every category: search the setting name in the command palette and Tongsheng Music opens the exact section and anchor."
       },
       "playerBar": {
         "basicsAutoExpand": "It is not only hover that opens it. Whenever playback is paused and you are somewhere other than the home screen, the capsule stays expanded on its own \u2014 the moment you are most likely to want the controls is the moment it stops hiding them. Start playing again, or go back home, and it slims down.",
-        "basicsIntro": "Folia's playback controls are this one capsule. The permanent row other players put along the bottom — previous, next, shuffle, repeat, volume — has no fixed place here at all.",
+        "basicsIntro": "Tongsheng Music's playback controls are this one capsule. The permanent row other players put along the bottom — previous, next, shuffle, repeat, volume — has no fixed place here at all.",
         "basicsPlay": "The only button that is always present is play / pause. On a wide window it sits at the far left; when the row is too narrow for one line it moves to the middle of a second row, with the two slots on either side.",
         "basicsTitle": "Changing tracks goes through the title, not a button. Hover it and arrows appear on both sides, previewing the previous and next track names — you pick where to go by reading it, not by pressing blind.",
         "basicsProgress": "Drag or click the progress bar to seek. Clicking anywhere else on the capsule does not pause: it opens the player page, or on Lattice pulls the view back to the current song.",
@@ -5029,7 +5151,7 @@ export default {
         "slotsIntro": "These two buttons to the right of the progress bar are not fixed, and each slot is independent.",
         "slotsWhere": "Choose in settings: loop, shuffle, like, queue, volume, sleep timer and four more, applied the moment you pick.",
         "shuffleIntro": "This shuffle is not what it is elsewhere - it is not a mode that stays on.",
-        "shuffleOnce": "Press it and Folia shuffles the current queue in place, once; that order then stands. Want another? Press again.",
+        "shuffleOnce": "Press it and Tongsheng Music shuffles the current queue in place, once; that order then stands. Want another? Press again.",
         "volumeIntro": "The bottom control bar has no permanent volume slider.",
         "volumeOpens": "Pressing here opens the volume surface inside the command palette, rather than a little slider in place."
       },
@@ -5096,7 +5218,7 @@ export default {
         "sourceLyrics": "The right end of the Lyrics row lists the lyrics this song has; click a segment to switch. With only one, the row just shows its name.",
         "sourceOffset": "“Timeline Offset” steps by 250ms, or takes a typed number; positive values make lyrics appear later. It is temporary for this playback only — for a lasting change there is a global offset in settings, and the two add up.",
         "sourceLyricsFile": "“Import / export lyrics” puts both jobs in one window: open it, then choose. “Match Online” to its left opens the window for matching lyrics.",
-        "sourceExportFormats": "The top of the window imports: lrc, vtt, ttml, qrc, yrc, krc, txt and the .fia files Folia exports. Navidrome songs cannot import, so their window only exports. The two tiles below save this song: .fia keeps word timing, translations, background vocals and your saved segmentation and imports straight back; .lrc is enhanced LRC that other players read, but those Folia-only details are dropped.",
+        "sourceExportFormats": "The top of the window imports: lrc, vtt, ttml, qrc, yrc, krc, txt and the .fia files Tongsheng Music exports. Navidrome songs cannot import, so their window only exports. The two tiles below save this song: .fia keeps word timing, translations, background vocals and your saved segmentation and imports straight back; .lrc is enhanced LRC that other players read, but those Tongsheng Music-only details are dropped.",
         "sourceExportBatch": "The bottom row is the batch export: it opens the export page in the command palette and saves every lyric cached on this device at once. The Lyrics row under Cache Details in Settings · Storage & backup has the same entry.",
         "coverTab": "The Cover tab is the song itself: the large cover, the title, artists and album under it, then a row of actions. There is nothing else on this tab.",
         "coverTabDetail": "Artist and album are both links into their collections. Clicking the title copies \u201ctitle - artist - album\u201d together with the source page link; Ctrl-click opens this song's page on its source platform instead.",
@@ -5109,12 +5231,12 @@ export default {
       },
       "transition": {
         "enable": "This group is about how one song joins the next. The switch at the top is the same value as the “Smart transition” tile in the Controls tab — two places, one setting.",
-        "modes": "The transition mode has two segments: Folia Crossfade fades from one song to the next, Folia Automix analyses the audio and picks the joining point.",
+        "modes": "The transition mode has two segments: Tongsheng Music Crossfade fades from one song to the next, Tongsheng Music Automix analyses the audio and picks the joining point.",
         "badge": "The small tag left of the two segments is the running state: “Full” or “Compatible” means Automix is running; “Using crossfade” means a condition is missing and the app fell back to a crossfade.",
         "notice": "Automix needs song caching; “Turn song caching on” at the right end of the notice switches it on right there."
       },
       "libraryWatch": {
-        "enable": "With this on, Folia keeps an eye on the local folders you imported and runs an incremental scan whenever their files change \u2014 no going back to re-scan by hand every time you add music.",
+        "enable": "With this on, Tongsheng Music keeps an eye on the local folders you imported and runs an incremental scan whenever their files change \u2014 no going back to re-scan by hand every time you add music.",
         "roots": "The list only unfolds below the switch, one row per watched root folder, with its real path in the small line underneath.",
         "warning": "Look at the icon on the left of each row: an eye means it is watching; an amber triangle means the watch on that folder has stopped working \u2014 a path that went away, permissions that changed. After that the scans simply stop happening, and this icon is the only sign.",
         "recheck": "When you see a triangle, press “Re-check folders” on the right: it attaches every imported folder again. The small line beside it is the time of the last automatic scan."
@@ -5124,7 +5246,7 @@ export default {
         "next": "Switch to “Append to next” and what you add slots in right behind whatever is playing, so it is up next. This changes every add-to-queue entry point in the app — the button on a card, the one that appears on a queue row, the command in the palette."
       },
       "lyricsSource": {
-        "autoBest": "With “Auto Use Best Lyric” on, Folia searches NetEase, AMLLDB, QQ and KuGou for this song and takes a perfectly matched word-by-word version when one exists. The cost is that it overrides the source you picked by hand on the source tab — if a manual pick did not stick, this is usually why.",
+        "autoBest": "With “Auto Use Best Lyric” on, Tongsheng Music searches NetEase, AMLLDB, QQ and KuGou for this song and takes a perfectly matched word-by-word version when one exists. The cost is that it overrides the source you picked by hand on the source tab — if a manual pick did not stick, this is usually why.",
         "priority": "The two segments of “Local song lyrics priority” decide whether local or online lyrics win. When a file’s own lyrics and lyrics found online both exist, this is what settles it.",
         "globalOffset": "“Global Timing Offset” opens a full-screen ruler that moves every song’s lyrics earlier or later by one amount — usually to make up for the fixed delay of a sound card or Bluetooth.",
         "offsetSum": "The source tab has an offset of its own, “Timeline Offset”, and it is not the same thing: that one is for the current song only and is gone when you change tracks, this one is global and lasting. The two add up, so when one song is badly out, check both."
@@ -5136,7 +5258,7 @@ export default {
       "lyricExport": {
         "whatItIs": "This page packs the lyrics already on this device into one zip. It does not download new lyrics.",
         "effective": "The online cache covers online songs you have played, exported as playback shows them, so lyrics you imported or matched by hand win. The local library exports only lyrics matched online: each file is named after its audio file and placed in the zip\u2019s local folder in the library\u2019s own folder tree, so extracting it into the folder that holds your library puts every file beside its song. Instrumentals and songs without lyrics are skipped and listed in manifest.json.",
-        "formats": ".fia is lossless and imports straight back into Folia; LRC works anywhere but drops background vocals and segmentation. Tick both and the zip holds two folders.",
+        "formats": ".fia is lossless and imports straight back into Tongsheng Music; LRC works anywhere but drops background vocals and segmentation. Tick both and the zip holds two folders.",
         "names": "The online lyric cache carries no song titles of its own. Songs you play record their titles as they play, and that comes first; after that, names come from playlists and queues cached on this device, and only then from the music service online, with the answer remembered for next time. With the lookup off, songs without a known title are named by ID.",
         "running": "Once started, progress shows here and the button turns into Cancel. Closing the palette cancels too: the export does not keep running in the background."
       },
@@ -5152,7 +5274,7 @@ export default {
         "windowNormal": "The biggest difference between the desktop build and the browser is these three, and none of them live inside the app: one changes where the window sits on the desktop, one lives in the system tray, and one is a second window. Start from this ordinary main window.",
         "wallpaper": "Wallpaper mode sinks it to the very bottom of the desktop: border and title bar gone, lyrics laid straight onto the desktop, with icons and other windows stacking over them as usual. The cost is the line in settings \u2014 the keyboard no longer reaches it in this mode.",
         "wallpaperExit": "Which means you cannot leave wallpaper mode by clicking the window. Use \u201cWallpaper Mode\u201d in the tray menu, or search the same command in the command window.",
-        "trayIcon": "This one in the corner of the taskbar is Folia\u2019s tray icon. Settings \u00b7 Desktop can make minimising go straight to the tray \u2014 the main window leaves the taskbar, but playback does not stop and the system media keys keep working.",
+        "trayIcon": "This one in the corner of the taskbar is Tongsheng Music\u2019s tray icon. Settings \u00b7 Desktop can make minimising go straight to the tray \u2014 the main window leaves the taskbar, but playback does not stop and the system media keys keep working.",
         "trayMenu": "Clicking the tray icon opens this column: everything you can do without opening the main window \u2014 show/hide window, open the remote window, transparent background, click-through, always on top, hide the taskbar icon, desktop lyrics, wallpaper mode, reset window, quit. In wallpaper mode it is the only way out.",
         "remote": "The remote window is a second small window; run “Toggle remote control window” in the command window to open it, or use “Remote Window” in the tray menu. It stays on top even while the main window is minimised, or sunk into the wallpaper.",
         "remoteChrome": "It carries its own set of window switches: always on top, transparent background, click-through (the mouse passes straight through to whatever is underneath), hide the taskbar icon, and auto-hiding UI. Being a separate window rather than a corner of the main one is exactly what lets those switches be independent."
@@ -5179,8 +5301,8 @@ export default {
       },
       "localGridControls": {
         "sources": "This row switches the local library between folders, albums, artists and your local playlists. It changes what the Grid3D rail contains; it does not switch to an online provider.",
-        "foldersAndPlaylists": "Folders preserve the imported directory structure. Local playlists are stored by Folia and are separate from online and Navidrome playlists.",
-        "imports": "Import folder adds music from a directory. Import playlist reads an M3U or M3U8 file and creates a local playlist from tracks Folia can resolve.",
+        "foldersAndPlaylists": "Folders preserve the imported directory structure. Local playlists are stored by Tongsheng Music and are separate from online and Navidrome playlists.",
+        "imports": "Import folder adds music from a directory. Import playlist reads an M3U or M3U8 file and creates a local playlist from tracks Tongsheng Music can resolve.",
         "refresh": "Refresh rescans imported roots for added, changed and missing files. It does not create another copy of the library."
       },
       "onlineCollectionActions": {

@@ -40,6 +40,6 @@ describe('the sign-in members of each built-in platform', () => {
     });
 
     it('has a row for every built-in platform', () => {
-        expect(listOnlineMusicProviders().map(provider => provider.id).sort()).toEqual(Object.keys(AUTH_MEMBERS).sort());
+        expect(listOnlineMusicProviders().filter(provider => provider.capabilities.auth).map(provider => provider.id).sort()).toEqual(Object.keys(AUTH_MEMBERS).sort());
     });
 });
