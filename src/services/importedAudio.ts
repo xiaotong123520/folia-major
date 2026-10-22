@@ -7,6 +7,8 @@ export interface ImportedAudioTrack {
     url: string;
     /** Blob URLs belong to this session only and must be revoked on removal/unmount. */
     temporary: boolean;
+    /** Optional stream URLs to try if the primary URL fails to load. */
+    fallbackUrls?: string[];
 }
 
 export function isPlayableAudioFile(file: Pick<File, 'name' | 'type'>): boolean {
