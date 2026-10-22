@@ -2,14 +2,14 @@
 
 ## Status
 
-This branch contains an optional Folia provider adapter, a bounded HTTP client, unit tests for the client, and this guide. It has not yet been built or run in CI in this session. Do not merge or deploy until the repository checks pass and a real authorized playback smoke test succeeds.
+This isolated branch contains an optional Folia provider adapter, bounded HTTP transport, same-origin allowlisted proxy, focused unit tests, and a CI workflow. CI passed at commit `aee10b57fb0a2fddac40dd32a5e262ced9d52bdd`; later source-identity and proxy redirect-hardening changes are being revalidated. Real authorized playback has not been smoke-tested because no upstream API is configured. Do not merge or deploy until the latest CI passes and real playback is verified.
 
 ## Files added or updated
 
 - `src/services/onlineMusic/music-backend/musicBackendTransport.ts`: bounded JSON transport, HTTPS enforcement, request timeout/cancellation, endpoint validation and size limits.
 - `src/services/onlineMusic/music-backend/musicBackendProvider.ts`: maps the candidate API's search and lyrics response into Folia's provider contract; uses the backend stream endpoint for audio.
 - `src/services/onlineMusic/providerRegistry.ts`: registers the optional provider. It reports not configured until the base URL is set.
-- `api-ts/music-backend-proxy.ts`: same-origin, read-only allowlist proxy for search, lyrics, stream, inspect/switch, album and playlist detail. It forwards Range headers and selected audio response headers; it does not expose cookie/QR-login routes.
+- `api-ts/music-backend-proxy.ts`: same-origin, read-only allowlist proxy for search, lyrics, stream, inspect/switch, album and playlist detail. It forwards Range headers and selected audio response headers, rejects upstream redirects, and does not expose cookie/QR-login routes.
 - `vercel.json`: routes `/api/music-backend/*` to the allowlisted proxy.
 - `test/unit/music-backend/musicBackendTransport.test.ts`: transport validation tests.
 - `test/unit/music-backend/musicBackendProxy.test.ts`: proxy allowlist, origin, query filtering, and Range-forwarding tests.
