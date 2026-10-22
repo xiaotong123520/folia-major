@@ -168,7 +168,11 @@ export function createFallbackHandler(env = process.env, fetcher = fetch) {
           const raw = await loadText(answer, 16384);
           let value;
           try { value = JSON.parse(raw); } catch { value = raw.trim(); }
-          const candidate = typeof value === 'string' ? value : value?.data?.url || value?.data?.music_url || value?.url || value?.music_url || value?.data?.src || '';
+          // Never treat an arbitrary HTML/JSON body as audio. Only bounded HTTPS media links
+          // on explicitly configured hostnames are eligible for follow-up requests.
+          const candidate = typeof value === 'string' ? value
+            : typeof value?.data === 'string' ? value.data
+            : value?.data?.url || value?.data?.music_url || value?.url || value?.music_url || value?.data?.src || '';
           const safe = streamUrl(candidate, hosts);
           if (safe) {
             const audio = await remote(fetcher, safe, { method: req.method, headers: { accept: 'audio/*', ...(req.headers.range ? { range: req.headers.range } : {}) } });
@@ -219,11 +223,14 @@ export function createFallbackHandler(env = process.env, fetcher = fetch) {
           if (!unique.has(song.source + ':' + song.id)) unique.set(song.source + ':' + song.id, song);
         }
       }
-      if (!unique.size && allowNameLookup && q.length <= 80 && offset === 0) {
+      // Show explicit name-based point-song alternatives even when catalog search has matches.
+      // Name-only APIs cannot prove which recording they return; users choose this fallback.
+      if (allowNameLookup && offset === 0) {
         for (const s of ['netease', 'qq']) {
           unique.set('point:' + s, {
             id: legacyId(s, q), source: s, name: q,
-            artist: '名称点歌（版本待验证）', album: '', durationMs: 0,
+            artist: s === 'netease' ? '网易云点歌接口（版本待验证）' : 'QQ点歌接口（版本待验证）',
+            album: '按名称点歌', durationMs: 0, is_vip: false,
           });
         }
       }
