@@ -5,7 +5,6 @@
  * OAuth tokens, and server credentials must not be stored here.
  */
 export const FOLIA_SERVER_STORAGE_KEY = 'folia.preview.serverBase.v1';
-export type FoliaProviderRoute = 'netease' | 'qq' | 'kugou';
 
 type RuntimeConfig = { foliaApiBase?: string };
 type FoliaRuntimeWindow = Window & { __FOLIA_RUNTIME_CONFIG__?: RuntimeConfig };
@@ -36,11 +35,6 @@ export function getFoliaServerBase(): string | null {
     }
     const vite = import.meta.env?.VITE_FOLIA_SERVER_BASE;
     return typeof vite === 'string' ? normalizeFoliaServerBase(vite) : null;
-}
-
-export function foliaProviderApiBase(provider: FoliaProviderRoute): string | null {
-    const base = getFoliaServerBase();
-    return base ? `${base}/${provider}` : null;
 }
 
 /** All paths must be application-owned, never arbitrary URL forwarding. */
