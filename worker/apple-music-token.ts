@@ -15,11 +15,11 @@ const base64url = (value: string | Uint8Array): string => {
     const bytes = typeof value === 'string' ? new TextEncoder().encode(value) : value;
     let binary = '';
     for (const byte of bytes) binary += String.fromCharCode(byte);
-    return btoa(binary).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');
+    return btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 };
 
 const decodePrivateKey = (pem: string): Uint8Array => {
-    const body = pem.replace(/-----BEGIN PRIVATE KEY-----/g, '').replace(/-----END PRIVATE KEY-----/g, '').replace(/\\s/g, '');
+    const body = pem.replace(/-----BEGIN PRIVATE KEY-----/g, '').replace(/-----END PRIVATE KEY-----/g, '').replace(/\s/g, '');
     const binary = atob(body);
     return Uint8Array.from(binary, character => character.charCodeAt(0));
 };
@@ -41,7 +41,7 @@ export async function handleAppleMusicToken(request: Request, env: AppleTokenEnv
         const now = Math.floor(Date.now() / 1000);
         const signingInput = base64url(JSON.stringify({ alg: 'ES256', kid: keyId }))
             + '.' + base64url(JSON.stringify({ iss: teamId, iat: now, exp: now + 60 * 60 * 24 * 30 }));
-        const pem = privateKeyValue.replace(/\\\\n/g, '\n');
+        const pem = privateKeyValue.replace(/\\n/g, '\n');
         const key = await crypto.subtle.importKey(
             'pkcs8',
             decodePrivateKey(pem),
