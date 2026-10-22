@@ -3,6 +3,8 @@ import { ArrowDown, ArrowLeft, AudioLines, Bot, Check, LoaderCircle, Mic, Music2
 import { useTranslation } from 'react-i18next';
 import type { LocalSong, UnifiedSong } from '../../types';
 import { omni } from '../../services/onlineMusic/omni';
+import { getNavidromeConfig, isNavidromeEnabled, navidromeApi } from '../../services/navidromeService';
+import { buildUnifiedNavidromeSong } from '../../services/playbackAdapters';
 
 type RadioBrief = {
     title: string;
@@ -147,6 +149,23 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                     }
                 } catch {
                     // One provider query failing should not cancel the rest of the radio search.
+                }
+                // Folia's existing Navidrome/Subsonic server is a separate catalogue from Omni.
+                // Search it through the established service and convert results to the existing playback carrier.
+                try {
+                    if (isNavidromeEnabled()) {
+                        const config = getNavidromeConfig();
+                        if (config) {
+                            const serverPage = await navidromeApi.search(config, term, 0, 0, 8);
+                            for (const serverSong of serverPage.song ?? []) {
+                                const unified = buildUnifiedNavidromeSong(navidromeApi.toNavidromeSong(config, serverSong)) as UnifiedSong;
+                                const key = JSON.stringify(unified.sourceRef ?? {}) + ':' + String(unified.id);
+                                if (!found.has(key)) found.set(key, unified);
+                            }
+                        }
+                    }
+                } catch {
+                    // A missing or offline personal server must not block online-provider results.
                 }
                 if (found.size >= 12) break;
             }
