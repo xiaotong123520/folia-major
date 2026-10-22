@@ -2898,6 +2898,7 @@ export default function App() {
             {!isElectronWindow && isMusicLinkImportOpen && <MusicLinkImport
                 onClose={() => setIsMusicLinkImportOpen(false)}
                 onPlayOnline={handleSearchResultPlay}
+                onOpenAppleMusic={() => setIsAppleMusicOpen(true)}
             />}
 
             {currentView === 'player' && !(isLyricMatchOpen && isLocalPlaybackSong(currentSong)) && (
