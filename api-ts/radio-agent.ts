@@ -34,9 +34,10 @@ export default async function handler(req: Request) {
     const message = typeof body.message === "string" ? body.message.trim().slice(0, 500) : "";
     if (!message) return new Response(JSON.stringify({ error: "Missing message" }), { status: 400, headers: jsonHeaders });
 
-    const provider = (process.env.VITE_AI_PROVIDER || process.env.FOLIA_AI_PROVIDER || "gemini").toLowerCase();
+    const provider = (process.env.AI_PROVIDER || process.env.VITE_AI_PROVIDER || process.env.FOLIA_AI_PROVIDER || "gemini").toLowerCase();
     let raw: unknown = null;
-    if (provider === "openai") {
+    const normalizedProvider = provider === "google" ? "gemini" : provider;
+    if (normalizedProvider === "openai") {
       const apiKey = process.env.OPENAI_API_KEY;
       if (!apiKey) return new Response(JSON.stringify({ error: "OpenAI API key is not configured on the server" }), { status: 503, headers: jsonHeaders });
       const base = (process.env.OPENAI_API_URL || "https://api.openai.com/v1/chat/completions").replace(/\/+$/, "");
@@ -45,7 +46,7 @@ export default async function handler(req: Request) {
       if (!response.ok) throw new Error("AI provider request failed (" + response.status + ")");
       const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
       raw = JSON.parse(data.choices?.[0]?.message?.content || "{}");
-    } else {
+    } else if (normalizedProvider === "gemini") {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) return new Response(JSON.stringify({ error: "Gemini API key is not configured on the server" }), { status: 503, headers: jsonHeaders });
       const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
@@ -53,11 +54,13 @@ export default async function handler(req: Request) {
       if (!response.ok) throw new Error("AI provider request failed (" + response.status + ")");
       const data = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
       raw = JSON.parse(data.candidates?.[0]?.content?.parts?.map(part => part.text || "").join("") || "{}");
+    } else {
+      return new Response(JSON.stringify({ error: "Unsupported AI provider configured on the server", code: "AI_PROVIDER_UNSUPPORTED" }), { status: 503, headers: jsonHeaders });
     }
     return new Response(JSON.stringify(parseBrief(raw, message)), { status: 200, headers: jsonHeaders });
   } catch (error) {
     const detail = error instanceof Error ? error.message : "Unknown error";
-    console.error("Radio Agent request failed:", detail);
+    console.error("[RadioAgent] request failed:", error);
     return new Response(JSON.stringify({ error: "Radio Agent could not reach the configured AI service" }), { status: 502, headers: jsonHeaders });
   }
 }
