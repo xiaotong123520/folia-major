@@ -225,7 +225,7 @@ export function createFallbackHandler(env = process.env, fetcher = fetch) {
       }
       // Show explicit name-based point-song alternatives even when catalog search has matches.
       // Name-only APIs cannot prove which recording they return; users choose this fallback.
-      if (allowNameLookup && offset === 0) {
+      if (allowNameLookup) {
         for (const s of ['netease', 'qq']) {
           unique.set('point:' + s, {
             id: legacyId(s, q), source: s, name: q,
@@ -234,8 +234,13 @@ export function createFallbackHandler(env = process.env, fetcher = fetch) {
           });
         }
       }
+      // Keep user-requested fallback options visible even when the primary API fills a page.
       const songs = [...unique.values()];
-      return send(res, 200, { code: 200, data: { songs: songs.slice(offset, offset + limit), total: songs.length } });
+      const ordered = [
+        ...songs.filter(item => String(item.id).startsWith('legacy-')),
+        ...songs.filter(item => !String(item.id).startsWith('legacy-')),
+      ];
+      return send(res, 200, { code: 200, data: { songs: ordered.slice(offset, offset + limit), total: ordered.length } });
     }
     if (!Object.hasOwn(SOURCES, source) && source !== 'local') return send(res, 400, { code: 400, msg: 'Unsupported source' });
     if (!id || id.length > 350) return send(res, 400, { code: 400, msg: 'Invalid track ID' });
