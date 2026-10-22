@@ -44,7 +44,7 @@ jobs:
         run: npm run typecheck
 
       - name: Focused music feature tests
-        run: npx vitest run -c vitest.config.ts test/unit/musicLinkResolver.test.ts test/unit/importedAudio.test.ts test/unit/radioAgent.test.ts test/unit/workerAiRoutes.test.ts test/unit/importedAudioStorage.test.ts test/unit/musicLinkPlayback.test.ts test/unit/music-backend
+        run: npx vitest run -c vitest.config.ts test/unit/directPointSong.test.ts test/unit/musicLinkResolver.test.ts test/unit/importedAudio.test.ts test/unit/radioAgent.test.ts test/unit/workerAiRoutes.test.ts test/unit/importedAudioStorage.test.ts test/unit/musicLinkPlayback.test.ts test/unit/music-backend
 
       - name: Validate server gateway
         run: node --test deploy/music-backend-gateway/gateway.test.mjs

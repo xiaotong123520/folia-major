@@ -14,7 +14,7 @@ describe('persistent browser imports', () => {
         const db = new ImportedAudioDatabase(name);
         await db.tracks.bulkPut([
             { id: 'local', name: 'Song.wav', file: new Blob(['RIFF-test-audio'], { type: 'audio/wav' }), createdAt: 1 },
-            { id: 'remote', name: 'Stream', url: 'https://example.com/a.mp3', createdAt: 2 },
+            { id: 'remote', name: 'Stream', url: 'https://example.com/a.mp3', fallbackUrls: ['https://example.com/b.mp3'], createdAt: 2 },
         ]);
         db.close();
         const reopened = new ImportedAudioDatabase(name);
@@ -22,6 +22,7 @@ describe('persistent browser imports', () => {
         expect(await saved[0].file?.text()).toBe('RIFF-test-audio');
         expect(saved[0].url).toBeUndefined();
         expect(saved[1].url).toBe('https://example.com/a.mp3');
+        expect(saved[1].fallbackUrls).toEqual(['https://example.com/b.mp3']);
         reopened.close();
     });
 

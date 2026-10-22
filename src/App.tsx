@@ -2865,6 +2865,7 @@ export default function App() {
 
             {!isElectronWindow && <PersonalMusicTools
                 onImport={() => setIsMusicLinkImportOpen(true)}
+                onImportFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
                 onRadio={() => setIsRadioAgentOpen(true)}
                 onApple={() => setIsAppleMusicOpen(true)}
             />}
@@ -2882,6 +2883,7 @@ export default function App() {
                 onOpenAppleMusic={() => setIsAppleMusicOpen(true)}
                 onAddFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
                 onAddAudioUrl={url => importedAudioPlayerRef.current?.addUrl(url) ?? false}
+                onAddPointSong={request => importedAudioPlayerRef.current?.addPointSong(request) ?? false}
             />}
             {!isElectronWindow && <ImportedAudioPlayer
                 ref={importedAudioPlayerRef}
