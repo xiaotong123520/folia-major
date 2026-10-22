@@ -192,6 +192,11 @@ const tokenFromCookieString = (cookie: string): string => {
 // 外部 URL 与 Electron 维持 `?cookie=`：跨源发自定义头会触发 preflight，而后端是
 // `Access-Control-Allow-Origin: *`，按规范不允许搭配 credentials。
 const isSameOriginBase = (base: string): boolean => base.startsWith('/');
+// Our own CORS-allowlisted Folia gateway accepts X-QQ-Session, so keep the
+// sealed session token out of request URLs and reverse-proxy access logs.
+const canUseSessionHeader = (base: string): boolean => (
+    isSameOriginBase(base) || base === foliaProviderApiBase('qq')
+);
 
 export const hasQqSession = (): boolean => Boolean(getWebSessionCookie());
 
@@ -366,7 +371,7 @@ export const requestQq = async <T = unknown>(
     });
     const headers: Record<string, string> = {};
     if (cookie) {
-        if (isSameOriginBase(base)) {
+        if (canUseSessionHeader(base)) {
             const token = tokenFromCookieString(cookie);
             // 同源请求不允许把未知格式的 session 放回 URL；清掉无效值，交给后端按未登录处理。
             if (token) headers[SESSION_HEADER_NAME] = token;
