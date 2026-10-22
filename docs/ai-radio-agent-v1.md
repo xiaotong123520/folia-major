@@ -64,6 +64,17 @@ type RadioAgentBrief = {
 
 The AI must not invent playable URLs or track IDs. It returns a listening brief; the app resolves real candidates through its existing music services. Validate all response fields and provide a deterministic fallback brief if the AI request fails.
 
+## Implementation status
+
+The first vertical slice is now present on `feature/ai-radio-agent-v1`:
+- `src/components/app/RadioAgent.tsx`: mobile-first overlay, text prompt, browser speech recognition where supported, optional speech synthesis, station brief and track candidates.
+- `api-ts/radio-agent.ts`: server-side JSON brief endpoint for Gemini or OpenAI-compatible configuration; secrets stay on the server.
+- `src/App.tsx`: floating launcher and callbacks to Folia's existing local-song and online/Navidrome playback handlers.
+- Locale entries added for Chinese, English and Indonesian.
+- Online discovery uses `omni.searchSongs`; configured Navidrome/Subsonic discovery uses `navidromeApi.search`; local library matching uses existing `localSongs`.
+
+Not yet verified: production build, typecheck, unit tests, Vercel preview, runtime AI credentials, and real server/provider playback. GitHub currently reports no check runs for the pull request head. Do not merge or claim deployment success until these are checked. The first slice also does not yet persist Agent preferences or use long-term personalized listening memory.
+
 ## Delivery phases
 
 ### Phase 0 — baseline and safety
