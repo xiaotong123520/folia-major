@@ -1,7 +1,31 @@
 
 
 export default {
-  "radioAgent": {
+  "appleMusic": {
+    "name": "Apple Music",
+    "tokenUnavailable": "Apple Music 开发者令牌不可用。",
+    "authorizedNotice": "已通过 Apple Music 官方授权。曲库和播放权限仍受订阅、地区及浏览器支持范围限制。",
+    "authorizationFailed": "Apple Music 授权失败，请重试。",
+    "noResults": "没有找到歌曲，请尝试其他关键词。",
+    "searchFailed": "搜索失败，请检查授权状态、网络、Apple Music 地区和订阅权限。",
+    "playFailed": "无法播放这首歌曲。请确认 Apple Music 订阅有效，且歌曲在当前地区可用。",
+    "signedOut": "已撤销 Apple Music 授权。",
+    "subtitle": "官方账号授权 · Folia",
+    "close": "关闭",
+    "signInHeading": "使用苹果官方授权登录",
+    "signInDescription": "Folia 不会收集或保存你的 Apple ID 密码。点击后将加载 Apple Music 官方授权流程。请先配置服务端开发者凭据。",
+    "connecting": "正在连接 Apple Music…",
+    "signIn": "登录 Apple Music",
+    "authorized": "Apple Music 已授权",
+    "signOut": "退出授权",
+    "searchLabel": "搜索 Apple Music 歌曲",
+    "searchPlaceholder": "搜索歌曲、歌手或专辑",
+    "unknownSong": "未知歌曲",
+    "song": "歌曲",
+    "playSong": "播放 {{song}}",
+    "footer": "播放由 Apple MusicKit 处理，不会绕过订阅或地区限制。授权令牌只保存在当前页面内存中；关闭页面后不持久化。"
+  },
+    "radioAgent": {
     "title": "AI 音乐电台",
     "open": "AI 电台",
     "close": "关闭电台",
