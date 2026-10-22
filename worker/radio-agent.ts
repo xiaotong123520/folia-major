@@ -19,7 +19,7 @@ const fallback = (message: string) => {
 };
 const clean = (value: unknown, limit: number): string | null => {
     if (typeof value !== 'string') return null;
-    const result = value.replace(/[\\u0000-\\u001f\\u007f]/g, ' ').trim().slice(0, limit);
+    const result = value.replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, limit);
     return result || null;
 };
 const parseBrief = (raw: unknown, message: string) => {
@@ -48,7 +48,7 @@ export async function handleRadioAgent(request: Request, env: RadioEnv): Promise
         let raw: unknown;
         if (provider === 'openai') {
             if (!env.OPENAI_API_KEY) return new Response(JSON.stringify({ error: 'OpenAI API key is not configured on the server' }), { status: 503, headers });
-            const base = (env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions').replace(/\\/+$/, '');
+            const base = (env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions').replace(/\/+$/, '');
             const endpoint = base.endsWith('/chat/completions') ? base : base.endsWith('/v1') ? base + '/chat/completions' : base + '/v1/chat/completions';
             const response = await fetch(endpoint, { method: 'POST', headers: { authorization: 'Bearer ' + env.OPENAI_API_KEY, 'content-type': 'application/json' }, body: JSON.stringify({ model: env.OPENAI_API_MODEL || 'gpt-4o-mini', temperature: 0.6, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: message }] }) });
             if (!response.ok) throw new Error('OpenAI request failed: ' + response.status);
