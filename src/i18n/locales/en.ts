@@ -1,7 +1,31 @@
 
 
 export default {
-  "radioAgent": {
+  "appleMusic": {
+    "name": "Apple Music",
+    "tokenUnavailable": "Apple Music developer token is unavailable.",
+    "authorizedNotice": "Authorized with Apple Music. Library and playback access still depend on subscription, region, and browser support.",
+    "authorizationFailed": "Apple Music authorization failed. Please try again.",
+    "noResults": "No songs found. Try another search term.",
+    "searchFailed": "Search failed. Check authorization, network, region, and subscription access.",
+    "playFailed": "This song could not be played. Check your subscription and regional availability.",
+    "signedOut": "Apple Music authorization has been revoked.",
+    "subtitle": "Official account authorization · Folia",
+    "close": "Close",
+    "signInHeading": "Sign in with Apple authorization",
+    "signInDescription": "Folia never collects or stores your Apple ID password. This opens Apple's official MusicKit authorization. Server developer credentials must be configured first.",
+    "connecting": "Connecting to Apple Music…",
+    "signIn": "Sign in to Apple Music",
+    "authorized": "Apple Music authorized",
+    "signOut": "Revoke authorization",
+    "searchLabel": "Search Apple Music songs",
+    "searchPlaceholder": "Search songs, artists, or albums",
+    "unknownSong": "Unknown song",
+    "song": "song",
+    "playSong": "Play {{song}}",
+    "footer": "Playback is handled by Apple MusicKit and does not bypass subscription or regional restrictions. The authorization token stays in page memory and is not persisted."
+  },
+    "radioAgent": {
     "title": "AI Radio",
     "open": "AI Radio",
     "close": "Close radio",
