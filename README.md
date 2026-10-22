@@ -53,4 +53,4 @@ GITHUB_PAGES=true npm run build
 - `https://cer.luckying.love/music/LuckyWYY.php?Love=`
 - `https://cer.luckying.love/music/Lucky.php?Love=`
 
-**重要边界**：纯静态 GitHub Pages 不能执行 PHP、Node 服务端代理，也无法绕过 CORS、需要私钥的音频地址、VIP/DRM 访问限制。只有第三方接口**直接返回浏览器能播放的音频、或 HTTP 重定向到可播放资源**时，网页音频控件才能播放；若返回 JSON、HTML、需要 Cookies/签名或未授权资源，不能保证播放。此功能是可测试的直连点歌入口，不代表这三个第三方接口已通过真实音频验收，也不等于会员解锁。请勿把含凭据的私密 URL 粘贴到公共分享场景。
+**重要边界**：纯静态 GitHub Pages 不能执行 PHP、Node 服务端代理，也无法绕过 CORS、需要私钥的音频地址、VIP/DRM 访问限制。如果第三方接口直接返回音频、重定向到音频，或返回**允许浏览器跨域读取（CORS）的 JSON 音频地址**，播放器会尝试播放；若 JSON 不允许跨域读取、接口返回 HTML、需要 Cookies/签名或缺少授权，不能保证播放。此功能是可测试的直连点歌入口，不代表这三个第三方接口已通过真实音频验收，也不等于会员解锁。请勿把含凭据的私密 URL 粘贴到公共分享场景。
