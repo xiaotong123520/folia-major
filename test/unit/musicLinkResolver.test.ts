@@ -30,6 +30,7 @@ describe('resolveMusicLink', () => {
     expect(result.canResolveMetadata).toBe(true);
     expect(result.canPlayInFolia).toBe(false);
     expect(result.requiresUserEntitlement).toBe(true);
+    expect(result.resourceId).toBe('123456789');
   });
 
   it('rejects unsafe schemes and credentials', () => {
