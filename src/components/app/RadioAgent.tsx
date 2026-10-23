@@ -8,6 +8,7 @@ import { buildUnifiedNavidromeSong } from '../../services/playbackAdapters';
 import { resolveMusicLink, type MusicLinkResolution } from '../../services/musicLinkResolver';
 import { PERSONAL_LIBRARY_PROVIDER, savePersonalRadio } from '../../services/personalRadioStorage';
 import { getPlaybackSongKey } from '../../utils/appPlaybackGuards';
+import { getSongCoverUrl } from '../../services/onlineMusic/songMetadata';
 
 // src/components/app/RadioAgent.tsx — mood-based radio creation, search, and playback handoff.
 type RadioBrief = {
@@ -23,7 +24,8 @@ type Props = {
     open: boolean;
     onClose: () => void;
     localSongs: LocalSong[];
-    onPlayOnline: (song: UnifiedSong) => void;
+    /** Use the main Folia queue, so station tracks and cover art appear on the Lattice wall. */
+    onPlayOnline: (song: UnifiedSong, stationQueue: UnifiedSong[]) => void | Promise<void>;
     onPlayLocal: (song: LocalSong) => void;
     onOpenLibrary: (tab: 'albums' | 'radio') => void;
 };
@@ -212,6 +214,13 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
         }
     };
 
+    const playStationSong = useCallback((song: UnifiedSong) => {
+        // The complete station list becomes the real play queue. Folia's Lattice wall
+        // reads that queue, so it can show the same artwork and exact recording IDs.
+        onClose();
+        void onPlayOnline(song, onlineSongs);
+    }, [onClose, onPlayOnline, onlineSongs]);
+
     const startVoice = useCallback(() => {
         const speechWindow = window as SpeechWindow;
         const Constructor = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
@@ -367,6 +376,11 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                         {!brief && !loading && <div className="flex min-h-44 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 px-6 text-center"><Music2 size={28} className="mb-3 text-white/30" /><p className="text-sm text-white/60">{t('radioAgent.emptyTitle')}</p><p className="mt-1 max-w-xs text-xs leading-5 text-white/35">{t('radioAgent.emptyDescription')}</p></div>}
                         {loading && <div className="flex min-h-44 items-center justify-center gap-3 text-sm text-white/50"><LoaderCircle size={18} className="animate-spin" />{t('radioAgent.searching')}</div>}
                         {brief && !loading && localMatches.length === 0 && onlineSongs.length === 0 && <div className="rounded-2xl border border-white/10 p-5 text-sm text-white/50">{t('radioAgent.noResults')}</div>}
+                        {onlineSongs.length > 0 && <button type="button"
+                            onClick={() => playStationSong(onlineSongs[0])}
+                            className="mb-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-violet-200/30 bg-violet-200/10 px-4 text-sm font-medium text-violet-100 transition hover:bg-violet-200/20">
+                            <Play size={16} /> {t('radioAgent.playStationWall')}
+                        </button>}
                         <div className="space-y-2">
                             {localMatches.map((song, index) => <div key={song.id} className="group flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 transition hover:border-white/15 hover:bg-white/[0.05]">
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-200/10 text-emerald-100/70"><Music2 size={17} /></div>
@@ -378,7 +392,7 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                                 {song.album?.coverUrl ? <img src={song.album.coverUrl} alt="" loading="lazy" className="h-10 w-10 shrink-0 rounded-xl object-cover" /> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-200/10 text-violet-100/70"><Music2 size={17} /></div>}
                                 <div className="min-w-0 flex-1"><p className="truncate text-sm text-white/90">{song.name}</p><p className="mt-1 truncate text-xs text-white/40">{song.artists?.map(artist => artist.name).join(', ') || t('radioAgent.unknownArtist')} · {song.album?.name || t('radioAgent.onlineSource')}</p></div>
                                 <span className="hidden text-[10px] text-white/25 sm:inline">{String(index + localMatches.length + 1).padStart(2, '0')}</span>
-                                <button type="button" onClick={() => onPlayOnline(song)} aria-label={t('radioAgent.play')} className="rounded-full border border-white/10 p-2.5 text-white/70 hover:bg-white/10 hover:text-white"><Play size={15} /></button>
+                                <button type="button" onClick={() => playStationSong(song)} aria-label={t('radioAgent.play')} className="rounded-full border border-white/10 p-2.5 text-white/70 hover:bg-white/10 hover:text-white"><Play size={15} /></button>
                             </div>)}
                         </div>
                         <div className="mt-5 flex items-start gap-2 rounded-xl border border-white/[0.07] p-3 text-[11px] leading-5 text-white/35"><Settings2 size={14} className="mt-0.5 shrink-0" /><span>{t('radioAgent.footerHint')}</span></div>

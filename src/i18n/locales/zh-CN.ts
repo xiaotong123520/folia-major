@@ -120,6 +120,7 @@ export default {
     "disclaimer": "仅使用已有音乐服务与官方授权接口。链接识别不会解锁 VIP 曲目或生成未经授权的播放地址。服务器音乐请在现有服务器曲库中配置。"
   },
   "radioAgent": {
+    "playStationWall": "播放整组电台 · 在封面墙查看",
     "serverFallback": "没有找到与描述匹配的在线曲目，先展示服务器曲库中的歌曲供你选择。",
     "savedWall": "我的电台封面墙",
     "saveWall": "保存到封面墙",

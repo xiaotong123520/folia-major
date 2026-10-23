@@ -120,6 +120,7 @@ export default {
     "disclaimer": "Only existing music providers and authorized APIs are used. Recognizing a link does not unlock subscription tracks or generate unauthorized audio streams. Configure your music server in the existing server library."
   },
   "radioAgent": {
+    "playStationWall": "Play station · View cover wall",
     "serverFallback": "No online tracks matched your description. Showing server catalog tracks for you to choose from.",
     "savedWall": "My radio cover wall",
     "saveWall": "Save to cover wall",

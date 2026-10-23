@@ -120,6 +120,7 @@ export default {
     "disclaimer": "Hanya layanan musik yang tersedia dan API resmi yang digunakan. Pengenalan tautan tidak membuka lagu berlangganan atau membuat streaming tanpa izin. Atur server musik di pustaka server."
   },
   "radioAgent": {
+    "playStationWall": "Putar radio · Lihat dinding sampul",
     "serverFallback": "Tidak ada lagu daring yang cocok dengan deskripsi. Menampilkan lagu dari katalog server untuk Anda pilih.",
     "savedWall": "Dinding sampul radio saya",
     "saveWall": "Simpan ke dinding sampul",
