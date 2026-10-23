@@ -107,10 +107,10 @@ export const requireOnlineMusicProviderForSong = (song: SongResult): OnlineMusic
 };
 
 registerOnlineMusicProvider(neteaseProvider);
-registerOnlineMusicProvider(hearttraceProvider);
 registerOnlineMusicProvider(kugouProvider);
 registerOnlineMusicProvider(qqProvider);
 registerOnlineMusicProvider(bodianProvider);
 registerOnlineMusicProvider(ytmProvider);
 registerOnlineMusicProvider(spotifyProvider);
 registerOnlineMusicProvider(musicBackendProvider);
+registerOnlineMusicProvider(hearttraceProvider);
