@@ -1,3 +1,4 @@
+import { useMediaQuery } from '../../../hooks/useMediaQuery';
 import { animate } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject, type PointerEvent, type RefObject } from 'react';
 import type { Bounds } from '../../../components/wall/layout';
@@ -55,9 +56,9 @@ export const getVisibleWorldBounds = (state: BravaisFrameState): Bounds | null =
 };
 
 /** 可见范围离已裁剪范围的边缘还剩不到一截 overscan 时才需要重新裁剪。 */
-export const needsRecull = (visible: Bounds, culled: Bounds | null) => {
+export const needsRecull = (visible: Bounds, culled: Bounds | null, overscan = BRAVAIS_OVERSCAN) => {
     if (!culled) return true;
-    const padding = BRAVAIS_OVERSCAN - BRAVAIS_CULL_EDGE_MARGIN;
+    const padding = overscan - BRAVAIS_CULL_EDGE_MARGIN;
     return visible.left < culled.left - padding
         || visible.right > culled.right + padding
         || visible.top < culled.top - padding
@@ -75,6 +76,8 @@ export const useBravaisCamera = ({
     fieldRef: RefObject<HTMLDivElement | null>;
     reducedMotion: boolean;
 }) => {
+    const compact = useMediaQuery('(max-width: 639px)');
+    const overscan = compact ? 240 : BRAVAIS_OVERSCAN;
     // 已裁剪（渲染了 slot）的可见范围；墙渲染它外扩 overscan 的 slot。
     const [bounds, setBounds] = useState<Bounds | null>(null);
     const boundsRef = useRef<Bounds | null>(null);
@@ -108,8 +111,8 @@ export const useBravaisCamera = ({
         syncPointerCamera();
         renderFrame();
         const visible = getVisibleWorldBounds(frameRef.current);
-        if (visible && (forceRecull || needsRecull(visible, boundsRef.current))) scheduleRecull();
-    }, [frameRef, renderFrame, scheduleRecull, syncPointerCamera]);
+        if (visible && (forceRecull || needsRecull(visible, boundsRef.current, overscan))) scheduleRecull();
+    }, [frameRef, renderFrame, scheduleRecull, syncPointerCamera, overscan]);
 
     /**
      * 相机没动、可见范围变了（缝开口补间：两半各让出半个开口，可见的世界范围随之变宽）时按此刻的可见范围重新裁剪
@@ -118,8 +121,8 @@ export const useBravaisCamera = ({
      */
     const checkCull = useCallback((force = false) => {
         const visible = getVisibleWorldBounds(frameRef.current);
-        if (visible && (force || needsRecull(visible, boundsRef.current))) scheduleRecull();
-    }, [frameRef, scheduleRecull]);
+        if (visible && (force || needsRecull(visible, boundsRef.current, overscan))) scheduleRecull();
+    }, [frameRef, scheduleRecull, overscan]);
 
     const stopCamera = useCallback(() => {
         animationRef.current?.stop();
@@ -215,7 +218,7 @@ export const useBravaisCamera = ({
         stopPan: stopCamera,
         containerRef: fieldRef,
         reducedMotion,
-        overscan: BRAVAIS_OVERSCAN,
+        overscan,
         bounds: bounds ?? { left: 0, right: 0, top: 0, bottom: 0 },
         cameraRef,
         getWorldBounds,
@@ -249,5 +252,5 @@ export const useBravaisCamera = ({
         },
     }), [didDragRef, onClickCapture, onPointerMove, panCancel, panDown, panUp, settle]);
 
-    return { bounds, moveTo, tweenTo, checkCull, stopCamera, syncPointerCamera, pointer: pointerWithRange, setRange, settle };
+    return { bounds, overscan, moveTo, tweenTo, checkCull, stopCamera, syncPointerCamera, pointer: pointerWithRange, setRange, settle };
 };

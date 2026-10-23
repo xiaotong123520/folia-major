@@ -30,7 +30,7 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideo
     ];
     const runAndClose = (action: () => void) => { setOpen(false); action(); };
     return <>
-        <aside className="fixed right-[max(12px,env(safe-area-inset-right))] bottom-[calc(160px+env(safe-area-inset-bottom))] z-[85] flex max-w-[calc(100vw-24px)] flex-col-reverse items-end gap-2 sm:bottom-auto sm:top-[max(12px,env(safe-area-inset-top))] sm:flex-col">
+        <aside className="fixed left-[max(12px,env(safe-area-inset-left))] sm:left-auto sm:right-[max(12px,env(safe-area-inset-right))] bottom-[calc(176px+env(safe-area-inset-bottom))] z-[85] flex max-w-[calc(100vw-24px)] flex-col-reverse items-start gap-2 sm:items-end sm:bottom-auto sm:top-[max(12px,env(safe-area-inset-top))] sm:flex-col">
             <button type="button" aria-label={t('personal.tools')} aria-expanded={open}
                 onClick={() => setOpen(value => !value)}
                 className="flex min-h-11 items-center gap-2 rounded-full border border-white/20 bg-[#17151f]/95 px-4 text-sm text-white shadow-xl backdrop-blur-xl">

@@ -94,7 +94,9 @@ export function WallToolsSurface({ idPrefix, label, isDaylight, destination, ent
     const isWideLayout = useMediaQuery('(min-width: 640px)');
     const bottomPx = usePlayerBottomBarBottomPx(isWideLayout ? 24 : 16);
     // stack 的 max-height 要减掉按钮此刻的底距（随底栏抬升量变），经 CSS 变量交给样式。
-    const bottomVar = useTransform(bottomPx, value => `${value}px`);
+    // The phone transport and now-playing card occupy the lower 160px.
+    const toolsBottom = useTransform(bottomPx, value => value + (isWideLayout ? 0 : 160));
+    const bottomVar = useTransform(toolsBottom, value => `${value}px`);
     const host = useWallToolsHost();
 
     const close = () => {
@@ -159,7 +161,7 @@ export function WallToolsSurface({ idPrefix, label, isDaylight, destination, ent
     return (
         <motion.div
             ref={rootRef}
-            style={{ bottom: bottomPx, '--wall-tools-bottom': bottomVar } as unknown as MotionStyle}
+            style={{ bottom: toolsBottom, '--wall-tools-bottom': bottomVar } as unknown as MotionStyle}
             className={`lattice-tools group ${above ? 'has-above' : ''} ${isDaylight ? 'is-daylight' : ''}`}
         >
             {/* 面板与队列浮岛叠在按钮上方的一列里（column-reverse：面板在下、浮岛在上）：定位在 stack 上，面板自己不再 absolute。 */}

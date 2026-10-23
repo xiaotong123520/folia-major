@@ -26,6 +26,9 @@ export const handleWallHandoffViewChange = (from: AppView, to: AppView) => {
         if (to !== target) store.abort();
         return;
     }
+    // Phone WebKit must not retain two poster walls and the visualizer for a 3D handoff.
+    // Use the ordinary view switch, which unmounts the previous wall immediately.
+    if (typeof window !== 'undefined' && window.matchMedia?.('(max-width: 639px)').matches) return;
     if (from === 'home' && to === 'lattice') {
         const peer = store.homePeer;
         if (!peer?.canHandoff()) return;

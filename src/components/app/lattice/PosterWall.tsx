@@ -59,6 +59,7 @@ type PosterWallProps = {
 const CELL_SIZE = 128;
 const GAP = 8;
 const OVERSCAN = 500;
+const PHONE_OVERSCAN = 240;
 // How much of the flight path may stay rendered while the camera travels, in viewports.
 const MAX_RESERVED_VIEWPORTS = 3;
 // Metro tile landing: the wave starts at the top-left of the viewport and runs down the diagonal.
@@ -129,6 +130,7 @@ export default function PosterWall({
     const autoFocusOnSongChange = useLatticeSettingsStore(state => state.autoFocusOnSongChange);
     const devicePixelRatio = useDevicePixelRatio();
     const pixelScale = cameraScale * devicePixelRatio;
+    const overscan = cameraScale < 0.6 ? PHONE_OVERSCAN : OVERSCAN;
 
     const wallLayout = useMemo(
         () => (sections ? createExploreLayout(sections, METRICS) : createQueueLayout(tiles.length, METRICS)),
@@ -251,12 +253,12 @@ export default function PosterWall({
     // The posters, and on the explore wall the headings, that are drawn.
     const drawn = useMemo(() => {
         if (!measured || !opened) return { posters: [], headings: [] };
-        const visible = wallLayout.near(bounds, OVERSCAN);
+        const visible = wallLayout.near(bounds, overscan);
         if (!activePoster || visible.posters.some(instance => instance.instanceId === activePoster.instance.instanceId)) {
             return visible;
         }
         return { posters: [...visible.posters, activePoster.instance], headings: visible.headings };
-    }, [activePoster, bounds, wallLayout, measured, opened]);
+    }, [activePoster, bounds, wallLayout, measured, opened, overscan]);
     const instances = drawn.posters;
 
     // World point the viewport is centred on; both the keyboard seed and playback follow need it.
@@ -275,7 +277,7 @@ export default function PosterWall({
         stopPan,
         containerRef,
         reducedMotion,
-        overscan: OVERSCAN,
+        overscan,
         bounds,
         cameraRef,
         getWorldBounds,
