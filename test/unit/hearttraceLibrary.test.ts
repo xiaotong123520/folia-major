@@ -62,6 +62,17 @@ describe('server library in the shared player', () => {
         expect(inputs).toHaveLength(2);
     });
 
+    it('parses nested JSON LRC from the owner endpoint without showing raw JSON to the player', async () => {
+        const raw = JSON.stringify({ code: 200, data: { lyric: '[00:01.50]第一句\\n[00:03.50]第二句' } });
+        const mock = vi.fn(async () => new Response(raw, { headers: { 'content-type': 'application/json' } }));
+        vi.stubGlobal('fetch', mock);
+        const result = await hearttraceProvider.lyrics!.getLyrics(toHearttraceSong(catalogSnapshot[0]));
+        expect(mock).toHaveBeenCalledTimes(1);
+        expect(result.lyrics?.lines).toHaveLength(2);
+        expect(result.mainText).toContain('[00:01.50]');
+        expect(result.mainText).not.toContain('"code"');
+    });
+
     it('does not call a recording instrumental just because it has no lyric file', async () => {
         vi.stubGlobal('fetch', async () => new Response(null, { status: 204 }));
         const result = await hearttraceProvider.lyrics!.getLyrics(toHearttraceSong(catalogSnapshot[0]));
