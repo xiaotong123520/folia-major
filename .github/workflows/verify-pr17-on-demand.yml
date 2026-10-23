@@ -1,8 +1,5 @@
 name: Verify PR 17 without merging
 on:
-  push:
-    paths:
-      - '.github/workflows/verify-pr17-on-demand.yml'
   workflow_dispatch:
 
 permissions:
