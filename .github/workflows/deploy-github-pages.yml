@@ -8,6 +8,10 @@ on:
       - 'README.md'
       - 'docs/**'
       - '.github/workflows/**'
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:
