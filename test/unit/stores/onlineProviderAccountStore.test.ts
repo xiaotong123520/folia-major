@@ -16,7 +16,7 @@ const createStorage = (initial: Record<string, string> = {}) => {
 
 describe('online provider account store', () => {
     beforeEach(() => vi.resetModules());
-    afterEach(() => vi.unstubAllGlobals());
+    afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
     it('defaults legacy state to NetEase and persists the selected provider', async () => {
         const storage = createStorage();
@@ -28,6 +28,17 @@ describe('online provider account store', () => {
 
         expect(useOnlineProviderAccountStore.getState().activeProviderId).toBe('kugou');
         expect(storage.getItem('active_online_provider_id')).toBe('kugou');
+    });
+
+    it('opens a configured public source without replacing a saved platform choice', async () => {
+        vi.stubEnv('VITE_INITIAL_ONLINE_PROVIDER', 'hearttrace');
+        vi.stubGlobal('localStorage', createStorage());
+        const first = await import('@/stores/useOnlineProviderAccountStore');
+        expect(first.useOnlineProviderAccountStore.getState().activeProviderId).toBe('hearttrace');
+        vi.resetModules();
+        vi.stubGlobal('localStorage', createStorage({ active_online_provider_id: 'netease' }));
+        const next = await import('@/stores/useOnlineProviderAccountStore');
+        expect(next.useOnlineProviderAccountStore.getState().activeProviderId).toBe('netease');
     });
 
     it('keeps provider accounts isolated and does not switch on logout', async () => {

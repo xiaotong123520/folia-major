@@ -7,13 +7,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const STORAGE_KEY = 'library_suite';
 
-const loadStore = async (initial?: string, options: { throwOnGet?: boolean; throwOnSet?: boolean } = {}) => {
+const loadStore = async (initial?: string, options: { throwOnGet?: boolean; throwOnSet?: boolean; compact?: boolean } = {}) => {
     const storage = new Map<string, string>(initial === undefined ? [] : [[STORAGE_KEY, initial]]);
     const setItem = vi.fn((key: string, value: string) => {
         if (options.throwOnSet) throw new Error('quota');
         storage.set(key, value);
     });
-    vi.stubGlobal('window', {});
+    vi.stubGlobal('window', { matchMedia: () => ({ matches: options.compact === true }) });
     vi.stubGlobal('localStorage', {
         getItem: (key: string) => {
             if (options.throwOnGet) throw new Error('denied');
@@ -44,6 +44,15 @@ describe('library suite store', () => {
         const { useLibrarySuiteStore, setItem } = await loadStore();
         expect(useLibrarySuiteStore.getState().suite).toBe('bravais');
         expect(setItem).not.toHaveBeenCalled();
+    });
+
+    it('uses a readable phone list without overwriting the desktop wall preference', async () => {
+        const { useLibrarySuiteStore, storage, setItem } = await loadStore('bravais', { compact: true });
+        expect(useLibrarySuiteStore.getState().suite).toBe('grid');
+        expect(storage.get(STORAGE_KEY)).toBe('bravais');
+        expect(setItem).not.toHaveBeenCalled();
+        useLibrarySuiteStore.getState().hydrate();
+        expect(useLibrarySuiteStore.getState().suite).toBe('grid');
     });
 
     it('persists a choice and reads it back after a restart', async () => {

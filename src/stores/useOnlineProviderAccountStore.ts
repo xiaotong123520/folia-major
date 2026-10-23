@@ -32,8 +32,13 @@ type OnlineProviderAccountStore = {
 const ACTIVE_PROVIDER_KEY = 'active_online_provider_id';
 
 const getInitialProviderId = (): OnlineProviderId => {
-    if (typeof localStorage === 'undefined' || typeof localStorage.getItem !== 'function') return DEFAULT_ONLINE_PROVIDER_ID;
-    return localStorage.getItem(ACTIVE_PROVIDER_KEY) || DEFAULT_ONLINE_PROVIDER_ID;
+    // Personal deployments can open a public catalog first; an explicit platform choice always wins.
+    const initial = String(import.meta.env.VITE_INITIAL_ONLINE_PROVIDER || '').trim() || DEFAULT_ONLINE_PROVIDER_ID;
+    try {
+        return typeof localStorage === 'undefined' ? initial : localStorage.getItem(ACTIVE_PROVIDER_KEY) || initial;
+    } catch {
+        return initial;
+    }
 };
 
 const emptyAccount = (): OnlineProviderAccountState => ({

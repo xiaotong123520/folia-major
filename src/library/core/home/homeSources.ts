@@ -27,6 +27,18 @@ export const isOnlineHomeTab = (tab: LibraryHomeTabKey): tab is LibraryHomeOnlin
     (ONLINE_TABS as readonly string[]).includes(tab)
 );
 
+/** 平台切换后保留可用的页签；服务器等来源没有歌单时，直接打开它实际提供的专辑。 */
+export const resolveAvailableHomeTab = (
+    active: LibraryHomeTabKey,
+    tabs: readonly Pick<LibraryHomeTabView, 'key' | 'disabledReason'>[],
+): LibraryHomeTabKey => {
+    if (!isOnlineHomeTab(active)) return active;
+    if (tabs.some(tab => tab.key === active && !tab.disabledReason)) return active;
+    return tabs.find(tab => tab.key === 'albums' && !tab.disabledReason)?.key
+        ?? tabs.find(tab => isOnlineHomeTab(tab.key) && !tab.disabledReason)?.key
+        ?? active;
+};
+
 /** 翻译一条首页文案；翻译为空时用 fallback。 */
 export const translateHomeMessage = (t: TFunction, message: LibraryHomeMessage): string => (
     (message.values ? t(message.key, message.values) : t(message.key)) || message.fallback || ''

@@ -31,6 +31,16 @@ const writeStoredSuite = (suite: LibrarySuiteId) => {
     }
 };
 
+// A phone must show the song list rather than the desktop wall's narrow poster seam.
+// Do not overwrite the stored desktop preference when opening the same account on a phone.
+const readInitialSuite = (): LibrarySuiteId => {
+    const preferred = readStoredSuite() ?? LIBRARY_SUITE_INITIAL_CHOICE;
+    const compact = typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(max-width: 767px)').matches;
+    return compact && preferred === 'bravais' ? 'grid' : preferred;
+};
+
 type LibrarySuiteState = {
     /** 选中的 suite（用户的选择或初始选择），不一定可用；实际生效的经 registry 解析。 */
     suite: LibrarySuiteId;
@@ -41,10 +51,10 @@ type LibrarySuiteState = {
 };
 
 export const useLibrarySuiteStore = create<LibrarySuiteState>(set => ({
-    suite: readStoredSuite() ?? LIBRARY_SUITE_INITIAL_CHOICE,
+    suite: readInitialSuite(),
     setSuite: (suite) => {
         writeStoredSuite(suite);
         set({ suite });
     },
-    hydrate: () => set({ suite: readStoredSuite() ?? LIBRARY_SUITE_INITIAL_CHOICE }),
+    hydrate: () => set({ suite: readInitialSuite() }),
 }));

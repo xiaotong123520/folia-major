@@ -7,6 +7,7 @@ import {
     isHomeImportBusy,
     isOnlineHomeTab,
     onlineHomeTitleKey,
+    resolveAvailableHomeTab,
     resolveHomeOnlineSource,
     resolveHomeTabs,
     resolveLocalUnavailableReason,
@@ -232,5 +233,21 @@ describe('cycleIndex（首页 Tab / F6 循环）', () => {
         expect(cycleIndex(tabs, 0, 1, tab => tab.key === 'playlist')).toBe(0);
         expect(cycleIndex(tabs, 0, 1, () => false)).toBe(-1);
         expect(cycleIndex([], -1, 1, () => true)).toBe(-1);
+    });
+});
+
+// A public catalog with albums but no account playlists must never remain on a disabled empty page.
+describe('resolveAvailableHomeTab', () => {
+    const tabs = [{ key: 'playlist' as const, disabledReason: 'unavailable' }, { key: 'radio' as const }, { key: 'albums' as const }];
+    it('opens albums when the selected platform has no playlists', () => {
+        expect(resolveAvailableHomeTab('playlist', tabs)).toBe('albums');
+    });
+    it('keeps a supported selection and never moves away from local music', () => {
+        expect(resolveAvailableHomeTab('radio', tabs)).toBe('radio');
+        expect(resolveAvailableHomeTab('local', tabs)).toBe('local');
+        expect(resolveAvailableHomeTab('playlist', [{ key: 'playlist' }])).toBe('playlist');
+    });
+    it('uses another online tab when albums are not available', () => {
+        expect(resolveAvailableHomeTab('explore', [{ key: 'playlist' }])).toBe('playlist');
     });
 });

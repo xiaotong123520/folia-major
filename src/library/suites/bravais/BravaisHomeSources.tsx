@@ -83,7 +83,7 @@ export const BravaisHomeOnline: React.FC<BravaisHomeSourceCommonProps & {
     // fb3（用户实测）：未登录时不再显示「先搜几首喜欢的歌试试看」（grid / TUI 仍用 home.guestTitle），缝里只有
     // 「连接在线平台」入口；登录过期仍要说。
     const emptyMessage = online.accountView === 'guest'
-        ? (online.needsRelogin ? t('status.loginExpired') : undefined)
+        ? (online.needsRelogin ? t('status.loginExpired') : t('home.guestPrompt'))
         : online.accountView === 'resolving' ? t('home.loadingLibrary') : list.emptyMessage;
     // B10：账户位里的平台切换（account-select / account-logout）。
     const account = useBravaisHomeAccount(accountController, online);

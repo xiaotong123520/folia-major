@@ -5,7 +5,7 @@ import type { HomeViewTab } from '../../../types';
 import type { ProviderCollection, ProviderUser } from '../../../types/onlineMusic';
 import type { LibraryHomeOnlineSource, LibraryHomeTabView } from './homeModel.contract';
 import type { LibraryAccountController } from '../account/account.contract';
-import { isOnlineHomeTab, resolveHomeOnlineSource, resolveHomeTabs, translateHomeTabs } from './homeSources';
+import { isOnlineHomeTab, resolveAvailableHomeTab, resolveHomeOnlineSource, resolveHomeTabs, translateHomeTabs } from './homeSources';
 import { resolveActiveProviderSummary } from '../account/accountRules';
 import { readOnlineProviderCapabilities, readOnlineProviderLabel } from './online/onlineHomeProvider.service';
 import { useSearchNavigationStore } from '../../../stores/useSearchNavigationStore';
@@ -80,12 +80,6 @@ export const useLibraryHomeSources = ({
         canListPlaylists, cloudPlaylist, explore, personalFmModes, playlists, provider, providerId, recommendations, user, userAlbums, userLibrary,
     ]);
 
-    // The explore tab is gone after a switch to a provider without one, and a stored choice of it
-    // may be older than the switch.
-    useEffect(() => {
-        if (tab === 'explore' && !online.canUseExplore) setTab('playlist');
-    }, [online.canUseExplore, setTab, tab]);
-
     const localAvailability = getLocalLibraryAvailability();
     const tabs = useMemo(() => translateHomeTabs(resolveHomeTabs({
         visibility,
@@ -93,6 +87,12 @@ export const useLibraryHomeSources = ({
         online,
         localAvailability: { supported: localAvailability.supported, reason: localAvailability.reason },
     }), t), [localAvailability.reason, localAvailability.supported, navidromeEnabled, online, t, visibility]);
+
+    // 不把切换平台后已禁用的歌单页留在屏幕上；否则公开服务器曲库看起来像没有歌曲。
+    useEffect(() => {
+        const availableTab = resolveAvailableHomeTab(tab, tabs);
+        if (availableTab !== tab) setTab(availableTab);
+    }, [setTab, tab, tabs]);
 
     const personalFmModeLabel = online.hasPersonalFmModes
         ? getPersonalFmSelectionLabel(personalFmSelection, (key, fallback) => t(key, fallback ?? ''))
