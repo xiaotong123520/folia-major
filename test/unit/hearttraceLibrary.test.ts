@@ -63,7 +63,7 @@ describe('server library in the shared player', () => {
     });
 
     it('parses nested JSON LRC from the owner endpoint without showing raw JSON to the player', async () => {
-        const raw = JSON.stringify({ code: 200, data: { lyric: '[00:01.50]第一句\\n[00:03.50]第二句' } });
+        const raw = JSON.stringify({ code: 200, data: { lyric: '[00:01.50]第一句\n[00:03.50]第二句' } });
         const mock = vi.fn(async () => new Response(raw, { headers: { 'content-type': 'application/json' } }));
         vi.stubGlobal('fetch', mock);
         const result = await hearttraceProvider.lyrics!.getLyrics(toHearttraceSong(catalogSnapshot[0]));
