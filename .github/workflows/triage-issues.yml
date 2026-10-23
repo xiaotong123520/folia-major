@@ -4,10 +4,6 @@ name: Triage Issues
 # 登录诊断的已知原因与处理步骤见 .github/triage/login-playbook.json。
 # 运行模式由仓库变量 TRIAGE_MODE 控制（off / dry-run / live），没设时取 config.json 的 mode。
 on:
-  issues:
-    types: [opened, reopened, edited]
-  issue_comment:
-    types: [created]
   workflow_dispatch:
     inputs:
       issue_number:
