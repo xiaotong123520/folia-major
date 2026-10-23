@@ -2,6 +2,8 @@
 
 export default {
   "hearttraceLibrary": {
+    "wall": "Dinding sampul album server",
+    "defaultRadio": "Radio musik server",
     "playNamed": "Putar {{name}}",
     "close": "Tutup pustaka",
     "loading": "Memuat pustaka…",
@@ -118,6 +120,13 @@ export default {
     "disclaimer": "Hanya layanan musik yang tersedia dan API resmi yang digunakan. Pengenalan tautan tidak membuka lagu berlangganan atau membuat streaming tanpa izin. Atur server musik di pustaka server."
   },
   "radioAgent": {
+    "serverFallback": "Tidak ada lagu daring yang cocok dengan deskripsi. Menampilkan lagu dari katalog server untuk Anda pilih.",
+    "savedWall": "Dinding sampul radio saya",
+    "saveWall": "Simpan ke dinding sampul",
+    "updateWall": "Perbarui radio tersimpan",
+    "saveHint": "Menyimpan lagu daring beserta sumber aslinya di browser ini. File lokal dan lagu Navidrome tidak disertakan.",
+    "savedHint": "Tersimpan. Buka dinding sampul radio saya. Radio tetap ada setelah halaman dimuat ulang.",
+    "saveFailed": "Gagal menyimpan. Penyimpanan browser mungkin penuh atau tidak tersedia.",
     "shareTitle": "Kenali tautan berbagi musik",
     "sharePlaceholder": "Tempel URL platform musik (HTTPS)",
     "shareResolve": "Kenali",

@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useSyncExternalStore } from 'react';
+import { getSavedRadiosRevision, subscribeSavedRadios } from '../../../../services/personalRadioStorage';
 import { useTranslation } from 'react-i18next';
 import type { LibraryHomeCard, LibraryHomeResources } from '../homeModel.contract';
 import { buildOnlineAlbumCards, buildOnlinePlaylistCards, buildOnlineRadioCards } from '../homeCards';
@@ -31,14 +32,19 @@ export const useLibraryHomeOnline = (
 ): LibraryHomeOnlineList => {
     const { t } = useTranslation();
     const { tab, online, personalFmModeLabel } = sources;
+    const radioRevision = useSyncExternalStore(subscribeSavedRadios, getSavedRadiosRevision);
     const { favoriteAlbums, radioFeed } = useLibraryHomeOnlineFeeds({
         resources,
         tab,
         providerId: online.providerId,
-        userId: online.user?.id ?? null,
+        userId: online.user?.id ?? (online.accountView === 'public' ? '__public_library__' : null),
         canUseAlbums: online.canUseAlbums,
         canUseRadio: online.canUseRadio,
     });
+
+    useEffect(() => {
+        if (radioRevision > 0 && tab === 'radio' && online.accountView === 'public') void resources.radioFeed.reload();
+    }, [radioRevision, tab, online.accountView, online.providerId, resources.radioFeed]);
 
     const playlistCards = useMemo(() => buildOnlinePlaylistCards(online.collections, t), [online.collections, t]);
     const albumCards = useMemo(() => buildOnlineAlbumCards(favoriteAlbums.data, t), [favoriteAlbums.data, t]);

@@ -63,7 +63,7 @@ export const BravaisHomeOnline: React.FC<BravaisHomeSourceCommonProps & {
     account: LibraryAccountController;
 }> = ({ tab, online, list, account: accountController, homeActions, onOpenGridView, ...common }) => {
     const { t } = useTranslation();
-    const showList = online.accountView === 'authenticated';
+    const showList = online.accountView === 'authenticated' || online.accountView === 'public';
     useLibraryHomeListRegistration({
         enabled: showList,
         getState: (): LibraryHomeListState => ({

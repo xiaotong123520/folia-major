@@ -1,13 +1,14 @@
 import type { UnifiedSong } from '../../types';
 import { lazy, Suspense, useState } from 'react';
-import { AudioLines, Film, Link2, Music2, QrCode, Radio, Server, X } from 'lucide-react';
+import { AudioLines, Film, LayoutGrid, Link2, Music2, QrCode, Radio, Server, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { openLoginWindow } from '../login/loginWindowStore';
 import Sheet from '../shared/Sheet';
 
 // One toolbar and the original application surfaces on every viewport; no separate phone homepage.
 const HearttraceLibrary = lazy(() => import('./hearttraceLibrary/HearttraceLibrary'));
-export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideos, onPlayServerSong }: {
+export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideos, onPlayServerSong, onOpenLibrary }: {
+    onOpenLibrary: (tab: 'albums' | 'radio') => void;
     onPlayServerSong: (song: UnifiedSong) => void;
     onImport: () => void;
     onRadio: () => void;
@@ -18,6 +19,8 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideo
     const [open, setOpen] = useState(false);
     const [serverOpen, setServerOpen] = useState(false);
     const actions = [
+        { icon: LayoutGrid, label: t('hearttraceLibrary.wall'), run: () => onOpenLibrary('albums') },
+        { icon: Radio, label: t('radioAgent.savedWall'), run: () => onOpenLibrary('radio') },
         { icon: Server, label: t('hearttraceLibrary.title'), run: () => setServerOpen(true) },
         { icon: QrCode, label: t('mobileAccess.accounts'), run: () => openLoginWindow() },
         { icon: Link2, label: t('personal.import'), run: onImport },

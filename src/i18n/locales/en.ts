@@ -2,6 +2,8 @@
 
 export default {
   "hearttraceLibrary": {
+    "wall": "Server album cover wall",
+    "defaultRadio": "Server music radio",
     "playNamed": "Play {{name}}",
     "close": "Close library",
     "loading": "Loading library…",
@@ -118,6 +120,13 @@ export default {
     "disclaimer": "Only existing music providers and authorized APIs are used. Recognizing a link does not unlock subscription tracks or generate unauthorized audio streams. Configure your music server in the existing server library."
   },
   "radioAgent": {
+    "serverFallback": "No online tracks matched your description. Showing server catalog tracks for you to choose from.",
+    "savedWall": "My radio cover wall",
+    "saveWall": "Save to cover wall",
+    "updateWall": "Update saved radio",
+    "saveHint": "Saves online tracks with their original sources in this browser. Local files and Navidrome tracks are not included.",
+    "savedHint": "Saved. Open My radio cover wall to view it. It remains after refreshing.",
+    "saveFailed": "Could not save. Browser storage may be full or unavailable.",
     "shareTitle": "Parse a music share link",
     "sharePlaceholder": "Paste a music platform URL (HTTPS)",
     "shareResolve": "Identify",

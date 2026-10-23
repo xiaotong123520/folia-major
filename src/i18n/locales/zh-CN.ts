@@ -2,6 +2,8 @@
 
 export default {
   "hearttraceLibrary": {
+    "wall": "服务器专辑封面墙",
+    "defaultRadio": "服务器音乐电台",
     "playNamed": "播放 {{name}}",
     "close": "关闭曲库",
     "loading": "正在加载曲库…",
@@ -118,6 +120,13 @@ export default {
     "disclaimer": "仅使用已有音乐服务与官方授权接口。链接识别不会解锁 VIP 曲目或生成未经授权的播放地址。服务器音乐请在现有服务器曲库中配置。"
   },
   "radioAgent": {
+    "serverFallback": "没有找到与描述匹配的在线曲目，先展示服务器曲库中的歌曲供你选择。",
+    "savedWall": "我的电台封面墙",
+    "saveWall": "保存到封面墙",
+    "updateWall": "更新已保存电台",
+    "saveHint": "保存当前在线曲目，保留原始音源。电台仅存于当前浏览器，本地文件与 Navidrome 曲目不随此操作保存。",
+    "savedHint": "已保存。打开“我的电台封面墙”即可查看，刷新后仍保留。",
+    "saveFailed": "保存失败，浏览器存储可能已满或不可用，请重试。",
     "shareTitle": "解析音乐分享链接",
     "sharePlaceholder": "粘贴音乐平台分享链接（HTTPS）",
     "shareResolve": "解析",

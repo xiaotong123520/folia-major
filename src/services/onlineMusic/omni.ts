@@ -475,6 +475,7 @@ export const omni = {
                 shortName: provider.shortName || provider.displayName,
                 availability: provider.getAvailability?.() ?? { configured: true },
                 requiresAccount: provider.capabilities.auth,
+                ...(provider.capabilities.publicLibrary ? { publicLibrary: true } : {}),
                 status: account?.status || 'unknown',
                 user: account?.user || null,
                 collections: account?.collections || [],

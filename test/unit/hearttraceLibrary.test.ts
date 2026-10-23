@@ -5,6 +5,27 @@ import { catalogSnapshot } from '../../src/services/onlineMusic/hearttrace/catal
 // Exact recording identities keep artwork and original timestamped lyrics in the main player.
 afterEach(() => vi.unstubAllGlobals());
 describe('server library in the shared player', () => {
+    it('exposes public album cards with complete paginated tracks and the same recording paths', async () => {
+        const albums = await hearttraceProvider.library!.getUserAlbums!('__public_library__', 100, 0);
+        expect(albums.items).toHaveLength(43);
+        const tracks = (await Promise.all(albums.items.map(album => hearttraceProvider.catalog!.getAlbumTracks!(album.id, 1000, 0)))).flatMap(page => page.items);
+        expect(tracks).toHaveLength(catalogSnapshot.length);
+        expect(new Set(tracks.map(song => song.sourceRef.mediaId)).size).toBe(catalogSnapshot.length);
+        const first = albums.items[0];
+        const page = await hearttraceProvider.catalog!.getAlbumTracks!(first.id, 2, 0);
+        expect(page.items.length).toBeLessThanOrEqual(2);
+        expect(page.nextOffset).toBe(page.items.length);
+        expect(first.coverUrl).toBe(page.items[0].album.coverUrl);
+    });
+    it('provides a playable default station without pretending there is a signed-in account', async () => {
+        expect(hearttraceProvider.capabilities.auth).toBe(false);
+        expect(hearttraceProvider.capabilities.publicLibrary).toBe(true);
+        const cards = await hearttraceProvider.recommendations!.getRecommendedCollections!(30);
+        const station = cards.find(card => card.id === 'server-radio')!;
+        const page = await hearttraceProvider.catalog!.getPlaylistTracks!(station.id, 10, 0);
+        expect(page.items).toHaveLength(10);
+        expect(page.total).toBe(catalogSnapshot.length);
+    });
     it('keeps every recording unique and retains all album covers', () => {
         const songs = catalogSnapshot.map(toHearttraceSong);
         expect(new Set(songs.map(song => song.sourceRef?.mediaId)).size).toBe(songs.length);
