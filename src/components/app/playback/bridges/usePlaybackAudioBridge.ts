@@ -73,12 +73,15 @@ export function usePlaybackAudioBridge({
     const replayGainMode = usePlaybackStore(state => state.replayGainMode);
     const enableMediaCache = useAudioSettingsStore(state => state.enableMediaCache);
 
-    useEffect(() => installPlaybackContextRecovery({
-        getContext: () => audioContextRef.current,
-        getAudio: () => audioRef.current,
-        page: document,
-        view: window,
-    }), [audioContextRef, audioRef]);
+    useEffect(() => {
+        if (typeof document === 'undefined' || typeof window === 'undefined') return;
+        return installPlaybackContextRecovery({
+            getContext: () => audioContextRef.current,
+            getAudio: () => audioRef.current,
+            page: document,
+            view: window,
+        });
+    }, [audioContextRef, audioRef]);
 
     const previousAudioSrcRef = useRef<string | null>(null);
     const replayGainLogSignatureRef = useRef<string | null>(null);
