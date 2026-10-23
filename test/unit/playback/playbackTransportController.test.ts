@@ -67,6 +67,15 @@ function mount({ contextResume, audioPlay, refreshSource = false }: {
     return { audio, recover, params, actions: () => actions };
 }
 describe('transport pause during pending resume', () => {
+    it('resumes an iOS interrupted graph before starting the media element', async () => {
+        const host = mount();
+        const resume = vi.fn(async () => {});
+        host.params.audioContextRef.current = { state: 'interrupted', resume } as unknown as AudioContext;
+        await act(async () => { await host.actions().resumePlayback(); });
+        expect(resume).toHaveBeenCalledTimes(1);
+        expect(host.audio.play).toHaveBeenCalledTimes(1);
+        expect(resume.mock.invocationCallOrder[0]).toBeLessThan(host.audio.play.mock.invocationCallOrder[0]);
+    });
     it('does not start audio when a pause interrupts AudioContext.resume', async () => {
         const context = deferred();
         const host = mount({ contextResume: context.promise });

@@ -8,6 +8,7 @@ import { calculateReplayGain } from '../../../../utils/replayGain';
 import { applyAudioEqualizerSettings, planAudioEqualizerApply } from '../../../../services/audioEqualizerGraph';
 import { type AudioEffectChain } from '../../../../services/audioEffects/effectChain';
 import { buildPlaybackGraph } from '../../../../services/playbackGraph';
+import { claimPlaybackAudioSession, installPlaybackContextRecovery } from '../../../../services/playbackAudioSession';
 import { cachePlayedTrackAssets } from '../../../../services/playedTrackCache';
 import { registerPlaybackFadeGraph } from '../../../../services/playbackFade';
 import { rampGain, type AutomixDeckChain } from '../../../../services/automix/crossfadeGraph';
@@ -71,6 +72,13 @@ export function usePlaybackAudioBridge({
     const currentSong = usePlaybackStore(state => state.currentSong);
     const replayGainMode = usePlaybackStore(state => state.replayGainMode);
     const enableMediaCache = useAudioSettingsStore(state => state.enableMediaCache);
+
+    useEffect(() => installPlaybackContextRecovery({
+        getContext: () => audioContextRef.current,
+        getAudio: () => audioRef.current,
+        page: document,
+        view: window,
+    }), [audioContextRef, audioRef]);
 
     const previousAudioSrcRef = useRef<string | null>(null);
     const replayGainLogSignatureRef = useRef<string | null>(null);
@@ -149,6 +157,7 @@ export function usePlaybackAudioBridge({
     }, [audioContextRef, currentSong, gainNodeRef, getActiveChain, localSongs, replayGainMode]);
 
     const setupAudioAnalyzer = useCallback(() => {
+        claimPlaybackAudioSession();
         // The context is the sentinel, not the source node: a deck that failed to connect must
         // not let this run twice, because createMediaElementSource throws on a second call.
         if (!audioRef.current || audioContextRef.current) return;
@@ -331,6 +340,7 @@ export function usePlaybackAudioBridge({
                 }
 
                 syncOutputGain(getTargetPlaybackVolume(), 0);
+                claimPlaybackAudioSession();
                 const playPromise = audioRef.current.play();
                 if (playPromise !== undefined) {
                     playPromise

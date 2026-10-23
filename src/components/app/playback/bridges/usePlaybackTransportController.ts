@@ -11,6 +11,7 @@ import { getPlaybackSongKey } from '../../../../utils/appPlaybackGuards';
 import type { OnlineRecovery, OnlineRecoveryOptions } from '../restore/createOnlineRecoveryController';
 import type { OnlineFailure } from '../../../../services/onlineMusic/failure/onlineFailureCase';
 import { onlineFailureToast } from '../source/onlineFailureToast';
+import { needsPlaybackContextResume } from '../../../../services/playbackAudioSession';
 
 // src/components/app/playback/bridges/usePlaybackTransportController.ts
 
@@ -118,7 +119,7 @@ export function usePlaybackTransportController({
         const shouldAutoplay = () => wantsPlayback.current && isSameSource();
 
         setupAudioAnalyzer();
-        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+        if (audioContextRef.current && needsPlaybackContextResume(audioContextRef.current)) {
             try {
                 await audioContextRef.current.resume();
             } catch (error) {
