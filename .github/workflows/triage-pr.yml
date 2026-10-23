@@ -1,12 +1,10 @@
 name: Triage Pull Requests
 
-# PR 元数据管理：按标题前缀打类型标签、提示暂停接受的区域、标记改动过大。纯确定性逻辑，不调用 LLM，也不审查代码。
+# PR 元数据管理，需手动触发以避免 fork 频繁触发。纯确定性逻辑，不调用 LLM。
 on:
   # 用 pull_request_target 是因为 fork PR 在 pull_request 下拿到的 token 只读，打不了标签。
   # 代价是这里有写权限，所以：只 checkout 默认分支、不 checkout 也不执行 PR 的任何文件、不注入 DeepSeek 密钥。
   # workflow 定义和脚本都来自 base 分支，PR 改了它们也不影响这次运行。
-  pull_request_target:
-    types: [opened, edited, synchronize, reopened, ready_for_review]
   workflow_dispatch:
     inputs:
       pr_number:
