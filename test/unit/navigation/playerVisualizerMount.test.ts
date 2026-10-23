@@ -115,3 +115,10 @@ describe('shouldMountPlayerVisualizer', () => {
         })).toBe(false);
     });
 });
+
+it('releases the GPU scene behind a translucent phone library, restoring it on the player', () => {
+    const input = { compact: true, currentView: 'home', hasLatticeExited: true, shouldRevealHomeSurface: true, libraryOccludesPlayer: false, hasLibraryOcclusionSettled: false };
+    expect(shouldMountPlayerVisualizer(input)).toBe(false);
+    expect(shouldMountPlayerVisualizer({ ...input, currentView: 'player', shouldRevealHomeSurface: false })).toBe(true);
+    expect(shouldMountPlayerVisualizer({ ...input, compact: false })).toBe(true);
+});

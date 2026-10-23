@@ -1,3 +1,5 @@
+import { useMediaQuery } from '../../../hooks/useMediaQuery';
+
 // src/components/app/presentation/playerVisualizerMount.ts
 // 播放页 visualizer 什么时候挂载（App 的背景层）。两种情况下画面被完全盖住、visualizer 卸载以免在下面空转：
 // - Lattice：进入即卸载，退出动画结束（hasLatticeExited）后才重新挂载；
@@ -19,6 +21,7 @@ type PlayerVisualizerMountInput = {
     hasLibraryOcclusionSettled: boolean;
     /** 翻牌交接要求 visualizer 挂着（首页墙的窗还开着 / 马上要开）。 */
     handoffKeepsVisualizer?: boolean;
+    compact?: boolean;
 };
 
 /** visualizer 是否挂载。三项遮挡条件缺一不可，任何一项失效都立即恢复挂载；交接要求挂着时一定挂着。 */
@@ -29,8 +32,15 @@ export const shouldMountPlayerVisualizer = ({
     libraryOccludesPlayer,
     hasLibraryOcclusionSettled,
     handoffKeepsVisualizer = false,
-}: PlayerVisualizerMountInput) => handoffKeepsVisualizer || (
+    compact = false,
+}: PlayerVisualizerMountInput) => !(compact && shouldRevealHomeSurface) && (handoffKeepsVisualizer || (
     currentView !== 'lattice'
     && hasLatticeExited
     && !(shouldRevealHomeSurface && libraryOccludesPlayer && hasLibraryOcclusionSettled)
-);
+));
+
+/** Do not run a full GPU lyric scene beneath the phone library wall. */
+export const usePlayerVisualizerMount = (input: PlayerVisualizerMountInput) => {
+    const compact = useMediaQuery('(max-width: 639px)');
+    return shouldMountPlayerVisualizer({ ...input, compact });
+};
