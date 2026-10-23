@@ -1,6 +1,9 @@
 name: Radio and server lyrics verification
 
 on:
+  push:
+    branches:
+      - fix/shared-mobile-layout
   pull_request:
     paths:
       - 'src/components/app/RadioAgent.tsx'
