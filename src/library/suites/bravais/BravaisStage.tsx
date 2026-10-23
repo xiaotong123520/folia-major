@@ -8,7 +8,7 @@ import { useReducedMotionFor } from '../../../hooks/useReducedMotionFor';
 import { useLatticeSettingsStore } from '../../../stores/useLatticeSettingsStore';
 import { useLibraryWallLookStore } from '../../../stores/useLibraryWallLookStore';
 import type { LibrarySuiteStageProps } from '../../core/suite/suite.contract';
-import { BRAVAIS_METRICS, BRAVAIS_OVERSCAN, BRAVAIS_SEAM_ACRYLIC_BLUR } from './bravaisConstants';
+import { BRAVAIS_METRICS, BRAVAIS_SEAM_ACRYLIC_BLUR } from './bravaisConstants';
 import { WALL_REFLOW_CONTROLS_REVEAL } from '../../../components/wall/wallReflowMotion';
 import { resolveSlotItem, type BravaisDisplay } from './bravaisDisplay';
 import type { BravaisLayer } from './bravaisLayer';
@@ -263,8 +263,8 @@ const BravaisStage: React.FC<LibrarySuiteStageProps> = ({
     });
     const shape = display?.shape ?? BRAVAIS_BLOCK_SHAPE;
     const slots = useMemo<readonly WallSlot[]>(() => (
-        camera.bounds ? collectShapeSlots(shape, expandBounds(camera.bounds, BRAVAIS_OVERSCAN), FLIP_MAX_TILES) : []
-    ), [camera.bounds, shape]);
+        camera.bounds ? collectShapeSlots(shape, expandBounds(camera.bounds, camera.overscan), FLIP_MAX_TILES) : []
+    ), [camera.bounds, camera.overscan, shape]);
     slotsRef.current = slots;
     // B11 transitions.beforePush：宿主压栈之前，没经过墙上磁贴的打开用键盘焦点所在的 slot 当起点磁贴。
     const getFocusedSlotKey = useCallback(() => focus.focusedRef.current, [focus.focusedRef]);

@@ -360,3 +360,8 @@
 
 /* 降级状态的来源同 wall.css 里海报的那条规则（useMotionSettingsStore → <html data-reduce-motion>）。 */
 :root[data-reduce-motion~='lattice'] .lattice-poster-lights-out { transition: none; }
+
+/* Touch hover can stay latched on iOS; do not allocate a filtered cover surface for it. */
+@media (hover: none) and (pointer: coarse) {
+    .lattice-poster:hover { filter: none; }
+}
