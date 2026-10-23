@@ -178,16 +178,7 @@ export const hearttraceProvider: OnlineMusicProvider = {
         },
         async getPlaylistDetail(id) { return radioCollections().find(radio => radio.id === id) ?? null; },
         async getPlaylistTracks(id, limit, offset) {
-            const page = pageOf(radioTracks(String(id)), limit, offset);
-            // Restore other platforms' playback metadata by exact id, never by a title search or a saved audio URL.
-            const { omni } = await import('../omni');
-            page.items = await Promise.all(page.items.map(async song => {
-                const ref = song.sourceRef;
-                if (ref.kind !== 'online' || ref.providerId === providerId) return song;
-                try { return await omni.getSongDetail(ref.providerId, ref.mediaId) ?? song; }
-                catch { return song; }
-            }));
-            return page;
+            return pageOf(radioTracks(String(id)), limit, offset);
         },
     },
     recommendations: {
