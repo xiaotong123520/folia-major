@@ -88,6 +88,26 @@ describe.each([
         expect(recorded.status).toBe(403);
         expect(fetchMock).not.toHaveBeenCalled();
     });
+
+    it('relays only the owner public lyric route without forwarding browser credentials', async () => {
+        const fetchMock = vi.fn(async () => new Response('[00:01.00]Test line', { headers: { 'content-type': 'text/plain' } }));
+        vi.stubGlobal('fetch', fetchMock);
+        const { res, recorded } = recordingResponse();
+        const target = new URL('/api/lyrics.php?a=8&n=2', 'https://我爱南京.com');
+        await handler({ method: 'GET', query: { url: target.href }, headers: { cookie: 'private=1', authorization: 'secret' } }, res);
+        expect(recorded.status).toBe(200);
+        expect(recorded.sent).toBe('[00:01.00]Test line');
+        expect(recorded.headers['access-control-allow-origin']).toBe('*');
+        expect(fetchMock).toHaveBeenCalledWith(target, expect.objectContaining({ redirect: 'error', headers: { Accept: 'text/plain' } }));
+    });
+
+    it.each(['/admin', '/api/lyrics.php?a=..&n=2', '/api/lyrics.php?a=8&n=0', '/api/lyrics.php?a=8&n=2&url=other'])('rejects owner site paths outside the lyric contract: %s', async path => {
+        const { fetchMock } = recordMusicu();
+        const { res, recorded } = recordingResponse();
+        await handler({ method: 'GET', query: { url: new URL(path, 'https://我爱南京.com').href }, headers: {} }, res);
+        expect(recorded.status).toBe(403);
+        expect(fetchMock).not.toHaveBeenCalled();
+    });
 });
 
 describe('the Cloudflare relay (worker/lyric-proxy.ts)', () => {

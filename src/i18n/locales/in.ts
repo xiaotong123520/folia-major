@@ -2,6 +2,9 @@
 
 export default {
   "hearttraceLibrary": {
+    "playNamed": "Putar {{name}}",
+    "close": "Tutup pustaka",
+    "loading": "Memuat pustaka…",
     "title": "Musik yang tersedia di server",
     "description": "{{count}} lagu, diputar dari situs asli Anda.",
     "search": "Cari lagu atau album",
@@ -1000,6 +1003,7 @@ export default {
     }
   },
   "ui": {
+    "unknownArtist": "Artis tidak diketahui",
     "visualizerRandom": "Acak",
     "noTrack": "Tidak Ada Trek",
     "selectPlaceholder": "Pilih...",

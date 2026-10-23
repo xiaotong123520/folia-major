@@ -2,6 +2,9 @@
 
 export default {
   "hearttraceLibrary": {
+    "playNamed": "Play {{name}}",
+    "close": "Close library",
+    "loading": "Loading library…",
     "title": "Existing server music",
     "description": "{{count}} tracks, streamed from your original website.",
     "search": "Search songs or albums",
@@ -1000,6 +1003,7 @@ export default {
     }
   },
   "ui": {
+    "unknownArtist": "Unknown artist",
     "visualizerRandom": "Random",
     "noTrack": "No Track",
     "selectPlaceholder": "Select...",

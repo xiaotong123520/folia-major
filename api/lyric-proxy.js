@@ -51,6 +51,30 @@ export default async function handler(req, res) {
     try {
         const targetUrl = new URL(targetUrlStr);
         const hostname = targetUrl.hostname;
+        // The owner's public lyric endpoint is relayed as read-only text, never as an arbitrary site proxy.
+        if (targetUrl.origin === new URL('https://我爱南京.com').origin) {
+            const album = targetUrl.searchParams.get('a') || '';
+            const number = targetUrl.searchParams.get('n') || '';
+            if (req.method !== 'GET' || targetUrl.username || targetUrl.password
+                || targetUrl.pathname !== '/api/lyrics.php' || !album || album.length > 160
+                || /[\\/\u0000-\u001f]/.test(album) || album === '..' || !/^[1-9]\d{0,3}$/.test(number)
+                || [...targetUrl.searchParams.keys()].some(key => key !== 'a' && key !== 'n')) {
+                return res.status(403).json({ error: 'Forbidden lyric request' });
+            }
+            const response = await fetch(targetUrl, { headers: { Accept: 'text/plain' }, redirect: 'error', signal: AbortSignal.timeout(8000) });
+            if (response.status === 204)
+                return res.status(204).end();
+            if (!response.ok)
+                return res.status(502).json({ error: 'Lyrics unavailable' });
+            if (!/text\/plain/i.test(response.headers.get('content-type') || ''))
+                return res.status(502).json({ error: 'Invalid lyrics response' });
+            const text = await response.text();
+            if (text.length > 131072)
+                return res.status(502).json({ error: 'Lyrics too large' });
+            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            res.setHeader('Cache-Control', 'public, max-age=300');
+            return res.status(200).send(text);
+        }
         // Security check: only allow proxying to known lyric provider domains
         const isAllowed = isAllowedLyricProxyHost(hostname);
         if (!isAllowed) {

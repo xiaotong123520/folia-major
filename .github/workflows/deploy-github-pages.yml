@@ -44,7 +44,7 @@ jobs:
         run: npm run typecheck
 
       - name: Focused music feature tests
-        run: npx vitest run -c vitest.config.ts test/unit/serverVideoLibrary.test.ts test/unit/directPointSong.test.ts test/unit/musicLinkResolver.test.ts test/unit/importedAudio.test.ts test/unit/radioAgent.test.ts test/unit/workerAiRoutes.test.ts test/unit/importedAudioStorage.test.ts test/unit/musicLinkPlayback.test.ts test/unit/music-backend
+        run: npx vitest run -c vitest.config.ts test/unit/hearttraceLibrary.test.ts test/unit/serverVideoLibrary.test.ts test/unit/directPointSong.test.ts test/unit/musicLinkResolver.test.ts test/unit/importedAudio.test.ts test/unit/radioAgent.test.ts test/unit/workerAiRoutes.test.ts test/unit/importedAudioStorage.test.ts test/unit/musicLinkPlayback.test.ts test/unit/music-backend
 
       - name: Validate server gateway
         run: node --test deploy/music-backend-gateway/gateway.test.mjs
@@ -52,6 +52,7 @@ jobs:
       - name: Build Pages assets (no server-side secrets)
         env:
           GITHUB_PAGES: 'true'
+          VITE_LIBRARY_INITIAL_SUITE: grid
           VITE_NETEASE_API_BASE: ${{ vars.VITE_NETEASE_API_BASE }}
           VITE_QQ_API_BASE: ${{ vars.VITE_QQ_API_BASE }}
           VITE_KUGOU_API_BASE: ${{ vars.VITE_KUGOU_API_BASE }}

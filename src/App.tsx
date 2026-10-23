@@ -2866,16 +2866,8 @@ export default function App() {
             <PonderHost theme={theme} isDaylight={isDaylight} />
 
             {!isElectronWindow && <PersonalMusicTools
-                onAddServerTrack={request => importedAudioPlayerRef.current?.addPointSong(request) ?? false}
-                mobileActions={{
-                    accountController,
-                    onLibrary: tab => { chooseLibrarySuite('grid'); navigateDirectHome(); setHomeViewTab(tab); },
-                    onSearch: query => { chooseLibrarySuite('grid'); navigateToSearch({ query, sourceTab: activeProviderId }); },
-                    onPlayer: navigateToPlayer,
-                    onSettings: () => openSettings(),
-                }}
+                onPlayServerSong={song => { handleSearchResultPlay(song); navigateToPlayer(); }}
                 onImport={() => setIsMusicLinkImportOpen(true)}
-                onImportFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
                 onRadio={() => setIsRadioAgentOpen(true)}
                 onApple={() => setIsAppleMusicOpen(true)}
                 onVideos={() => setIsVideoLibraryOpen(true)}

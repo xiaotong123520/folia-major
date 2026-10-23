@@ -9,6 +9,7 @@ import { bodianProvider } from './bodian/bodianProvider';
 import { ytmProvider } from './ytm/ytmProvider';
 import { spotifyProvider } from './spotify/spotifyProvider';
 import { musicBackendProvider } from './music-backend/musicBackendProvider';
+import { hearttraceProvider } from './hearttrace/hearttraceProvider';
 
 // src/services/onlineMusic/providerRegistry.ts
 
@@ -106,6 +107,7 @@ export const requireOnlineMusicProviderForSong = (song: SongResult): OnlineMusic
 };
 
 registerOnlineMusicProvider(neteaseProvider);
+registerOnlineMusicProvider(hearttraceProvider);
 registerOnlineMusicProvider(kugouProvider);
 registerOnlineMusicProvider(qqProvider);
 registerOnlineMusicProvider(bodianProvider);

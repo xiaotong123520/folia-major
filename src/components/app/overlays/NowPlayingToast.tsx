@@ -1,11 +1,12 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useTransform } from 'framer-motion';
 import { Music } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Theme } from '../../../types';
 import { useTransitionBorderCue } from './now-playing-toast/useTransitionBorderCue';
 import { usePlayerBottomBarBottomPx } from '../../../hooks/usePlayerBottomBarBottomPx';
 import { usePlayerOverlayObstacle } from '../../../hooks/usePlayerOverlayLayout';
+import { useMediaQuery } from '../../../hooks/useMediaQuery';
 
 // src/components/app/overlays/NowPlayingToast.tsx
 // 播放器与 Lattice 左下角的 now playing 卡片（playing-toast 样式：圆角 2xl、44px 封面、底部滑入）。
@@ -82,12 +83,15 @@ const NowPlayingToast: React.FC<NowPlayingToastProps> = ({
     // 它同时参与下面的 holdOpen：混音期间卡片必须留在屏幕上，否则描边跟着卡片一起卸载，
     // 而全屏圆环已经让位了。
     const bottomBarBottomPx = usePlayerBottomBarBottomPx();
+    const compact = useMediaQuery('(max-width: 639px)');
+    // On phones the original cover/title card stays above the original transport, without overlap.
+    const cardBottom = useTransform(bottomBarBottomPx, bottom => bottom + (compact ? 72 : 0));
     const transitionCue = useTransitionBorderCue();
 
     // 可见性状态机：never 不渲染；always 常驻；auto 换歌重新计时。
     // isNextUp（预览下一首）挂起计时，翻回 false 后（即使 trackKey 没变）重新计时。
     const [visible, setVisible] = useState(mode !== 'never');
-    const holdOpen = mode === 'always' || isNextUp || transitionCue !== null;
+    const holdOpen = mode === 'always' || (compact && mode === 'auto') || isNextUp || transitionCue !== null;
     const hideDelayMs = Math.max(3, Math.min(60, Math.round(timeoutSec))) * 1000;
     useEffect(() => {
         if (mode === 'never') {
@@ -144,8 +148,8 @@ const NowPlayingToast: React.FC<NowPlayingToastProps> = ({
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     // 底边跟右下角面板开关按钮和中间的进度条胶囊落在同一条基线上，
                     // 由共享 MotionValue 直接驱动 bottom（默认 32，即原来的 bottom-8）。
-                    style={{ bottom: bottomBarBottomPx }}
-                    className="pointer-events-none fixed left-6 z-40"
+                    style={{ bottom: cardBottom }}
+                    className="pointer-events-none fixed left-6 z-40 max-w-[calc(100vw-48px)]"
                 >
                     {/* 描边排在卡片前面：卡片自己是 relative，绘制顺序上压在描边上头，所以
                         描边内侧那一半被卡片背景盖住，露在外面的是外侧 + 辉光。

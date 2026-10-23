@@ -2,6 +2,9 @@
 
 export default {
   "hearttraceLibrary": {
+    "playNamed": "播放 {{name}}",
+    "close": "关闭曲库",
+    "loading": "正在加载曲库…",
     "title": "服务器现有音乐",
     "description": "已收录 {{count}} 首歌曲，音频由你原网站提供。",
     "search": "搜索歌曲或专辑",
@@ -1000,6 +1003,7 @@ export default {
     }
   },
   "ui": {
+    "unknownArtist": "未知歌手",
     "visualizerRandom": "随机",
     "noTrack": "无音轨",
     "selectPlaceholder": "请选择...",
