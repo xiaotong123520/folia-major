@@ -2877,7 +2877,12 @@ export default function App() {
                 open={isRadioAgentOpen}
                 onClose={() => setIsRadioAgentOpen(false)}
                 localSongs={localSongs}
-                onPlayOnline={handleSearchResultPlay}
+                onPlayOnline={async (song, stationQueue) => {
+                    // A station uses the same main player and source-aware queue as
+                    // the server library. The wall reads this queue directly.
+                    await playSong(song, stationQueue, false, { shouldNavigateToPlayer: false });
+                    navigateToLattice('queue');
+                }}
                 onPlayLocal={onPlayLocalSong}
             />}
             {!isElectronWindow && isAppleMusicOpen && <AppleMusicConnect onClose={() => setIsAppleMusicOpen(false)} />}
