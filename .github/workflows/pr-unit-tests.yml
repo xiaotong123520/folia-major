@@ -7,13 +7,8 @@ on:
       - synchronize
       - reopened
       - ready_for_review
-  # main 上也跑一次，唯一目的是把 node_modules 缓存写进 base 分支的 scope。Actions 的缓存
-  # 作用域规则是「PR 能读 base 分支的缓存，分支之间互相不可见」，而这个 workflow 原本只在
-  # pull_request 触发，于是缓存只会写进各个 PR 自己的 scope 并随 PR 合并作废——每个新分支、
-  # 每个 fork PR 的首跑都必然冷启动装 1.4GB 依赖。
-  push:
-    branches:
-      - main
+  # fork 的 Actions 使用规模已受到限制；不再对 main 的每次推送重复执行全量单测。
+  # main 的 Pages 工作流继续负责必要的构建和专项验证。
 
 permissions:
   contents: read

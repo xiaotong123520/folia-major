@@ -1,0 +1,46 @@
+name: Verify PR 17 without merging
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-pr17:
+    name: PR 17 full verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out pinned PR 17 branch commit
+        uses: actions/checkout@v4
+        with:
+          ref: '841284613e82f882b118ec32f23ba17e762fc4ba'
+          persist-credentials: false
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Restore node modules
+        id: node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-ubuntu-latest-node24-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: TypeScript check
+        run: npm run typecheck
+      - name: Focused lyrics and radio tests
+        run: npx vitest run -c vitest.config.ts test/unit/hearttraceLibrary.test.ts test/unit/radioAgent.test.ts
+      - name: Full unit test suite
+        run: npm run test:unit
+      - name: Build GitHub Pages client bundle
+        env:
+          GITHUB_PAGES: 'true'
+          VITE_LIBRARY_INITIAL_SUITE: grid
+        run: npm run build
+      - name: Validate distributable assets
+        run: |
+          test -s dist/index.html
+          find dist/assets -maxdepth 1 -type f -name '*.js' -print -quit | grep -q .

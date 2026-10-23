@@ -8,7 +8,6 @@ import { buildUnifiedNavidromeSong } from '../../services/playbackAdapters';
 import { resolveMusicLink, type MusicLinkResolution } from '../../services/musicLinkResolver';
 import { PERSONAL_LIBRARY_PROVIDER, savePersonalRadio } from '../../services/personalRadioStorage';
 import { getPlaybackSongKey } from '../../utils/appPlaybackGuards';
-import { getSongCoverUrl } from '../../services/onlineMusic/songMetadata';
 
 // src/components/app/RadioAgent.tsx — mood-based radio creation, search, and playback handoff.
 type RadioBrief = {
