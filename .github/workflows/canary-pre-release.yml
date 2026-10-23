@@ -12,9 +12,6 @@ on:
           - rolling
           - branch-release
           - artifacts
-  push:
-    branches:
-      - '**'
 
 permissions:
   contents: write
