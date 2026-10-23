@@ -53,6 +53,8 @@ export interface ProviderCapabilities {
     lyrics: boolean;
     auth: boolean;
     userLibrary: boolean;
+    /** A public catalog can be browsed without inventing a signed-in user. */
+    publicLibrary?: boolean;
     playlists: boolean;
     albums: boolean;
     artists: boolean;
@@ -90,6 +92,7 @@ export interface ProviderAccountSummary {
     availability: ProviderAvailability;
     /** False for a provider with no account at all (a Folium mod source): it is used without signing in. Absent means true. */
     requiresAccount?: boolean;
+    publicLibrary?: boolean;
     status: 'unknown' | 'authenticated' | 'anonymous' | 'error';
     user: ProviderUser | null;
     collections: ProviderCollection[];

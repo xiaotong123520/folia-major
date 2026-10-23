@@ -475,6 +475,7 @@ export const omni = {
                 shortName: provider.shortName || provider.displayName,
                 availability: provider.getAvailability?.() ?? { configured: true },
                 requiresAccount: provider.capabilities.auth,
+                ...(provider.capabilities.publicLibrary ? { publicLibrary: true } : {}),
                 status: account?.status || 'unknown',
                 user: account?.user || null,
                 collections: account?.collections || [],
@@ -1018,7 +1019,7 @@ export const omni = {
 
     async getCollectionTracks(collection: OmniCollection, page: PageInput): Promise<OmniPage<UnifiedSong>> {
         const provider = providerForCollection(collection);
-        return runRequest(provider, 'collection', async () => {
+        const result = await runRequest<OmniPage<UnifiedSong>>(provider, 'collection', async () => {
             if (collection.type === 'album') {
                 return await (provider.catalog?.getAlbumTracks?.(collection.id, page.limit, page.offset, collection) ?? emptyPage(page.offset));
             }
@@ -1027,6 +1028,16 @@ export const omni = {
             }
             return await (provider.catalog?.getPlaylistTracks?.(collection.id, page.limit, page.offset, collection) ?? emptyPage(page.offset));
         });
+        if (!provider.capabilities.publicLibrary) return result;
+        // Public saved stations keep identities, not temporary audio URLs. Resolve foreign
+        // tracks here, at the cross-provider boundary, rather than inside a concrete adapter.
+        const items = await Promise.all(result.items.map(async song => {
+            const ref = song.sourceRef;
+            if (ref.kind !== 'online' || ref.providerId === provider.id) return song;
+            try { return await this.getSongDetail(ref.providerId, ref.mediaId) ?? song; }
+            catch { return song; }
+        }));
+        return { ...result, items };
     },
 
     async getAlbumDetail(collection: OmniCollection): Promise<OmniCollection | null> {

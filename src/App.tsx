@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useMotionValueEvent } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import RadioAgent from './components/app/RadioAgent';
+import { usePersonalLibraryNavigation } from './components/app/hearttraceLibrary/usePersonalLibraryNavigation';
 import PersonalMusicTools from './components/app/PersonalMusicTools';
 import VideoLibrary from './components/app/VideoLibrary';
 import AppleMusicConnect from './components/app/AppleMusicConnect';
@@ -784,6 +785,7 @@ export default function App() {
         switchCleanup: providerSwitchCleanup,
     });
     const { providers: onlineProviders, activeProviderId } = useLibraryAccountProviders(accountController);
+    const openPersonalLibrary = usePersonalLibraryNavigation(accountController, navigateToHome);
     const activeProvider = useMemo(
         () => resolveActiveProviderSummary(onlineProviders, activeProviderId),
         [activeProviderId, onlineProviders],
@@ -2866,27 +2868,26 @@ export default function App() {
             <PonderHost theme={theme} isDaylight={isDaylight} />
 
             {!isElectronWindow && <PersonalMusicTools
-                onAddServerTrack={request => importedAudioPlayerRef.current?.addPointSong(request) ?? false}
-                mobileActions={{
-                    accountController,
-                    onLibrary: tab => { chooseLibrarySuite('grid'); navigateDirectHome(); setHomeViewTab(tab); },
-                    onSearch: query => { chooseLibrarySuite('grid'); navigateToSearch({ query, sourceTab: activeProviderId }); },
-                    onPlayer: navigateToPlayer,
-                    onSettings: () => openSettings(),
-                }}
+                onOpenLibrary={openPersonalLibrary}
+                onPlayServerSong={song => { handleSearchResultPlay(song); navigateToPlayer(); }}
                 onImport={() => setIsMusicLinkImportOpen(true)}
-                onImportFiles={files => importedAudioPlayerRef.current?.addFiles(files) ?? 0}
                 onRadio={() => setIsRadioAgentOpen(true)}
                 onApple={() => setIsAppleMusicOpen(true)}
                 onVideos={() => setIsVideoLibraryOpen(true)}
             />}
             {!isElectronWindow && isVideoLibraryOpen && <VideoLibrary onClose={() => setIsVideoLibraryOpen(false)} />}
             {!isElectronWindow && <RadioAgent
+                onOpenLibrary={tab => { setIsRadioAgentOpen(false); void openPersonalLibrary(tab); }}
                 open={isRadioAgentOpen}
                 onClose={() => setIsRadioAgentOpen(false)}
                 localSongs={localSongs}
-                onPlayOnline={handleSearchResultPlay}
-                onPlayLocal={onPlayLocalSong}
+                onPlayOnline={async (song, stationQueue) => {
+                    // A station uses the same main player and source-aware queue as
+                    // the server library. The wall reads this queue directly.
+                    await playSong(song, stationQueue, false, { shouldNavigateToPlayer: false });
+                    navigateToLattice('queue');
+                }}
+                onPlayLocal={song => { setIsRadioAgentOpen(false); onPlayLocalSong(song); navigateToPlayer(); }}
             />}
             {!isElectronWindow && isAppleMusicOpen && <AppleMusicConnect onClose={() => setIsAppleMusicOpen(false)} />}
             {!isElectronWindow && isMusicLinkImportOpen && <MusicLinkImport

@@ -1,0 +1,37 @@
+name: Radio and server lyrics verification
+
+on:
+  push:
+    branches:
+      - fix/shared-mobile-layout
+  pull_request:
+    paths:
+      - 'src/components/app/RadioAgent.tsx'
+      - 'src/services/onlineMusic/hearttrace/**'
+      - 'src/App.tsx'
+      - 'test/unit/hearttraceLibrary.test.ts'
+      - '.github/workflows/verify-radio-lyrics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  radio-lyrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Check TypeScript
+        run: npm run typecheck
+      - name: Radio and original recording lyric tests
+        run: npx vitest run -c vitest.config.ts test/unit/hearttraceLibrary.test.ts test/unit/radioAgent.test.ts
+      - name: Build GitHub Pages bundle
+        env:
+          GITHUB_PAGES: 'true'
+          VITE_LIBRARY_INITIAL_SUITE: grid
+        run: npm run build

@@ -23,6 +23,11 @@ const accountlessProvider = (): ProviderAccountSummary => ({
 });
 
 describe('online provider account home view', () => {
+    it('opens a public catalog without a user while keeping search-only sources accountless', () => {
+        const input = { provider: accountlessProvider(), hasUser: false, platformAvailable: true };
+        expect(resolveOnlineProviderAccountView(input)).toBe('accountless');
+        expect(resolveOnlineProviderAccountView({ ...input, provider: { ...input.provider, publicLibrary: true } })).toBe('public');
+    });
     it('shows a neutral resolving state while the account is hydrating', () => {
         expect(resolveOnlineProviderAccountView({
             provider: provider('unknown'),

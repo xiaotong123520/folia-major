@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, ArrowLeft, AudioLines, Bot, Check, LoaderCircle, Mic, Music2, Pause, Play, Radio, Send, Settings2, Volume2, VolumeX, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, AudioLines, Bot, Check, LayoutGrid, LoaderCircle, Mic, Music2, Pause, Play, Radio, Send, Settings2, Volume2, VolumeX, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { LocalSong, UnifiedSong } from '../../types';
 import { omni } from '../../services/onlineMusic/omni';
 import { getNavidromeConfig, isNavidromeEnabled, navidromeApi } from '../../services/navidromeService';
 import { buildUnifiedNavidromeSong } from '../../services/playbackAdapters';
 import { resolveMusicLink, type MusicLinkResolution } from '../../services/musicLinkResolver';
+import { PERSONAL_LIBRARY_PROVIDER, savePersonalRadio } from '../../services/personalRadioStorage';
+import { getPlaybackSongKey } from '../../utils/appPlaybackGuards';
 
 // src/components/app/RadioAgent.tsx — mood-based radio creation, search, and playback handoff.
 type RadioBrief = {
@@ -21,8 +23,10 @@ type Props = {
     open: boolean;
     onClose: () => void;
     localSongs: LocalSong[];
-    onPlayOnline: (song: UnifiedSong) => void;
+    /** Use the main Folia queue, so station tracks and cover art appear on the Lattice wall. */
+    onPlayOnline: (song: UnifiedSong, stationQueue: UnifiedSong[]) => void | Promise<void>;
     onPlayLocal: (song: LocalSong) => void;
+    onOpenLibrary: (tab: 'albums' | 'radio') => void;
 };
 
 type SpeechRecognitionResultLike = { 0?: { transcript?: string } };
@@ -70,11 +74,12 @@ const isBrief = (value: unknown): value is RadioBrief => {
 const localLabel = (song: LocalSong) => song.title || song.fileName.replace(/\.[^.]+$/, '');
 const localArtist = (song: LocalSong, fallback: string) => song.onlineMetadata?.artists?.map((artist) => typeof artist === 'string' ? artist : artist.name).filter(Boolean).join(', ') || song.importedMetadata?.artistNames?.join(', ') || fallback;
 
-export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, onPlayLocal }: Props) {
+export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, onPlayLocal, onOpenLibrary }: Props) {
     const { t } = useTranslation();
     const [message, setMessage] = useState('');
     const [brief, setBrief] = useState<RadioBrief | null>(null);
     const [onlineSongs, setOnlineSongs] = useState<UnifiedSong[]>([]);
+    const [savedRadioId, setSavedRadioId] = useState<string>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [narrationEnabled, setNarrationEnabled] = useState(false);
@@ -120,6 +125,7 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
         setLoading(true);
         setError('');
         setOnlineSongs([]);
+        setSavedRadioId(undefined);
         const fallback = makeFallbackBrief(prompt);
         let activeBrief = fallback;
         try {
@@ -148,10 +154,16 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
             const found = new Map<string, UnifiedSong>();
             for (const term of terms) {
                 try {
-                    const page = await omni.searchSongs(term, { limit: 8, offset: 0 });
-                    for (const song of page.items ?? []) {
-                        const key = JSON.stringify(song.sourceRef ?? {}) + ':' + String(song.id);
-                        if (!found.has(key)) found.set(key, song);
+                    // This is intentionally federated: the personal server participates even when another platform is selected.
+                    const active = omni.getActiveProviderSummary()?.providerId;
+                    const providers = [...new Set([PERSONAL_LIBRARY_PROVIDER, ...(active ? [active] : [])])];
+                    const pages = await Promise.allSettled(providers.map(provider => omni.searchProviderSongs(provider, term, { limit: 8, offset: 0 })));
+                    for (const page of pages) {
+                        if (page.status !== 'fulfilled') continue;
+                        for (const song of page.value.items) {
+                            const key = getPlaybackSongKey(song);
+                            if (!found.has(key)) found.set(key, song);
+                        }
                     }
                 } catch {
                     // One provider query failing should not cancel the rest of the radio search.
@@ -165,7 +177,7 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                             const serverPage = await navidromeApi.search(config, term, 0, 0, 8);
                             for (const serverSong of serverPage.song ?? []) {
                                 const unified = buildUnifiedNavidromeSong(navidromeApi.toNavidromeSong(config, serverSong)) as UnifiedSong;
-                                const key = JSON.stringify(unified.sourceRef ?? {}) + ':' + String(unified.id);
+                                const key = getPlaybackSongKey(unified);
                                 if (!found.has(key)) found.set(key, unified);
                             }
                         }
@@ -175,6 +187,12 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                 }
                 if (found.size >= 12) break;
             }
+            if (found.size === 0) {
+                // Offer real catalog tracks when mood words match no metadata; do not label them as AI matches.
+                const page = await omni.searchProviderSongs(PERSONAL_LIBRARY_PROVIDER, '', { limit: 12, offset: 0 });
+                for (const song of page.items) found.set(getPlaybackSongKey(song), song);
+                if (page.items.length) setError(t('radioAgent.serverFallback'));
+            }
             setOnlineSongs([...found.values()].slice(0, 12));
             if (found.size === 0 && localSongs.length === 0) setError(t('radioAgent.noResults'));
         } catch {
@@ -183,6 +201,24 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
             setLoading(false);
         }
     }, [loading, localSongs.length, t]);
+
+    const saveStation = () => {
+        try {
+            const saved = savePersonalRadio(brief?.title || t('radioAgent.queueTitle'), onlineSongs, savedRadioId);
+            setSavedRadioId(saved.id);
+            setError('');
+        } catch (error) {
+            console.warn('[PersonalRadio] Could not save station', error);
+            setError(t('radioAgent.saveFailed'));
+        }
+    };
+
+    const playStationSong = useCallback((song: UnifiedSong) => {
+        // The complete station list becomes the real play queue. Folia's Lattice wall
+        // reads that queue, so it can show the same artwork and exact recording IDs.
+        onClose();
+        void onPlayOnline(song, onlineSongs);
+    }, [onClose, onPlayOnline, onlineSongs]);
 
     const startVoice = useCallback(() => {
         const speechWindow = window as SpeechWindow;
@@ -238,9 +274,10 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                 return;
             }
             setOnlineSongs(current => {
-                const key = JSON.stringify(song.sourceRef ?? {}) + ':' + String(song.id);
-                return [song, ...current.filter(item => JSON.stringify(item.sourceRef ?? {}) + ':' + String(item.id) !== key)];
+                const key = getPlaybackSongKey(song);
+                return [song, ...current.filter(item => getPlaybackSongKey(item) !== key)];
             });
+            setSavedRadioId(undefined);
         } catch {
             setShareError(t('radioAgent.shareProviderUnavailable'));
         } finally {
@@ -280,7 +317,7 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                     <button type="button" onClick={onClose} aria-label={t('radioAgent.close')} className="rounded-full border border-white/10 p-2.5 text-white/70 transition hover:bg-white/10 hover:text-white"><X size={19} /></button>
                 </header>
 
-                <div className="relative grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[0.85fr_1.15fr]">
+                <div className="relative grid min-h-0 flex-1 overflow-y-auto grid-rows-[auto_auto] md:overflow-hidden md:grid-rows-1 md:grid-cols-[0.85fr_1.15fr]">
                     <section className="border-b border-white/10 p-4 sm:p-7 md:overflow-y-auto md:border-b-0 md:border-r">
                         <p className="mb-3 text-xs uppercase tracking-[0.24em] text-white/40">{t('radioAgent.yourMood')}</p>
                         <h2 className="mb-2 text-2xl font-light leading-snug sm:text-3xl">{t('radioAgent.headline')}</h2>
@@ -320,7 +357,17 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                         </div>}
                     </section>
 
-                    <section className="min-h-0 overflow-y-auto p-4 sm:p-7">
+                    <section className="min-h-0 p-4 sm:p-7 md:overflow-y-auto">
+                        <div className="mb-4 space-y-2">
+                            <div className="flex flex-wrap gap-2">
+                                <button type="button" disabled={loading || !onlineSongs.some(song => song.sourceRef.kind === 'online')}
+                                    onClick={saveStation} className="flex min-h-11 items-center gap-2 rounded-xl border border-violet-200/20 px-3 text-sm text-violet-100 disabled:opacity-40">
+                                    {savedRadioId ? <Check size={16} /> : <LayoutGrid size={16} />}{t(savedRadioId ? 'radioAgent.updateWall' : 'radioAgent.saveWall')}
+                                </button>
+                                <button type="button" onClick={() => onOpenLibrary('radio')} className="min-h-11 rounded-xl border border-white/15 px-3 text-sm text-white/75">{t('radioAgent.savedWall')}</button>
+                            </div>
+                            <p role="status" className="text-xs leading-5 text-white/45">{t(savedRadioId ? 'radioAgent.savedHint' : 'radioAgent.saveHint')}</p>
+                        </div>
                         <div className="mb-4 flex items-center justify-between gap-3">
                             <div><p className="text-[10px] uppercase tracking-[0.28em] text-emerald-200/65">{t('radioAgent.curation')}</p><h2 className="mt-1 text-lg font-medium">{brief?.title || t('radioAgent.queueTitle')}</h2></div>
                             <span className="rounded-full border border-white/10 px-3 py-1 text-[11px] text-white/45">{localMatches.length + onlineSongs.length} {t('radioAgent.tracks')}</span>
@@ -328,6 +375,11 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                         {!brief && !loading && <div className="flex min-h-44 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 px-6 text-center"><Music2 size={28} className="mb-3 text-white/30" /><p className="text-sm text-white/60">{t('radioAgent.emptyTitle')}</p><p className="mt-1 max-w-xs text-xs leading-5 text-white/35">{t('radioAgent.emptyDescription')}</p></div>}
                         {loading && <div className="flex min-h-44 items-center justify-center gap-3 text-sm text-white/50"><LoaderCircle size={18} className="animate-spin" />{t('radioAgent.searching')}</div>}
                         {brief && !loading && localMatches.length === 0 && onlineSongs.length === 0 && <div className="rounded-2xl border border-white/10 p-5 text-sm text-white/50">{t('radioAgent.noResults')}</div>}
+                        {onlineSongs.length > 0 && <button type="button"
+                            onClick={() => playStationSong(onlineSongs[0])}
+                            className="mb-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-violet-200/30 bg-violet-200/10 px-4 text-sm font-medium text-violet-100 transition hover:bg-violet-200/20">
+                            <Play size={16} /> {t('radioAgent.playStationWall')}
+                        </button>}
                         <div className="space-y-2">
                             {localMatches.map((song, index) => <div key={song.id} className="group flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 transition hover:border-white/15 hover:bg-white/[0.05]">
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-200/10 text-emerald-100/70"><Music2 size={17} /></div>
@@ -335,11 +387,11 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                                 <span className="hidden text-[10px] text-white/25 sm:inline">{String(index + 1).padStart(2, '0')}</span>
                                 <button type="button" onClick={() => onPlayLocal(song)} aria-label={t('radioAgent.play')} className="rounded-full border border-white/10 p-2.5 text-white/70 hover:bg-white/10 hover:text-white"><Play size={15} /></button>
                             </div>)}
-                            {onlineSongs.map((song, index) => <div key={String(song.id)} className="group flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 transition hover:border-white/15 hover:bg-white/[0.05]">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-200/10 text-violet-100/70"><Music2 size={17} /></div>
+                            {onlineSongs.map((song, index) => <div key={getPlaybackSongKey(song)} className="group flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 transition hover:border-white/15 hover:bg-white/[0.05]">
+                                {song.album?.coverUrl ? <img src={song.album.coverUrl} alt="" loading="lazy" className="h-10 w-10 shrink-0 rounded-xl object-cover" /> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-200/10 text-violet-100/70"><Music2 size={17} /></div>}
                                 <div className="min-w-0 flex-1"><p className="truncate text-sm text-white/90">{song.name}</p><p className="mt-1 truncate text-xs text-white/40">{song.artists?.map(artist => artist.name).join(', ') || t('radioAgent.unknownArtist')} · {song.album?.name || t('radioAgent.onlineSource')}</p></div>
                                 <span className="hidden text-[10px] text-white/25 sm:inline">{String(index + localMatches.length + 1).padStart(2, '0')}</span>
-                                <button type="button" onClick={() => onPlayOnline(song)} aria-label={t('radioAgent.play')} className="rounded-full border border-white/10 p-2.5 text-white/70 hover:bg-white/10 hover:text-white"><Play size={15} /></button>
+                                <button type="button" onClick={() => playStationSong(song)} aria-label={t('radioAgent.play')} className="rounded-full border border-white/10 p-2.5 text-white/70 hover:bg-white/10 hover:text-white"><Play size={15} /></button>
                             </div>)}
                         </div>
                         <div className="mt-5 flex items-start gap-2 rounded-xl border border-white/[0.07] p-3 text-[11px] leading-5 text-white/35"><Settings2 size={14} className="mt-0.5 shrink-0" /><span>{t('radioAgent.footerHint')}</span></div>
