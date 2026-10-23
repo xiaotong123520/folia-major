@@ -52,11 +52,41 @@ function hearttraceLyricRelay(target: URL): URL | null {
     }
 }
 
+function extractLrcText(raw: string): string | null {
+    const text = raw.trim();
+    if (!text || text.length > 131072 || /<html|<!doctype|<script/i.test(text)) return null;
+    if (!text.startsWith('{')) return text;
+    // Owner-hosted endpoints may send {data:{lyric:"[00:00.00]..."}} rather than raw LRC.
+    // Inspect documented lyric field names only; never display an error JSON as lyrics.
+    try {
+        const result: unknown = JSON.parse(text);
+        const lyricText = (value: unknown): string | null => {
+            if (typeof value === 'string') return value;
+            if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+            const row = value as Record<string, unknown>;
+            for (const key of ['lyric', 'lyrics', 'lrc', 'text', 'content']) {
+                const candidate = row[key];
+                if (typeof candidate === 'string') return candidate;
+                if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) {
+                    const nested = (candidate as Record<string, unknown>).lyric;
+                    if (typeof nested === 'string') return nested;
+                }
+            }
+            return null;
+        };
+        if (!result || typeof result !== 'object' || Array.isArray(result)) return null;
+        const body = result as Record<string, unknown>;
+        return lyricText(body.data) || lyricText(body);
+    } catch {
+        return null;
+    }
+}
+
 function parseTextLyrics(text: string) {
-    if (!text.trim()) return null;
-    if (text.length > 131072 || /<html|<!doctype|<script|^\s*[\[{]\s*["{]/i.test(text)) return null;
-    const parsed = parseLRC(text);
-    return parsed.lines.length > 0 ? parsed : null;
+    const lrc = extractLrcText(text);
+    if (!lrc || lrc.length > 131072) return null;
+    const parsed = parseLRC(lrc);
+    return parsed.lines.length > 0 ? { lyrics: parsed, mainText: lrc } : null;
 }
 
 /** One URL is the actual owner's lyric endpoint, the second is a CORS relay when needed. */
@@ -89,11 +119,11 @@ export async function readHearttraceLyrics(
                 failure = 'Oversized lyric response';
                 continue;
             }
-            const mainText = await response.text();
-            const lyrics = parseTextLyrics(mainText);
-            if (lyrics) return { lyrics, mainText, isPureMusic: false };
-            if (!mainText.trim()) absent = true;
-            else failure = 'Not timed LRC text';
+            const rawText = await response.text();
+            const parsed = parseTextLyrics(rawText);
+            if (parsed) return { ...parsed, isPureMusic: false };
+            if (!rawText.trim()) absent = true;
+            else failure = 'No valid timed lyrics in response';
         } catch (error) {
             failure = error instanceof Error ? error.name : 'Network unavailable';
         }
