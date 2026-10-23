@@ -1,12 +1,9 @@
 name: Sync Code Map
 
-# 代码地图是生成物，维护责任不摊派给贡献者：PR 不再校验它，改由 main 落地后自动重生成并提交。
+# 代码地图是生成物；本 fork 因 Actions 使用量过高改成手动触发。
 # 约 62% 的提交会新增或删除源文件，放在 PR 上校验会让绝大多数 PR 因为一个与改动无关的产物变红。
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - 'docs/CODEMAP.md'
+  workflow_dispatch:
 
 permissions:
   contents: write
