@@ -82,6 +82,20 @@ const createChain = (effects = createNeutralAudioEffects(), enabled = true) => {
 };
 
 describe('audio effect chain', () => {
+    it('routes neutral audio directly and disconnects the bypass when effects are enabled', () => {
+        const { chain, input, output } = createChain();
+        expect(input.connect).toHaveBeenCalledWith(output);
+        chain.apply(AUDIO_SOUND_PRESETS.radio.effects, true);
+        expect(input.disconnect).toHaveBeenCalledWith(output);
+        vi.mocked(input.connect).mockClear();
+        chain.apply(createNeutralAudioEffects(), true);
+        expect(input.connect).toHaveBeenCalledWith(output);
+        vi.mocked(input.connect).mockClear();
+        chain.apply(createNeutralAudioEffects(), true);
+        expect(input.connect).not.toHaveBeenCalled();
+        chain.dispose();
+        expect(input.disconnect).toHaveBeenCalledWith(output);
+    });
     it('leaves the optional branches unallocated for a neutral chain', () => {
         const { created } = createChain();
 

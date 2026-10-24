@@ -9,6 +9,18 @@ import {
 // test/unit/utils/mediaSessionSync.test.ts
 
 describe('mediaSessionSync', () => {
+    it.each(['missing', 'throws'])('publishes artwork when optional position reporting is %s', (mode) => {
+        const session = {
+            ...(mode === 'throws' ? { setPositionState: () => { throw new Error('Unsupported'); } } : {}),
+            metadata: null,
+        } as unknown as MediaSession;
+        expect(publishMediaSessionTrack(session,
+            { currentTime: 1, duration: 200, playbackRate: 1 },
+            { title: 'track', artist: 'artist', album: 'album', artworkUrl: 'https://images.test/art.jpg' },
+            init => init as unknown as MediaMetadata,
+        )).toBe(true);
+        expect(session.metadata?.artwork).toEqual([{ src: 'https://images.test/art.jpg' }]);
+    });
     it('ignores metadata events from an old or incomplete audio source', () => {
         expect(isMediaSessionSourceReady({
             currentSrc: 'https://music.example/old.mp3',

@@ -113,7 +113,11 @@ export const useMediaSessionBridge = ({
 
         if (!currentSong) {
             try {
-                navigator.mediaSession.setPositionState();
+                navigator.mediaSession.setPositionState?.();
+            } catch (e) {
+                console.warn('[MediaSession] Failed to clear position', e);
+            }
+            try {
                 navigator.mediaSession.metadata = null;
             } catch (e) {
                 console.warn('[MediaSession] Failed to clear metadata', e);
@@ -129,7 +133,11 @@ export const useMediaSessionBridge = ({
         }
 
         let disposed = false;
-        const sourceArtworkUrl = cachedCoverUrl || getSongCoverUrl(currentSong) || '';
+        // System playback panels can fetch HTTPS artwork independently of an expiring page blob.
+        const remoteArtworkUrl = getSongCoverUrl(currentSong) || '';
+        const sourceArtworkUrl = cachedCoverUrl && !cachedCoverUrl.startsWith('blob:')
+            ? cachedCoverUrl
+            : /^https:\/\//i.test(remoteArtworkUrl) ? remoteArtworkUrl : cachedCoverUrl || remoteArtworkUrl;
         let artworkUrl = getSupportedMediaSessionArtworkUrl(sourceArtworkUrl, document.baseURI);
         let disposableArtworkUrl: string | null = null;
         const publish = () => {

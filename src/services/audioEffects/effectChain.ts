@@ -1,6 +1,7 @@
 import {
     DEFAULT_AUDIO_EFFECT_SETTINGS,
     normalizeAudioEffects,
+    isNeutralAudioEffects,
     type AudioEffectSettings,
 } from '../../utils/audioEffects';
 import { createBitCrushCurve, createSaturationCurve } from './effectSources';
@@ -43,16 +44,29 @@ export const createAudioEffectChain = ({
     const wow = createWowBranch(context, nodes);
     let lastDrive = -1;
     let lastCrush = -1;
+    let bypassed = false;
 
     // Maps normalized settings onto every stage; a disabled chain falls back to the neutral set.
     const apply = (nextEffects: AudioEffectSettings, nextEnabled: boolean) => {
         const active = nextEnabled ? normalizeAudioEffects(nextEffects) : DEFAULT_AUDIO_EFFECT_SETTINGS;
+        const bypass = !nextEnabled || isNeutralAudioEffects(active);
+        if (bypass !== bypassed) {
+            if (bypass) {
+                input.disconnect(nodes.highpass);
+                input.connect(output);
+            } else {
+                input.disconnect(output);
+                input.connect(nodes.highpass);
+            }
+            bypassed = bypass;
+        }
 
         rampParam(context, nodes.highpass.frequency, active.highpass);
         rampParam(context, nodes.lowpass.frequency, Math.min(active.lowpass, context.sampleRate * 0.475));
 
         if (active.drive !== lastDrive) {
             lastDrive = active.drive;
+            nodes.drive.oversample = active.drive > 0 ? '4x' : 'none';
             nodes.drive.curve = createSaturationCurve(active.drive);
         }
         if (active.crush !== lastCrush) {
@@ -84,6 +98,7 @@ export const createAudioEffectChain = ({
     return {
         apply,
         dispose: () => {
+            if (bypassed) input.disconnect(output);
             wow.dispose();
             noise.dispose();
             reverb.dispose();

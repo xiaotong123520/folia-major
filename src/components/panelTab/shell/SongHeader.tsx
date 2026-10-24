@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Disc } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { SongResult } from '../../../types';
@@ -36,6 +36,11 @@ const SongHeader: React.FC<SongHeaderProps> = ({ isBig, currentSong, coverUrl, l
     const { t } = useTranslation();
     const underRef = useRef<HTMLDivElement>(null);
     const under = useMeasuredSize(underRef);
+    const primaryCover = getSizedCoverUrl(coverUrl, 512);
+    const remoteCover = getSizedCoverUrl(currentSong ? getProviderSongMetadata(currentSong).coverUrl : '', 512);
+    const [failedCovers, setFailedCovers] = useState<string[]>([]);
+    useEffect(() => setFailedCovers([]), [primaryCover, remoteCover]);
+    const visibleCover = [primaryCover, remoteCover].find(url => url && !failedCovers.includes(url));
     const artists = (currentSong ? getProviderSongMetadata(currentSong).artists : []).map(artist => artist.name).join(' / ');
     // The large cover is a square as wide as the panel's inside (100cqw), and lower where the
     // window leaves less: --pn-room is the height PanelShell can give this header.
@@ -54,8 +59,8 @@ const SongHeader: React.FC<SongHeaderProps> = ({ isBig, currentSong, coverUrl, l
                 className={`st-t-unfold absolute left-0 top-0 grid place-items-center overflow-hidden bg-[var(--st-fill)] transition-[width,height,border-radius] ${isBig ? 'rounded-[10px]' : 'cursor-pointer rounded-lg'}`}
                 style={isBig ? { width: '100%', height: coverHeight } : { width: FOLDED_PX, height: FOLDED_PX }}
             >
-                {coverUrl ? (
-                    <img src={getSizedCoverUrl(coverUrl, 512)} alt="Art" decoding="async" className="h-full w-full object-cover" />
+                {visibleCover ? (
+                    <img src={visibleCover} alt="Art" decoding="async" onError={() => setFailedCovers(previous => [...previous, visibleCover])} className="h-full w-full object-cover" />
                 ) : (
                     <Disc size={isBig ? 40 : 20} className="text-[color:var(--st-t3)]" />
                 )}

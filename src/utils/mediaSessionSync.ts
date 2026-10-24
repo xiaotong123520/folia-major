@@ -84,7 +84,12 @@ export const publishMediaSessionTrack = (
         return false;
     }
 
-    mediaSession.setPositionState(positionState);
+    // Position reporting is optional; a browser rejection must not suppress artwork and title.
+    try {
+        mediaSession.setPositionState?.(positionState);
+    } catch (error) {
+        console.warn('[MediaSession] Position unavailable; publishing track metadata', error);
+    }
     const artworkUrl = getSupportedMediaSessionArtworkUrl(track.artworkUrl);
     mediaSession.metadata = createMetadata({
         title: track.title,
