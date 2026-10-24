@@ -1,4 +1,4 @@
-import { createRequire } from "node:module";
+import qr from "qrcode";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from "node:crypto";
@@ -275,7 +275,6 @@ async function accountFetch(req, res, path, body, web = false) {
 
 //#endregion
 //#region api-ts/podcast.ts
-const qr = createRequire(import.meta.url)("qrcode");
 const publicCache = /* @__PURE__ */ new Map();
 async function readPublic(kind, id) {
 	const key = kind + ":" + id;

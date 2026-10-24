@@ -1,4 +1,4 @@
-import { createRequire } from 'node:module';
+import qr from 'qrcode';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { ID, PUBLIC_IDS, allowedAudio, episode, pageItems, parseLink, podcast, publicPage } from './xiaoyuzhou/content.js';
@@ -6,8 +6,6 @@ import { PodcastError, accountFetch, newDevice, qrCheck, qrCreate } from './xiao
 import { readCookie, setCookie } from './xiaoyuzhou/session.js';
 
 // One same-origin podcast backend combines public browsing and optional HttpOnly account access.
-const require = createRequire(import.meta.url);
-const qr = require('qrcode');
 const publicCache = new Map<string, { expires: number; value: any }>();
 async function readPublic(kind: string, id: string) {
     const key = kind + ':' + id;
