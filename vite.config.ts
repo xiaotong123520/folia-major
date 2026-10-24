@@ -281,8 +281,20 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
           importScripts: [localCoverWorkerImport],
           // Docker serves this file dynamically; it must never be pinned in the PWA precache.
           // The cover route is stored with the worker script itself, so precaching it is redundant.
-          globIgnores: ['**/runtime-config.js', '**/assets/folium-icons/**', '**/folia-cover-sw.js'],
+          globIgnores: ['**/index.html', '**/runtime-config.js', '**/assets/folium-icons/**', '**/folia-cover-sw.js'],
           runtimeCaching: [{
+            // Refresh the app shell online; retain a page copy for offline starts.
+            urlPattern: ({ request, url }) => request.mode === 'navigate'
+              && url.origin === self.location.origin
+              && !/^\/(?:api(?:\/|$)|__folia_cover\/)/.test(url.pathname),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'folia-pages',
+              networkTimeoutSeconds: 4,
+              cacheableResponse: { statuses: [200] },
+              expiration: { maxEntries: 8, maxAgeSeconds: 86400 },
+            },
+          }, {
             // Per-icon chunks load on demand. Their names are content-hashed, so an icon cached on
             // first use can be served as-is when the app later starts offline.
             urlPattern: /\/assets\/folium-icons\/[^/]+\.js$/,
@@ -294,6 +306,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
           }],
           // API navigations must reach the deployment platform instead of the SPA shell. Opening a
           // local cover in its own tab is a navigation too, and the cover route already answers it.
+          navigateFallback: null,
           navigateFallbackDenylist: [/^\/api(?:\/|$)/, /^\/__folia_cover\//]
         },
         manifest: {
