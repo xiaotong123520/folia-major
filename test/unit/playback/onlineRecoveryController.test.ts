@@ -102,6 +102,17 @@ const pendingLoad = () => {
 };
 
 describe('online playback recovery bounds', () => {
+    it('stops after one automatic recovery even when the CDN rotates signed path segments', async () => {
+        const first = 'https://cdn.example/signature-one/song.mp3';
+        const second = 'https://cdn.example/signature-two/song.mp3';
+        const { controller } = createController(first);
+        loadAudioSourceMock.mockResolvedValue({ kind: 'ok', audioSrc: second });
+        await expect(controller.recoverOnlinePlaybackSource({ failedSrc: first, autoplay: true }))
+            .resolves.toEqual({ recovered: true });
+        await expect(controller.recoverOnlinePlaybackSource({ failedSrc: second, autoplay: true }))
+            .resolves.toEqual({ recovered: false });
+        expect(loadAudioSourceMock).toHaveBeenCalledTimes(1);
+    });
     beforeEach(() => {
         vi.clearAllMocks();
         loadAudioSourceMock.mockReset();

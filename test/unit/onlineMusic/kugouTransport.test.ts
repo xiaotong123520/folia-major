@@ -5,6 +5,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const storage = new Map<string, string>();
 
 describe('KuGou Web transport', () => {
+    it('relays only the configured CDN on Web while preserving desktop URLs', async () => {
+        vi.stubEnv('VITE_KUGOU_AUDIO_PROXY_BASE', 'https://backend.test/audio/stream');
+        vi.stubGlobal('window', undefined);
+        const { getKugouPlaybackUrl } = await import('@/services/onlineMusic/kugou/kugouTransport');
+        const url = 'https://fs.youthandroid2.kugou.com/signed/song.mp3';
+        expect(getKugouPlaybackUrl(url)).toBe(`https://backend.test/audio/stream?url=${encodeURIComponent(url)}`);
+        expect(getKugouPlaybackUrl('https://other.test/song.mp3')).toBe('https://other.test/song.mp3');
+        vi.stubGlobal('window', { electron: { kugouRequest: vi.fn() } });
+        expect(getKugouPlaybackUrl(url)).toBe(url);
+    });
     beforeEach(() => {
         vi.resetModules();
         storage.clear();

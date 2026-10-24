@@ -14,10 +14,11 @@
 | `VITE_KUGOU_API_BASE` | `https://tingyu-kugou-api.vercel.app`，独立酷狗后端 | 前端公开配置 |
 | `VITE_QQ_API_BASE` | `/api/qq`，仓库内置 QQ 后端 | 前端公开配置 |
 | `QQ_SESSION_SECRET` | 足够长的随机会话加密密钥；不公开实际值 | Vercel 服务端 Secret |
+| `VITE_KUGOU_AUDIO_PROXY_BASE` | `https://tingyu-kugou-api.vercel.app/audio/stream`，授权音频转发 | 前端公开配置 |
 | `VITE_INITIAL_ONLINE_PROVIDER` | `hearttrace`，仅作首次访问默认值，已保存的平台选择优先 | 前端公开配置 |
 | `VITE_LIBRARY_INITIAL_SUITE` | `grid`，无已保存偏好时的资料库界面 | 前端公开配置 |
 
-酷狗网页后端于 2026-10-24 部署为官方 KuGouMusicApi v1.6.2，独立私有仓库为 `xiaotong123520/tingyu-kugou-api`，Vercel 项目为 `tingyu-kugou-api`，后端环境变量设为 `platform=lite`。公开搜索已返回真实歌曲，听屿 FM 的酷狗登录入口已启用，二维码图像已成功加载；扫码后的账号同步和授权播放仍待实际账号验证。此独立网页部署不代表仓库内桌面端或 Docker 的酷狗依赖已升级。
+酷狗网页后端于 2026-10-24 部署为官方 KuGouMusicApi v1.6.2，独立私有仓库为 `xiaotong123520/tingyu-kugou-api`，Vercel 项目为 `tingyu-kugou-api`，后端环境变量设为 `platform=lite`。公开搜索已返回真实歌曲，听屿 FM 的酷狗登录入口已启用，二维码图像已成功加载；已在浏览器确认扫码登录成功、读取账号及搜索歌曲。直接连接音频 CDN 失败；独立后端新增仅针对已观察到的 `fs.youthandroid2.kugou.com` MP3 地址的流式转发，保留 Range/206，不转发登录 Cookie，不跟随重定向，也不缓存音频。网页通过显式配置启用，桌面端不变。自动播放恢复按同一次歌曲启动限制一次，避免签名路径轮换造成无休止重试。修复后的完整实播仍需验证。此独立网页部署不代表仓库内桌面端或 Docker 的酷狗依赖已升级。
 
 Vercel 的 QQ 后端提供手机 QQ 与微信扫码；QQ 音乐 App 扫码需要不同的运行环境，不能把 Vercel 上的登录入口当作支持该方式的证据。具体配置见 [QQ 后端说明](../deploy/docker/qq-api/README.md)。
 

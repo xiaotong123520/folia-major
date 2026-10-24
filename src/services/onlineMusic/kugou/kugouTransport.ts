@@ -72,6 +72,23 @@ const getWebApiBase = (): string => {
     return value.trim().replace(/\/$/, '');
 };
 
+// A configured relay keeps authorized audio reachable where the platform CDN fails directly.
+export const getKugouPlaybackUrl = (value: string): string => {
+    if (typeof window !== 'undefined' && window.electron?.kugouRequest) return value;
+    const relay = import.meta.env?.MODE === 'test'
+        ? process.env.VITE_KUGOU_AUDIO_PROXY_BASE
+        : import.meta.env?.VITE_KUGOU_AUDIO_PROXY_BASE;
+    if (!relay) return value;
+    try {
+        const target = new URL(value);
+        if (target.hostname !== 'fs.youthandroid2.kugou.com' || target.username || target.password
+            || target.port || !['https:', 'http:'].includes(target.protocol)) return value;
+        return `${relay}?url=${encodeURIComponent(value)}`;
+    } catch {
+        return value;
+    }
+};
+
 const isDeviceVerificationRequired = (body: any): boolean => {
     const errorCode = Number(body?.errcode ?? body?.error_code);
     const message = String(body?.error ?? body?.error_msg ?? body?.msg ?? '');

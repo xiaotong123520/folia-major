@@ -27,6 +27,7 @@ import { removeProviderSessionValue, readProviderSessionValue } from '../provide
 import i18n from '../../../i18n/config';
 import {
     getKugouTransportAvailability,
+    getKugouPlaybackUrl,
     hasKugouAuthenticatedSearchSession,
     requestKugouAnonymousSearch,
     requestKugou,
@@ -1179,7 +1180,7 @@ export const kugouProvider: OnlineMusicProvider = {
                             });
                             return {
                                 // Preserve the upstream candidate here; the shared playback transport normalizes its scheme.
-                                url,
+                                url: getKugouPlaybackUrl(url),
                                 fetchedAt: Date.now(),
                                 quality: candidateQuality,
                                 ...(replayGain ? { replayGain } : {}),
@@ -1234,7 +1235,7 @@ export const kugouProvider: OnlineMusicProvider = {
                             requestedQuality: quality,
                         });
                         return {
-                            url: legacyUrl,
+                            url: getKugouPlaybackUrl(legacyUrl),
                             fetchedAt: Date.now(),
                             quality: 'standard',
                         };

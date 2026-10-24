@@ -130,14 +130,16 @@ export const createOnlineRecoveryController = ({
             return { recovered: false };
         }
 
-        const normalizedFailedSrc = getOnlineRecoveryKey(failedSrc || audioElement.currentSrc || audioSrc || null);
+        const songKey = getPlaybackSongKey(song);
+        const start = startOfAskedSong();
+        const recoveryKey = `${songKey}#${start}`;
+        // Some CDNs rotate signed path segments as well as query parameters.
+        // Bound automatic media recovery to this song start, regardless of the new URL.
+        const normalizedFailedSrc = failedSrc ? recoveryKey : getOnlineRecoveryKey(audioElement.currentSrc || audioSrc || null);
         if (!force && normalizedFailedSrc && lastAudioRecoverySourceRef.current === normalizedFailedSrc) {
             return { recovered: false };
         }
 
-        const songKey = getPlaybackSongKey(song);
-        const start = startOfAskedSong();
-        const recoveryKey = `${songKey}#${start}`;
         const pendingRecovery = onlinePlaybackRecoveryRef.current.get(recoveryKey);
         if (pendingRecovery) {
             return pendingRecovery;
