@@ -572,6 +572,7 @@ it('loads podcast transcript directly without stale cache or lyric auto matching
         { isCurrent: () => true, onLyrics, onDone });
     expect(onLyrics).toHaveBeenCalledWith(native);
     expect(onDone).toHaveBeenCalledOnce();
+    expect(saveLyricsStateMock).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ onlineOverrideLyrics: native, hasOnlineOverride: true }));
     expect(songCacheMock).not.toHaveBeenCalled();
     expect(loadLyricsStateMock).not.toHaveBeenCalled();
     expect(autoMatchMock).not.toHaveBeenCalled();

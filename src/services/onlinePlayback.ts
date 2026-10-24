@@ -196,7 +196,10 @@ export async function loadOnlineSongLyrics(
     if (usesNativePodcastTranscript(song)) {
         const result = await omni.getLyrics(song, { userId });
         if (!isCurrent()) return;
-        onStateChange?.(null);
+        const nativeState: OnlineLyricsState = { lyricsSource: 'online', hasOnlineOverride: true, onlineOverrideLyrics: result.lyrics, matchedIsPureMusic: false };
+        await saveOnlineLyricsState(song, nativeState);
+        if (!isCurrent()) return;
+        onStateChange?.(nativeState);
         onPureMusicChange?.(false);
         onLyrics(result.lyrics);
         onDone();
