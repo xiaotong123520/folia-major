@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 const account = vi.hoisted(() => vi.fn());
 vi.mock('../../../api-ts/xiaoyuzhou/account.js', () => ({
     accountFetch: account,
@@ -7,10 +7,9 @@ vi.mock('../../../api-ts/xiaoyuzhou/account.js', () => ({
 import { readTranscript } from '../../../api-ts/xiaoyuzhou/transcript';
 
 // Native transcript media ids differ from playback ids on RSS-bridged shows.
-beforeEach(() => { vi.stubEnv('PODCAST_TRANSCRIPT_VERIFIED', 'true'); });
 afterEach(() => { account.mockReset(); vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
-it('blocks unverified live transcript content by default', async () => {
-    vi.stubEnv('PODCAST_TRANSCRIPT_VERIFIED', '');
+it('honors the explicit transcript off switch', async () => {
+    vi.stubEnv('PODCAST_TRANSCRIPT_VERIFIED', 'false');
     await expect(readTranscript({}, {}, '6021f949a789fca4eff4492c')).rejects.toThrow('尚未通过内容核对');
     expect(account).not.toHaveBeenCalled();
 });
@@ -37,4 +36,10 @@ it('rejects an unrecognized transcript host before making any request', async ()
     const fetcher = vi.fn(); vi.stubGlobal('fetch', fetcher);
     await expect(readTranscript({}, {}, '6021f949a789fca4eff4492c')).rejects.toThrow();
     expect(fetcher).not.toHaveBeenCalled();
+});
+
+it('rejects a mismatched episode before requesting its transcript', async () => {
+    account.mockResolvedValueOnce({ data: { eid: '000000000000000000000000', transcriptMediaId: 'native' } });
+    await expect(readTranscript({}, {}, '6021f949a789fca4eff4492c')).rejects.toThrow('身份不匹配');
+    expect(account).toHaveBeenCalledTimes(1);
 });

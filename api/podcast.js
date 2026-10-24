@@ -301,7 +301,7 @@ function normalizeTranscript(raw) {
 }
 async function readTranscript(req, res, id, probe = false) {
 	if (!ID.test(id)) throw new PodcastError(400, "无效单集");
-	if (!probe && process.env.PODCAST_TRANSCRIPT_VERIFIED !== "true") throw new PodcastError(503, "平台文稿尚未通过内容核对，暂不显示同步字幕；下方可查看节目简介与章节");
+	if (!probe && process.env.PODCAST_TRANSCRIPT_VERIFIED === "false") throw new PodcastError(503, "平台文稿尚未通过内容核对，暂不显示同步字幕；下方可查看节目简介与章节");
 	const ep = (await accountFetch(req, res, "/v1/episode/get?eid=" + id))?.data;
 	if (ep?.eid !== id) throw new PodcastError(502, "文稿单集身份不匹配，已停止读取");
 	const page = probe ? (await publicPage("episode", id)).episode : null;
