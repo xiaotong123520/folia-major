@@ -1,4 +1,4 @@
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const account = vi.hoisted(() => vi.fn());
 vi.mock('../../../api-ts/xiaoyuzhou/account.js', () => ({
     accountFetch: account,
@@ -7,7 +7,13 @@ vi.mock('../../../api-ts/xiaoyuzhou/account.js', () => ({
 import { readTranscript } from '../../../api-ts/xiaoyuzhou/transcript';
 
 // Native transcript media ids differ from playback ids on RSS-bridged shows.
-afterEach(() => { account.mockReset(); vi.unstubAllGlobals(); });
+beforeEach(() => { vi.stubEnv('PODCAST_TRANSCRIPT_VERIFIED', 'true'); });
+afterEach(() => { account.mockReset(); vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
+it('blocks unverified live transcript content by default', async () => {
+    vi.stubEnv('PODCAST_TRANSCRIPT_VERIFIED', '');
+    await expect(readTranscript({}, {}, '6021f949a789fca4eff4492c')).rejects.toThrow('尚未通过内容核对');
+    expect(account).not.toHaveBeenCalled();
+});
 it('uses the native transcript id and never forwards account credentials to the CDN', async () => {
     account.mockResolvedValueOnce({ data: { transcriptMediaId: 'native', media: { id: 'external' } } })
         .mockResolvedValueOnce({ data: { transcriptUrl: 'https://media.xyzcdn.net/transcript.json?signature=test' } });

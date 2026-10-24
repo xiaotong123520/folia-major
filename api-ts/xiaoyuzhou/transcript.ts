@@ -18,6 +18,10 @@ export function normalizeTranscript(raw: unknown) {
 }
 export async function readTranscript(req: any, res: any, id: string) {
     if (!ID.test(id)) throw new PodcastError(400, '无效单集');
+    // Live samples failed content verification. Do not distribute them as subtitles until verified.
+    if (process.env.PODCAST_TRANSCRIPT_VERIFIED !== 'true') {
+        throw new PodcastError(503, '平台文稿尚未通过内容核对，暂不显示同步字幕；下方可查看节目简介与章节');
+    }
     const detail = await accountFetch(req, res, '/v1/episode/get?eid=' + id);
     const ep = detail?.data;
     const mediaId = ep?.transcriptMediaId || ep?.transcript?.mediaId || ep?.media?.id;
