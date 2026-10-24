@@ -9,6 +9,7 @@ import { getPlatformLyricSource } from '../utils/lyrics/lyricSources';
 import { createSafeObjectUrl } from '../utils/blobGuards';
 import type { AudioQualityPreference, MediaId, ProviderAudioSource } from '../types/onlineMusic';
 import { omni } from './onlineMusic/omni';
+import { usesNativePodcastTranscript } from './onlineMusic/xiaoyuzhou/xiaoyuzhouLyrics';
 import { autoRetryDelaysMs, logOnlineFailure, onlineFailureOf, type OnlineFailure } from './onlineMusic/failure/onlineFailureCase';
 import { noteOnlineRequestCooldown, onlineRequestCooldown } from './onlineMusic/failure/onlineRequestCooldown';
 import { getSongResourceCacheKey } from './onlineMusic/resourceKeys';
@@ -192,6 +193,15 @@ export async function loadOnlineSongLyrics(
     }
 ): Promise<void> {
     const { isCurrent, onLyrics, onPureMusicChange, onStateChange, onAutoMatchStart, onDone } = callbacks;
+    if (usesNativePodcastTranscript(song)) {
+        const result = await omni.getLyrics(song, { userId });
+        if (!isCurrent()) return;
+        onStateChange?.(null);
+        onPureMusicChange?.(false);
+        onLyrics(result.lyrics);
+        onDone();
+        return;
+    }
     const lyricCacheKey = getSongResourceCacheKey('lyric', song);
     const onlineLyricsState = await loadOnlineLyricsState(song);
   const initialSettingsLyricSettings = useLyricSettingsStore.getState();

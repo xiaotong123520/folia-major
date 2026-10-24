@@ -29,6 +29,7 @@ export interface PlatformNamePlace {
 }
 
 export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
+    'src/services/onlinePlayback.ts': { n: { xiaoyuzhou: 1 }, kind: 'list', why: 'native transcript playback policy registration; music matching stays unchanged' },
     'api-ts/podcast.ts': { n: { xiaoyuzhou: 7 }, kind: 'main', why: 'same-origin podcast backend entry and known upstream hosts' },
     'api-ts/xiaoyuzhou/session.ts': { n: { qq: 1 }, kind: 'stored', why: 'existing server secret is a fallback seed with a separate podcast purpose' },
     'api/podcast.js': { n: { qq: 1, xiaoyuzhou: 21 }, kind: 'main', why: 'generated single serverless podcast entry' },

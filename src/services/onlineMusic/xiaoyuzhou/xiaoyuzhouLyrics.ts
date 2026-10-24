@@ -1,4 +1,9 @@
-import type { LyricData } from '../../../types';
+import type { LyricData, SongResult } from '../../../types';
+
+// Podcast speech must not reuse music matching or stale transcript caches.
+export function usesNativePodcastTranscript(song: SongResult) {
+    return song.sourceRef?.kind === 'online' && song.sourceRef.providerId === 'xiaoyuzhou';
+}
 
 // Preserve supplied timestamps; descriptions and chapter headings never become fabricated lyrics.
 export function podcastTranscriptLyrics(segments: Array<{ startMs: number; text: string }>, durationMs?: number) {

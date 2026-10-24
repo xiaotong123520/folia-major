@@ -559,3 +559,20 @@ describe('instrumental tracks, once auto-match has settled them', () => {
         expect(merged.matchedIsPureMusic).toBe(true);
     });
 });
+
+// Native podcast timing wins over prefetched text and previously matched music lyrics.
+it('loads podcast transcript directly without stale cache or lyric auto matching', async () => {
+    vi.clearAllMocks();
+    const native = { lines: [], isWordByWord: false };
+    lyricsMock.mockResolvedValueOnce({ lyrics: native });
+    const onLyrics = vi.fn();
+    const onDone = vi.fn();
+    await loadOnlineSongLyrics({ ...song, sourceRef: { kind: 'online', providerId: 'xiaoyuzhou', mediaId: 'episode' } },
+        { lyrics: { lines: [{ fullText: 'stale' }] } } as any, null,
+        { isCurrent: () => true, onLyrics, onDone });
+    expect(onLyrics).toHaveBeenCalledWith(native);
+    expect(onDone).toHaveBeenCalledOnce();
+    expect(songCacheMock).not.toHaveBeenCalled();
+    expect(loadLyricsStateMock).not.toHaveBeenCalled();
+    expect(autoMatchMock).not.toHaveBeenCalled();
+});
