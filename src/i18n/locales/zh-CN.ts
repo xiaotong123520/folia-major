@@ -2,6 +2,7 @@
 
 export default {
   "podcast": {
+    "followPlayback": "跟随播放",
     "transcript": "文稿 / 简介",
     "transcriptAvailable": "已读取平台文稿（{{count}} 句）",
     "noTranscript": "平台未返回字幕。本页简介和章节不等于逐字稿。",

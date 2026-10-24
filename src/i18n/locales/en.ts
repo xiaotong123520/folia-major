@@ -2,6 +2,7 @@
 
 export default {
   "podcast": {
+    "followPlayback": "Follow playback",
     "transcript": "Transcript / notes",
     "transcriptAvailable": "Platform transcript loaded ({{count}} lines)",
     "noTranscript": "No transcript returned. Notes and chapters are not a verbatim transcript.",

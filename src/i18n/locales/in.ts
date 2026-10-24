@@ -2,6 +2,7 @@
 
 export default {
   "podcast": {
+    "followPlayback": "Ikuti pemutaran",
     "transcript": "Transkrip / catatan",
     "transcriptAvailable": "Transkrip dimuat ({{count}} baris)",
     "noTranscript": "Platform tidak mengembalikan transkrip. Catatan dan bab bukan transkrip kata demi kata.",
