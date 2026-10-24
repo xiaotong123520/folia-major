@@ -80,13 +80,10 @@ export const publishMediaSessionTrack = (
     createMetadata: MediaSessionMetadataFactory = init => new MediaMetadata(init)
 ) => {
     const positionState = createMediaSessionPositionState(audio);
-    if (!positionState) {
-        return false;
-    }
 
     // Position reporting is optional; a browser rejection must not suppress artwork and title.
     try {
-        mediaSession.setPositionState?.(positionState);
+        if (positionState) mediaSession.setPositionState?.(positionState);
     } catch (error) {
         console.warn('[MediaSession] Position unavailable; publishing track metadata', error);
     }

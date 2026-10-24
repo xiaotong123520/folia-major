@@ -141,12 +141,15 @@ export const useMediaSessionBridge = ({
         let artworkUrl = getSupportedMediaSessionArtworkUrl(sourceArtworkUrl, document.baseURI);
         let disposableArtworkUrl: string | null = null;
         const publish = () => {
-            if (disposed || !isMediaSessionSourceReady(audio, audioSrc, document.baseURI)) {
+            if (disposed) {
                 return;
             }
 
             try {
-                publishMediaSessionTrack(navigator.mediaSession, audio, {
+                // Safari may report a redirected currentSrc. That must not hide the track entirely.
+                const timeline = isMediaSessionSourceReady(audio, audioSrc, document.baseURI)
+                    ? audio : { currentTime: 0, duration: Number.NaN, playbackRate: 1 };
+                publishMediaSessionTrack(navigator.mediaSession, timeline, {
                     title: currentSong.name,
                     artist: getSongArtistLabel(currentSong) || unknownArtistLabel,
                     album: getSongAlbumLabel(currentSong),
