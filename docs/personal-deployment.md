@@ -2,7 +2,23 @@
 
 ## 已实现与仍需配置
 
-前端可从 `VITE_MUSIC_BACKEND_BASE_URL` 指定的自有 HTTPS 服务调用音乐接口。地址为空时关闭服务器能力，不假装已部署。此代码包不包含你的服务器地址、SSH 凭据或平台 Cookie，因此还不能宣称服务器已上线或真实在线音乐已验收。
+前端可从 `VITE_MUSIC_BACKEND_BASE_URL` 指定的自有 HTTPS 服务调用音乐接口。地址为空时关闭此通用后端能力；它与内置的 `hearttrace` 服务器来源是两个独立适配器。部署配置和代码存在不等于所有音乐来源已通过验收。
+
+截至 2026-10-24，当前 Vercel 部署的服务器来源已在浏览器观察到音频加载成功、播放进度持续前进。网易云窗口曾显示已登录，网易云与 QQ 扫码授权后的在线播放仍未完成验收。主屏幕安全区适配通过类型检查和生产构建，真实 iPhone 仍待验收。不在文档或仓库保存 SSH 凭据、平台 Cookie 或服务端密钥。
+
+## 当前 Vercel 平台后端配置
+
+| 变量 | 当前值或用途 | 位置 |
+| --- | --- | --- |
+| `VITE_NETEASE_API_BASE` | `https://tongsheng-netease-api.vercel.app`，独立网易云后端 | 前端公开配置 |
+| `VITE_QQ_API_BASE` | `/api/qq`，仓库内置 QQ 后端 | 前端公开配置 |
+| `QQ_SESSION_SECRET` | 足够长的随机会话加密密钥；不公开实际值 | Vercel 服务端 Secret |
+| `VITE_INITIAL_ONLINE_PROVIDER` | `hearttrace`，仅作首次访问默认值，已保存的平台选择优先 | 前端公开配置 |
+| `VITE_LIBRARY_INITIAL_SUITE` | `grid`，无已保存偏好时的资料库界面 | 前端公开配置 |
+
+Vercel 的 QQ 后端提供手机 QQ 与微信扫码；QQ 音乐 App 扫码需要不同的运行环境，不能把 Vercel 上的登录入口当作支持该方式的证据。具体配置见 [QQ 后端说明](../deploy/docker/qq-api/README.md)。
+
+服务端密钥不能使用 `VITE_` 前缀，也不能提交 `.env.local`、会话或 Cookie。修改 Vercel 环境变量后要重新部署。GitHub Pages 只有静态文件，无法运行 `/api/qq`：Pages 的 `VITE_QQ_API_BASE` 需配置可跨域访问的独立 HTTPS 后端完整根地址，并单独设置 Actions Variables 后重新构建。Vercel 与 Pages 的配置不会自动同步。
 
 现有 API 若不符合以下契约，需要编写服务端适配。不要直接把带密钥的第三方解析地址填进前端。
 

@@ -1,8 +1,9 @@
 # 桐声音乐
 
-手机和电脑使用同一套 React + TypeScript + Vite + Zustand 网页代码。主分支发布到：
+手机和电脑使用同一套 React + TypeScript + Vite + Zustand 网页代码。
 
-**https://xiaotong123520.github.io/folia-major/**
+- [当前 Vercel 站点](https://folia-major-ai-radio-preview.vercel.app/)：已部署前端与内置 QQ 后端。
+- [GitHub Pages 预览](https://xiaotong123520.github.io/folia-major/)：静态前端；更新以 Pages 工作流成功为准，推送源码不等于该地址已更新。
 
 右上角「桐声音乐」菜单包含音乐文件导入、分享链接解析、电台与 Apple Music 官方授权。可将网页添加到手机主屏幕作为 PWA 使用。
 
@@ -11,6 +12,8 @@
 网页版扫码登录需配置真实的平台后端。Pages 构建读取仓库 Actions Variables 中的 `VITE_NETEASE_API_BASE`、`VITE_QQ_API_BASE`、`VITE_KUGOU_API_BASE`，分别填写对应服务的公开 HTTPS 根地址后重新发布。外部点歌接口不属于平台账户登录后端，且可用性与内容授权尚未经过验证。各平台可用登录方式由现有登录窗口显示；同一手机能否识别二维码取决于平台 App 支持。未配置后端时不能完成扫码登录。
 
 ## 当前能力
+
+截至 2026-10-24：服务器来源已在浏览器实测音频加载和播放进度持续前进；网易云登录窗口曾显示已登录，但扫码授权后的在线歌曲播放尚未完成验收，QQ 登录后的播放也未验收。服务器歌曲能播不能作为平台歌曲能播的证据。真实 iPhone 的主屏幕模式、横屏和后台播放仍需实机确认。
 
 - 本地音频：通过普通文件选择器导入，兼容没有文件夹访问 API 的手机浏览器；使用原生音频控件播放。
 - 刷新恢复：音频字节和网络直链保存在当前浏览器的 IndexedDB，重新打开后恢复队列，不会恢复已经失效的 blob URL。浏览器空间不足时显示提示。不会上传文件。
@@ -24,6 +27,7 @@
 ## 发布与上游更新
 
 - `.github/workflows/deploy-github-pages.yml`：main 更新后执行类型检查、音乐功能单测、网关测试、生产构建与 Pages 发布。
+- Vercel 关联同一仓库的 main；环境变量修改后需重新部署。两种托管的构建配置独立，Vercel 环境变量不会自动同步到 GitHub Actions Variables。若 Actions 被停用，Pages 不会随 main 自动更新。
 - GitHub Pages 使用 Actions 作为来源，`folia-pages-preview` 环境只允许 main 部署。
 - `.github/workflows/sync-upstream.yml`：每天北京时间 10:00 检查上游，将可合并更新同步到按上游提交命名的待审查分支，不执行上游代码，不修改 main，不直接发布。已有同名审查分支不会被覆盖；合并冲突会在 Actions 摘要列出文件。
 - 无需放宽机器人创建/批准 PR 的权限。打开 Actions 运行摘要中的比较链接创建 PR，通过检查和审查后合并，现有 Pages 流程会统一更新手机和电脑网站。
@@ -46,7 +50,20 @@ AI 电台同时查询服务器目录与当前平台，仍通过 Omni 播放。�
 
 ## 手机封面墙
 
+手机首次进入资料库时，保存的 Bravais 桌面墙面偏好会在本次会话回退为 Grid，不覆盖保存值。切换音乐源后，若当前分类不受支持，会优先进入可用的专辑分类，避免停在空歌单页。新部署可用 `VITE_INITIAL_ONLINE_PROVIDER=hearttrace` 设置首次访问来源，已有平台选择优先；`VITE_LIBRARY_INITIAL_SUITE=grid` 设置无保存偏好时的初始界面。
+
 窄屏下资料库墙与队列拼贴使用普通页面切换，避免翻牌交接时同时保留两面墙；两种墙减少屏幕外的封面预渲染。手机资料库显示期间卸载墙后的歌词动画，返回播放页时恢复；音频播放不受影响。触摸设备不使用封面悬停滤镜，工具菜单为底部播放卡片和进度条留出空间。歌词与两种墙的导航功能仍保留。Safari 的进程内存限制需在真实 iPhone 上验证。
+
+## 添加到主屏幕与尺寸适配
+
+iPhone 在 Safari 打开站点，通过「分享 → 添加到主屏幕」安装。主屏幕入口与 Safari、Vercel 与 Pages 可能使用不同的本地数据和登录状态；一个入口登录成功，不代表其他入口已登录。
+
+- 手机网页容器使用动态视口高度，预留顶部状态栏、底部手势条以及横屏左右安全区。
+- 浮动控件以安全区内的容器定位，避免重复计算边距；本地播放器与工具菜单限制高度并支持内部滚动。
+- 手机输入框至少 16px，减少聚焦搜索框时 Safari 自动放大页面。
+- 更新后先关闭主屏幕应用，再联网重新打开，让自动更新的 Service Worker 获取新版。若仍是旧版，可先用 Safari 打开同一地址刷新；不要通过清空网站数据更新，以免丢失本地导入和保存内容。
+
+适配实现见 `src/components/app/AppShell.tsx`、`src/index.css`、`src/components/app/PersonalMusicTools.tsx` 和 `src/components/app/ImportedAudioPlayer.tsx`。类型检查和生产构建已通过；不能据此认定真实 iPhone 的尺寸验收已完成。
 
 ## 手机后台播放
 
