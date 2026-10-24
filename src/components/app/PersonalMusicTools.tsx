@@ -1,12 +1,13 @@
 import type { UnifiedSong } from '../../types';
 import { lazy, Suspense, useState } from 'react';
-import { AudioLines, Film, LayoutGrid, Link2, Music2, QrCode, Radio, Server, X } from 'lucide-react';
+import { AudioLines, Film, LayoutGrid, Link2, Music2, Podcast, QrCode, Radio, Server, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { openLoginWindow } from '../login/loginWindowStore';
 import Sheet from '../shared/Sheet';
 
 // One toolbar and the original application surfaces on every viewport; no separate phone homepage.
 const HearttraceLibrary = lazy(() => import('./hearttraceLibrary/HearttraceLibrary'));
+const PodcastLibrary = lazy(() => import('./xiaoyuzhou/PodcastLibrary'));
 export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideos, onPlayServerSong, onOpenLibrary }: {
     onOpenLibrary: (tab: 'albums' | 'radio') => void;
     onPlayServerSong: (song: UnifiedSong) => void;
@@ -18,10 +19,12 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideo
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [serverOpen, setServerOpen] = useState(false);
+    const [podcastOpen, setPodcastOpen] = useState(false);
     const actions = [
         { icon: LayoutGrid, label: t('hearttraceLibrary.wall'), run: () => onOpenLibrary('albums') },
         { icon: Radio, label: t('radioAgent.savedWall'), run: () => onOpenLibrary('radio') },
         { icon: Server, label: t('hearttraceLibrary.title'), run: () => setServerOpen(true) },
+        { icon: Podcast, label: t('podcast.title'), run: () => setPodcastOpen(true) },
         { icon: QrCode, label: t('mobileAccess.accounts'), run: () => openLoginWindow() },
         { icon: Link2, label: t('personal.import'), run: onImport },
         { icon: Radio, label: t('radioAgent.open'), run: onRadio },
@@ -49,6 +52,11 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideo
         <Sheet isOpen={serverOpen} onClose={() => setServerOpen(false)} title={t('hearttraceLibrary.title')} closeTip={t('hearttraceLibrary.close')} size="m">
             {serverOpen && <Suspense fallback={<p role="status">{t('hearttraceLibrary.loading')}</p>}>
                 <HearttraceLibrary onPlaySong={song => { setServerOpen(false); onPlayServerSong(song); }} />
+            </Suspense>}
+        </Sheet>
+        <Sheet isOpen={podcastOpen} onClose={() => setPodcastOpen(false)} title={t('podcast.title')} closeTip={t('podcast.close')} size="m">
+            {podcastOpen && <Suspense fallback={<p role="status">{t('podcast.loading')}</p>}>
+                <PodcastLibrary onLogin={() => setPodcastOpen(false)} onPlaySong={song => { setPodcastOpen(false); onPlayServerSong(song); }} />
             </Suspense>}
         </Sheet>
     </>;

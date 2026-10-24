@@ -1,6 +1,25 @@
 
 
 export default {
+  "podcast": {
+    "title": "Xiaoyuzhou podcasts",
+    "description": "Listen to public shows without signing in. Sign in optionally for subscriptions and episode search.",
+    "public": "Public shows",
+    "subscriptions": "My subscriptions",
+    "optionalLogin": "Optional: sign in",
+    "search": "Paste a full Xiaoyuzhou link, or search after signing in",
+    "open": "Open / search",
+    "publicHint": "Public show and episode links work without an account. Public pages may contain only the latest 15 episodes. Account features depend on upstream availability.",
+    "loginTitle": "Sign in to Xiaoyuzhou",
+    "loginNote": "Scan with the Xiaoyuzhou app and confirm. Signing in is optional; public listening remains available. Third-party sign-in may trigger account restrictions.",
+    "back": "Back to shows",
+    "minutes": "min",
+    "loading": "Loading podcasts…",
+    "failed": "Could not load podcasts. Please retry.",
+    "empty": "No content yet.",
+    "more": "Load more",
+    "close": "Close podcasts"
+},
   "hearttraceLibrary": {
     "wall": "Server album cover wall",
     "defaultRadio": "Server music radio",

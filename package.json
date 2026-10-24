@@ -19,7 +19,7 @@
     "dev": "vite",
     "dev:probe": "vite --open /dev-probe.html",
     "build": "npm run build:vercel-api && vite build",
-    "build:vercel-api": "tsc -p api-ts/tsconfig.json",
+    "build:vercel-api": "tsc -p api-ts/tsconfig.json && node dev/buildPodcastApi.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "codemap": "node dev/mcp/ts-code-map/codemap.mjs",
@@ -247,7 +247,8 @@
     "music-metadata": "^11.16.1",
     "qishui-music-api": "0.2.2",
     "ws": "^8.21.3",
-    "youtubei.js": "18.1.0"
+    "youtubei.js": "18.1.0",
+    "qrcode": "1.5.4"
   },
   "devDependencies": {
     "@applemusic-like-lyrics/ttml": "^1.0.1",

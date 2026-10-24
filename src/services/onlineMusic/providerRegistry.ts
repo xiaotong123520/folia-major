@@ -11,6 +11,7 @@ import { spotifyProvider } from './spotify/spotifyProvider';
 import { musicBackendProvider } from './music-backend/musicBackendProvider';
 import { hearttraceProvider } from './hearttrace/hearttraceProvider';
 import { qishuiProvider } from './qishui/qishuiProvider';
+import { xiaoyuzhouProvider } from './xiaoyuzhou/xiaoyuzhouProvider';
 
 // src/services/onlineMusic/providerRegistry.ts
 
@@ -116,3 +117,4 @@ registerOnlineMusicProvider(spotifyProvider);
 registerOnlineMusicProvider(musicBackendProvider);
 registerOnlineMusicProvider(hearttraceProvider);
 registerOnlineMusicProvider(qishuiProvider);
+registerOnlineMusicProvider(xiaoyuzhouProvider);

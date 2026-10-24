@@ -62,6 +62,12 @@ describe('online provider account home view', () => {
 });
 
 describe('picking a provider', () => {
+    it('opens an optional-account public source without requiring a login', () => {
+        const publicProvider = { ...provider('anonymous'), requiresAccount: true, publicLibrary: true };
+        expect(canSwitchToProviderDirectly(publicProvider)).toBe(true);
+        expect(resolveOnlineProviderAccountView({ provider: publicProvider, hasUser: false, platformAvailable: true })).toBe('public');
+        expect(resolveOnlineProviderAccountView({ provider: publicProvider, hasUser: true, platformAvailable: true })).toBe('authenticated');
+    });
     it('switches directly when signed in or when there is nothing to sign in to', () => {
         expect(canSwitchToProviderDirectly(provider('authenticated'))).toBe(true);
         expect(canSwitchToProviderDirectly(accountlessProvider())).toBe(true);

@@ -23,11 +23,12 @@ export const resolveOnlineProviderAccountView = ({
 }): OnlineProviderAccountView => {
     if (isAccountless(provider)) return provider?.publicLibrary ? 'public' : 'accountless';
     if (hasUser) return 'authenticated';
+    if (provider?.publicLibrary) return 'public';
     if (platformAvailable && (provider?.hydration === 'loading' || provider?.status === 'unknown')) return 'resolving';
     return 'guest';
 };
 
 /** Whether picking the provider switches to it now (signed in, or nothing to sign in to) rather than signing in first. */
 export const canSwitchToProviderDirectly = (provider: ProviderAccountSummary): boolean => (
-    provider.status === 'authenticated' || isAccountless(provider)
+    provider.status === 'authenticated' || isAccountless(provider) || Boolean(provider.publicLibrary)
 );

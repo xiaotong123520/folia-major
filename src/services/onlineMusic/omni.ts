@@ -659,6 +659,13 @@ export const omni = {
         return withActiveProvider(async provider => provider.library?.getUserPlaylists?.(userId, page.limit, page.offset) ?? emptyPage(page.offset));
     },
 
+    async getProviderCollections(providerId: OmniProviderId, userId: MediaId | null, page: PageInput): Promise<OmniPage<OmniCollection>> {
+        const provider = requireOnlineMusicProvider(providerId);
+        if (userId != null) return provider.library?.getUserPlaylists?.(userId, page.limit, page.offset) ?? emptyPage(page.offset);
+        const items = await (provider.recommendations?.getRecommendedCollections?.(page.offset + page.limit) ?? Promise.resolve([]));
+        return { items: items.slice(page.offset, page.offset + page.limit), total: items.length, nextOffset: items.length, hasMore: false };
+    },
+
     // Reads who is signed in to a provider, their playlists and their liked songs from the
     // platform, and settles them in the account store (account/accountRead.ts): at app start,
     // after a sign-in, at a platform switch and for the sync button. A read asked for while one

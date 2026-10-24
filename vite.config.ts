@@ -158,7 +158,8 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
 
   let commitSuffix = '';
   const canResolveCommitName = /^[0-9a-f]{7,40}$/i.test(commitHash) && !/^0+$/.test(commitHash);
-  if (canResolveCommitName) {
+  // Commit nicknames are cosmetic: builds do not contact that optional service by default.
+  if (canResolveCommitName && process.env.FOLIA_RESOLVE_COMMIT_NAME === 'true') {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2000);

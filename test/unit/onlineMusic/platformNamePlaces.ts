@@ -21,7 +21,7 @@ export const PLACE_KINDS = {
 export type PlaceKind = keyof typeof PLACE_KINDS;
 
 export interface PlatformNamePlace {
-    n: Partial<Record<'netease' | 'qq' | 'kugou' | 'bodian' | 'ytm' | 'spotify' | 'qishui', number>>;
+    n: Partial<Record<'netease' | 'qq' | 'kugou' | 'bodian' | 'ytm' | 'spotify' | 'qishui' | 'xiaoyuzhou', number>>;
     // The kind of the file's lines of code; its comment lines are counted as comments.
     kind: PlaceKind;
     // What the lines are, where the kind alone does not say it.
@@ -29,6 +29,10 @@ export interface PlatformNamePlace {
 }
 
 export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
+    'api-ts/podcast.ts': { n: { xiaoyuzhou: 6 }, kind: 'main', why: 'same-origin podcast backend entry and known upstream hosts' },
+    'api-ts/xiaoyuzhou/session.ts': { n: { qq: 1 }, kind: 'stored', why: 'existing server secret is a fallback seed with a separate podcast purpose' },
+    'api/podcast.js': { n: { qq: 1, xiaoyuzhou: 18 }, kind: 'main', why: 'generated single serverless podcast entry' },
+    'src/components/app/PersonalMusicTools.tsx': { n: { xiaoyuzhou: 1 }, kind: 'list', why: 'lazy registration of the optional podcast surface' },
     'src/services/directPointSong.ts': { n: { netease: 5, qq: 12 }, kind: 'stored', why: 'three public point-song API endpoint hosts and source IDs for browser-only GitHub Pages; no provider login, entitlement or transport internals' },
     'src/components/app/MusicLinkImport.tsx': { n: { netease: 1, qq: 4 }, kind: 'text', why: 'three platform labels and direct import buttons in the user-selected browser-only point-song dialog' },
     'src/components/app/ImportedAudioPlayer.tsx': { n: { qq: 1 }, kind: 'text', why: 'visible fallback message for the user-selected QQ direct audio candidate' },
@@ -105,7 +109,7 @@ export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
     'src/services/onlineMusic/omni.ts': { n: { netease: 5, kugou: 2 }, kind: 'doc' },
     'src/services/onlineMusic/providerAccountCache.ts': { n: { kugou: 1 }, kind: 'doc' },
     'src/services/onlineMusic/music-backend/musicBackendProvider.ts': { n: { netease: 1, qq: 1, kugou: 1 }, kind: 'list', why: 'the self-hosted aggregate backend contract allowlists its supported source identifiers' },
-    'src/services/onlineMusic/providerRegistry.ts': { n: { netease: 2, qq: 2, kugou: 2, bodian: 2, ytm: 2, spotify: 4, qishui: 2 }, kind: 'list' },
+    'src/services/onlineMusic/providerRegistry.ts': { n: { netease: 2, qq: 2, kugou: 2, bodian: 2, ytm: 2, spotify: 4, qishui: 2, xiaoyuzhou: 2 }, kind: 'list' },
     'src/services/onlineMusic/qq/qqProvider.ts': { n: { kugou: 1 }, kind: 'doc' },
     'src/services/onlineMusic/qq/qqTransport.ts': { n: { netease: 1 }, kind: 'doc' },
     'src/services/onlineMusic/resourceCache.ts': { n: { netease: 2 }, kind: 'doc' },

@@ -1,6 +1,25 @@
 
 
 export default {
+  "podcast": {
+    "title": "小宇宙播客",
+    "description": "不登录也能听公开节目；登录后可读取我的订阅并搜索全站单集。",
+    "public": "公开节目",
+    "subscriptions": "我的订阅",
+    "optionalLogin": "可选：扫码登录",
+    "search": "粘贴小宇宙完整链接，或登录后搜索",
+    "open": "打开 / 搜索",
+    "publicHint": "免登录支持公开节目及单集完整链接；公开列表可能只展示最近约 15 集。账号功能取决于平台接口。",
+    "loginTitle": "登录小宇宙",
+    "loginNote": "使用小宇宙 App 扫码并确认。登录为可选项，关闭窗口仍可收听公开节目。第三方登录可能触发平台风控。",
+    "back": "返回节目列表",
+    "minutes": "分钟",
+    "loading": "正在读取播客…",
+    "failed": "播客读取失败，请重试。",
+    "empty": "暂无内容。",
+    "more": "加载更多",
+    "close": "关闭播客"
+},
   "hearttraceLibrary": {
     "wall": "服务器专辑封面墙",
     "defaultRadio": "服务器音乐电台",

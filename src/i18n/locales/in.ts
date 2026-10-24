@@ -1,6 +1,25 @@
 
 
 export default {
+  "podcast": {
+    "title": "Podcast Xiaoyuzhou",
+    "description": "Dengarkan acara publik tanpa masuk. Masuk opsional untuk langganan dan pencarian episode.",
+    "public": "Acara publik",
+    "subscriptions": "Langganan saya",
+    "optionalLogin": "Opsional: masuk",
+    "search": "Tempel tautan lengkap Xiaoyuzhou atau cari setelah masuk",
+    "open": "Buka / cari",
+    "publicHint": "Tautan acara dan episode publik dapat dibuka tanpa akun. Halaman publik mungkin hanya memuat 15 episode terbaru. Fitur akun bergantung pada layanan platform.",
+    "loginTitle": "Masuk ke Xiaoyuzhou",
+    "loginNote": "Pindai dengan aplikasi Xiaoyuzhou lalu konfirmasi. Masuk bersifat opsional. Login pihak ketiga dapat memicu pembatasan akun.",
+    "back": "Kembali ke acara",
+    "minutes": "menit",
+    "loading": "Memuat podcast…",
+    "failed": "Gagal memuat podcast. Coba lagi.",
+    "empty": "Belum ada konten.",
+    "more": "Muat lagi",
+    "close": "Tutup podcast"
+},
   "hearttraceLibrary": {
     "wall": "Dinding sampul album server",
     "defaultRadio": "Radio musik server",
