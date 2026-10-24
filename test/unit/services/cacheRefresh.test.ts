@@ -7,7 +7,7 @@ describe('cache recovery', () => {
     it('removes only app resources and keeps account/local music storage untouched', async () => {
         const unregister = vi.fn(async () => true);
         const unrelated = vi.fn(async () => true);
-        const remove = vi.fn(async () => true);
+        const remove = vi.fn(async (_name: string) => true);
         const storageClear = vi.fn();
         const databaseDelete = vi.fn();
         const replace = vi.fn();
