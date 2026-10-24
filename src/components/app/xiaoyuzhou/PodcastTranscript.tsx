@@ -44,7 +44,7 @@ export default function PodcastTranscript({ song }: { song: UnifiedSong }) {
         {open && <>
         {lines.length > 0 && <button type="button" aria-pressed={follow} onClick={() => setFollow(value => !value)}
             className="min-h-11 rounded-lg px-3 text-sm">{t('podcast.followPlayback')}</button>}
-        <div ref={reader} className="relative max-h-[44dvh] space-y-3 overflow-y-auto overscroll-contain rounded-xl border border-[var(--st-line)] p-3 text-base leading-8">
+        <div ref={reader} className="relative max-h-[min(30dvh,280px)] space-y-3 overflow-y-auto overscroll-contain rounded-xl border border-[var(--st-line)] p-3 text-base leading-8">
             {busy ? <p role="status">{t('podcast.loading')}</p> : <>
                 {error && <p role="alert">{error}</p>}
                 {lines.length ? <><p className="font-medium">{t('podcast.transcriptAvailable', { count: lines.length })}</p>{lines.map((line, index) => <p key={index}
