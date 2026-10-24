@@ -1,3 +1,4 @@
+import type { PersonalFmCatalog, PersonalFmSelection } from './personalFm';
 import type { LyricData, ReplayGainInfo, SongResult, UnifiedSong } from '../types';
 
 // src/types/onlineMusic.ts
@@ -121,6 +122,12 @@ export interface ProviderAudioSource {
      * playback and the media cache ask.
      */
     preview?: boolean;
+    /**
+     * Where the preview clip starts inside the song, in milliseconds. Only meaningful with `preview`;
+     * absent means the clip starts at the song's start. Playback reads it with the URL
+     * (`omni.previewClipStartMsOfAudioSource`) to line the lyrics up with the clip.
+     */
+    clipStartMs?: number;
 }
 
 export type ProviderSongAvailabilityState = 'playable' | 'unavailable' | 'unknown';
@@ -197,6 +204,8 @@ export interface ProviderHistoryEntry {
 }
 
 export interface ProviderCollection {
+    /** A provider's named radio stream: selecting the card starts FM with this mode. */
+    personalFm?: PersonalFmSelection;
     providerId: OnlineProviderId;
     id: MediaId;
     name: string;
@@ -551,6 +560,12 @@ export interface OnlineAuthProvider {
      * no snapshot is found; null where there is nothing. Only for an adapter that had such caches.
      */
     oldKeptAccount?(): Promise<{ user: ProviderUser; collections: ProviderCollection[]; likedSongIds: MediaId[] } | null>;
+    /**
+     * What `oldKeptAccount` answered has been saved as the snapshot: the adapter removes those caches,
+     * so that they are not made a snapshot again over a newer one. Not called where the save failed:
+     * the caches are then asked for again at the next start. Never rejects.
+     */
+    forgetOldKeptAccount?(): Promise<void>;
     // 登录窗口里这个平台自己的标题和说明。
     getLoginTexts?(): LoginTexts;
     // 登录要靠的本地服务：它没起来时登录窗口显示它的错误原话和重启的按钮。
@@ -659,6 +674,7 @@ export interface PersonalFmRequestOptions {
 }
 
 export interface OnlineRecommendationProvider {
+    getPersonalFmCatalog?(): Promise<PersonalFmCatalog>;
     getDailySongs?(refresh?: boolean): Promise<UnifiedSong[]>;
     getPersonalFm?(options?: PersonalFmRequestOptions): Promise<UnifiedSong[]>;
     getRecommendedCollections?(limit: number): Promise<ProviderCollection[]>;

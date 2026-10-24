@@ -17,15 +17,18 @@ import type { LyricStaffAbsorbMode, LyricStaffPolicy } from '../../utils/lyrics/
 import type { AudioEqualizerModeId } from '../../utils/audioEqualizer';
 import type { ThemeGenerationSource } from '../../services/themePreferences';
 import type { TransitionMode } from '../../services/automix/transitionStrategy';
+import type { PersonalFmCatalog } from '../../types/personalFm';
 import type { PersonalFmSelection } from '../../services/onlineMusic/fmModes';
 import type { QueueBatchAction, QueueFacetKind } from './queueQuery';
 import type { CommandPlatform } from './availability';
 import type { CommandPaletteSurface } from './surfaces/types';
 import type { CommandSyntaxSpec } from './syntax/types';
 import type { PlaybackEntryView } from '../../stores/usePlaybackEntryViewStore';
+import type { GpuPreference } from '../../stores/useDesktopSettingsStore';
 import type { PonderHintVisibility } from '../../types/ponder';
 import type { LibraryWallLook } from '../../utils/libraryWallLook';
 import type { LibraryWallSeamStyle } from '../../utils/libraryWallSeamStyle';
+import type { LibraryWallSeamDirection } from '../../utils/libraryWallSeamDirection';
 
 // src/components/command-palette/types.ts
 // Shared command palette contracts used by the registry, hook, and UI shell.
@@ -167,6 +170,7 @@ export type CommandPalettePlaybackContext = {
     /** Personal FM owns the queue while it is on air; queue commands stand down. */
     isFmMode: boolean;
     personalFmSelection: PersonalFmSelection;
+    personalFmCatalog?: PersonalFmCatalog;
     /** Only the providers that actually implement FM modes offer the picker. */
     isPersonalFmModeSupported: boolean;
     setPersonalFmSelection: (selection: PersonalFmSelection) => Promise<void> | void;
@@ -280,6 +284,9 @@ export type CommandPaletteSettingsContext = {
     /** Lyrics / blur on the visualizer that shows through the bravais wall: flip the stored values. */
     toggleLibraryWallBackdropLyrics: () => void;
     toggleLibraryWallBackdropBlur: () => void;
+    /** Which way the bravais info strip opens (useLibraryWallLookStore.seamDirection: auto / vertical / horizontal); read live. */
+    libraryWallSeamDirection: () => LibraryWallSeamDirection;
+    setLibraryWallSeamDirection: (direction: LibraryWallSeamDirection) => void;
     ponderHintVisibility: PonderHintVisibility;
     setPonderHintVisibility: (visibility: PonderHintVisibility) => void;
     /** 触屏上那颗思索按钮显不显示。它是触屏唯一的入口，所以关掉是一个明确的选择。 */
@@ -338,6 +345,8 @@ export type CommandPaletteSettingsContext = {
     modSystemEnabled: boolean;
     toggleVoiceInputPause: () => void;
     togglePreventDisplaySleepDuringPlayback: () => void;
+    /** 后台节流: throttle the window and hold the lyric animation while it is minimised or hidden (main process applies it). */
+    toggleBackgroundThrottling: () => void;
     toggleWallpaperMode: () => void;
     /** Close button hides the main window to the tray instead of quitting (main process owns it). */
     toggleCloseToTray: () => void;
@@ -351,6 +360,10 @@ export type CommandPaletteSettingsContext = {
     toggleObsKeepMainWindowAnimation: () => void;
     /** macOS-only: the wallpaper-mode Dock auto-hide override (on by default). */
     toggleWallpaperMacAutohideDock: () => void;
+    /** Windows-only: the saved render GPU choice, read when asked (it can change while the palette is open). */
+    gpuPreference: () => GpuPreference;
+    /** Saves the render GPU choice; the main process applies it on the next launch. */
+    setGpuPreference: (preference: GpuPreference) => void;
     sleepTimerEnabled: boolean;
     setSleepTimerEnabled: (enabled: boolean) => void;
     sleepTimerHours: number;

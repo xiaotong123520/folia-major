@@ -26,6 +26,8 @@
 
 ## 发布与上游更新
 
+本分支同步 Folia [v0.7.22](https://github.com/chthollyphile/folia-major/releases/tag/v0.7.22)，保留桐声音乐的手机与主屏幕适配、服务器曲库、工具菜单和部署配置。上游的汽水音乐与全局快捷键属于桌面功能，不因同步而在手机网页启用。
+
 - `.github/workflows/deploy-github-pages.yml`：main 更新后执行类型检查、音乐功能单测、网关测试、生产构建与 Pages 发布。
 - Vercel 关联同一仓库的 main；环境变量修改后需重新部署。两种托管的构建配置独立，Vercel 环境变量不会自动同步到 GitHub Actions Variables。若 Actions 被停用，Pages 不会随 main 自动更新。
 - GitHub Pages 使用 Actions 作为来源，`folia-pages-preview` 环境只允许 main 部署。

@@ -784,7 +784,7 @@ describe('YouTube Music provider', () => {
         expect(auth.describeLoginFailure!('start', failure)).toMatchObject({ case: 'no-browser' });
         expect(auth.getLoginTexts!().caseNotes?.['no-browser']).toBe('home.loginNoBrowserYtm');
         for (const language of ['zh-CN', 'en', 'in']) {
-            expect(i18n.getFixedT(language)('home.loginNoBrowserYtm')).toMatch(/YouTube Music.+Chrome.+Edge.+Chromium.+Brave/);
+            expect(i18n.getFixedT(language)('home.loginNoBrowserYtm')).toMatch(/YouTube Music.+Chrome.+Beta.+Dev.+Canary.+Edge.+Chromium.+Brave.+Helium/);
         }
     });
 

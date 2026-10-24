@@ -10,6 +10,7 @@ import { ytmProvider } from './ytm/ytmProvider';
 import { spotifyProvider } from './spotify/spotifyProvider';
 import { musicBackendProvider } from './music-backend/musicBackendProvider';
 import { hearttraceProvider } from './hearttrace/hearttraceProvider';
+import { qishuiProvider } from './qishui/qishuiProvider';
 
 // src/services/onlineMusic/providerRegistry.ts
 
@@ -114,3 +115,4 @@ registerOnlineMusicProvider(ytmProvider);
 registerOnlineMusicProvider(spotifyProvider);
 registerOnlineMusicProvider(musicBackendProvider);
 registerOnlineMusicProvider(hearttraceProvider);
+registerOnlineMusicProvider(qishuiProvider);
