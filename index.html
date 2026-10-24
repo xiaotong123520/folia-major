@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="referrer" content="no-referrer" />
-    <meta name="description" content="桐声音乐手机应用：点歌、导入本地音乐、个人音乐电台。支持添加到手机主屏幕。" />
+    <meta name="description" content="听屿 FM手机应用：点歌、导入本地音乐、个人音乐电台。支持添加到手机主屏幕。" />
     <meta name="theme-color" content="#09090b" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="桐声音乐" />
+    <meta name="apple-mobile-web-app-title" content="听屿 FM" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%icon.svg" />
     <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
-    <title>桐声音乐 · 手机与电脑音乐空间</title>
+    <title>听屿 FM · 你的私人音乐电台</title>
     <script src="%BASE_URL%runtime-config.js"></script>
   <script type="importmap">
 {
@@ -86,6 +86,15 @@
         transform-origin: center 78%;
       }
 
+      #app-splash .app-splash-tagline {
+        margin: 0;
+        padding: 0 20px;
+        font: 400 clamp(12px, 3.2vw, 14px)/1.6 system-ui, -apple-system, sans-serif;
+        letter-spacing: 0.16em;
+        color: #a1a1aa;
+        text-align: center;
+      }
+
       /* 循环波形：每根竖条只做 transform 动画，合成器线程执行，不占主线程。 */
       #app-splash .app-splash-wave {
         display: flex;
@@ -141,9 +150,10 @@
     </style>
 </head>
   <body>
-    <div id="app-splash" role="status" aria-live="polite" aria-label="正在打开桐声音乐">
+    <div id="app-splash" role="status" aria-live="polite" aria-label="正在打开听屿 FM">
       <div class="app-splash-inner">
-        <div class="app-splash-title" aria-label="桐声音乐"><span>桐</span><span>声</span><span>音</span><span>乐</span></div>
+        <div class="app-splash-title" aria-label="听屿 FM"><span>听</span><span>屿</span><span>F</span><span>M</span></div>
+        <p class="app-splash-tagline">让喜欢的声音，陪你慢下来</p>
         <div class="app-splash-wave" aria-hidden="true">
           <span></span>
           <span></span>

@@ -30,11 +30,11 @@ export default function VideoLibrary({ onClose }: { onClose: () => void }) {
     const stream = base && current ? videoStreamUrl(base, current.id) : null;
     return (
         <div className="fixed inset-0 z-[150] flex items-end justify-center bg-black/80 p-0 backdrop-blur-lg sm:items-center sm:p-6"
-             role="dialog" aria-modal="true" aria-label="桐声视频库">
+             role="dialog" aria-modal="true" aria-labelledby="video-library-title">
             <section className="flex max-h-[94dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-[#12121a] text-white sm:rounded-3xl">
                 <header className="flex items-center justify-between border-b border-white/10 px-4 py-4 sm:px-6">
                     <div className="min-w-0">
-                        <h2 className="flex items-center gap-2 text-lg font-semibold"><Film size={20}/> 视频库</h2>
+                        <h2 id="video-library-title" className="flex items-center gap-2 text-lg font-semibold"><Film size={20}/> 视频库</h2>
                         <p className="mt-1 text-xs text-white/50">GitHub 前端 · 宝塔服务器音视频存储</p>
                     </div>
                     <button type="button" aria-label="关闭视频库" onClick={onClose}

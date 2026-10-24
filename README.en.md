@@ -1,8 +1,8 @@
-# Tongsheng Music
+# Tingyu FM
 
 A personal mobile and desktop web music player based on Folia.
 
-Synced with upstream [v0.7.22](https://github.com/chthollyphile/folia-major/releases/tag/v0.7.22), retaining Tongsheng mobile/home-screen layouts, server library, tools and deployment configuration. Upstream desktop-only features remain desktop-only.
+Synced with upstream [v0.7.22](https://github.com/chthollyphile/folia-major/releases/tag/v0.7.22), retaining Tingyu FM mobile/home-screen layouts, server library, tools and deployment configuration. Upstream desktop-only features remain desktop-only.
 
 - Current Vercel site: https://folia-major-ai-radio-preview.vercel.app/
 - Static GitHub Pages preview: https://xiaotong123520.github.io/folia-major/ (updated only after a successful Pages workflow).

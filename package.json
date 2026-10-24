@@ -1,8 +1,8 @@
 {
   "name": "folia-major",
-  "productName": "桐声音乐",
+  "productName": "听屿 FM",
   "desktopName": "folia-major.desktop",
-  "description": "桐声音乐 · 手机与电脑共用的音乐空间",
+  "description": "听屿 FM · 手机与电脑共用的音乐空间",
   "author": {
     "name": "xiaotong123520",
     "email": "174346993+xiaotong123520@users.noreply.github.com"
@@ -64,7 +64,7 @@
   },
   "build": {
     "appId": "top.izuna.foliamajor",
-    "productName": "桐声音乐",
+    "productName": "听屿 FM",
     "beforePack": "build/beforePack.cjs",
     "afterPack": "build/afterPack.cjs",
     "electronLanguages": [
