@@ -4,6 +4,9 @@ import { podcastTranscriptLyrics } from '../../../src/services/onlineMusic/xiaoy
 
 // Timed text must keep its units and remain distinct from an absent transcript.
 describe('podcast timed transcript', () => {
+    it('rejects placeholder documents rather than displaying them as real subtitles', () => {
+        expect(() => normalizeTranscript([{ startMs: 0, text: '片段' }, { startMs: 1000, text: '......' }, { startMs: 2000, text: '......' }])).toThrow('占位文稿');
+    });
     it('sorts valid segments and rejects invalid times and empty text', () => {
         expect(normalizeTranscript([{ startMs: 61020, text: ' 后一句 ' }, { startMs: 1200, text: '第一句' }, { startMs: -1, text: '无效' }, { text: '缺时间' }, { startMs: 0, text: '' }])).toEqual([{ startMs: 1200, text: '第一句' }, { startMs: 61020, text: '后一句' }]);
     });

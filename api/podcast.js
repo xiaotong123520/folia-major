@@ -278,7 +278,7 @@ async function accountFetch(req, res, path, body, web = false) {
 //#region api-ts/xiaoyuzhou/transcript.ts
 function normalizeTranscript(raw) {
 	if (!Array.isArray(raw)) throw new PodcastError(502, "字幕格式暂不支持");
-	return raw.flatMap((item) => {
+	const segments = raw.flatMap((item) => {
 		const startMs = Number(item?.startMs);
 		const text = typeof item?.text === "string" ? item.text.trim() : "";
 		return Number.isFinite(startMs) && startMs >= 0 && text ? [{
@@ -286,6 +286,9 @@ function normalizeTranscript(raw) {
 			text
 		}] : [];
 	}).sort((a, b) => a.startMs - b.startMs);
+	const placeholders = segments.filter((item) => /^[.。…\s]+$/.test(item.text)).length;
+	if (placeholders >= 2 && placeholders / segments.length >= .2) throw new PodcastError(502, "平台返回了片段或占位文稿，暂不能作为同步字幕；可先查看下方简介与章节");
+	return segments;
 }
 async function readTranscript(req, res, id) {
 	if (!ID.test(id)) throw new PodcastError(400, "无效单集");
