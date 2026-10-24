@@ -101,6 +101,7 @@ function episode(raw, parent) {
 		author: String(pod?.author || ""),
 		cover: image(raw.image) || image(pod?.image),
 		publishedAt: raw.pubDate || "",
+		description: String(raw.shownotes || raw.description || "").replace(/<\/(?:p|div|li|h[1-6])>|<br\s*\/?\s*>/gi, "\n").replace(/<[^>]*>/g, "").trim(),
 		audio: raw.media?.source?.url || raw.enclosure?.url || "",
 		private: raw.isPrivateMedia === true
 	};

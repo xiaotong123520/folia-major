@@ -2,6 +2,11 @@
 
 export default {
   "podcast": {
+    "transcript": "Transkrip / catatan",
+    "transcriptAvailable": "Transkrip dimuat ({{count}} baris)",
+    "noTranscript": "Platform tidak mengembalikan transkrip. Catatan dan bab bukan transkrip kata demi kata.",
+    "notes": "Catatan dan bab",
+
     "title": "Podcast Xiaoyuzhou",
     "description": "Dengarkan acara publik tanpa masuk. Masuk opsional untuk langganan dan pencarian episode.",
     "public": "Acara publik",

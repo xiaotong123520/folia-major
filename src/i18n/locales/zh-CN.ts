@@ -2,6 +2,11 @@
 
 export default {
   "podcast": {
+    "transcript": "文稿 / 简介",
+    "transcriptAvailable": "已读取平台文稿（{{count}} 句）",
+    "noTranscript": "平台未返回字幕。本页简介和章节不等于逐字稿。",
+    "notes": "节目简介与章节",
+
     "title": "小宇宙播客",
     "description": "不登录也能听公开节目；登录后可读取我的订阅并搜索全站单集。",
     "public": "公开节目",

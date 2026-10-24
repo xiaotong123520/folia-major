@@ -5,7 +5,7 @@ import { podcastApi, podcastAvailable, requestPodcast } from './xiaoyuzhouTransp
 import { podcastTranscriptLyrics } from './xiaoyuzhouLyrics';
 
 // Public share links and optional account subscriptions normalize into the same Omni source.
-type Episode = { id: string; title: string; duration: number; podcastId: string; podcastTitle: string; author: string; cover: string };
+type Episode = { id: string; title: string; duration: number; podcastId: string; podcastTitle: string; author: string; cover: string; description?: string };
 type Podcast = { id: string; title: string; author: string; cover: string; description: string; count: number };
 type Page<T> = { items: T[]; cursor: unknown };
 const providerId = 'xiaoyuzhou';
@@ -17,7 +17,7 @@ export const normalizePodcastEpisode = (raw: unknown): UnifiedSong => {
     return { id: item.id, name: item.title, artists: [{ id: item.podcastId || item.id, name: item.author || item.podcastTitle || '' }],
         album: { id: item.podcastId || item.id, name: item.podcastTitle || '', coverUrl: item.cover || '' },
         durationMs: Math.max(0, Number(item.duration) || 0) * 1000,
-        sourceRef: { kind: 'online', providerId, mediaId: item.id } };
+        sourceRef: { kind: 'online', providerId, mediaId: item.id, ...(item.description ? { providerData: { description: item.description } } : {}) } };
 };
 const collection = (item: Podcast): ProviderCollection => ({ providerId, id: item.id, type: 'playlist', name: item.title,
     coverUrl: item.cover, description: item.description, trackCount: item.count, creator: { id: item.id, nickname: item.author } });

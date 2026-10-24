@@ -27,6 +27,7 @@ export function episode(raw: any, parent?: any) {
     return { id: raw.eid, title: String(raw.title || ''), duration: Math.max(0, Number(raw.duration) || 0),
         podcastId: pod?.pid || raw.pid || '', podcastTitle: String(pod?.title || ''), author: String(pod?.author || ''),
         cover: image(raw.image) || image(pod?.image), publishedAt: raw.pubDate || '',
+        description: String(raw.shownotes || raw.description || '').replace(/<\/(?:p|div|li|h[1-6])>|<br\s*\/?\s*>/gi, '\n').replace(/<[^>]*>/g, '').trim(),
         // Audio addresses are resolved afresh on the server, never saved in frontend song metadata.
         audio: raw.media?.source?.url || raw.enclosure?.url || '', private: raw.isPrivateMedia === true };
 }

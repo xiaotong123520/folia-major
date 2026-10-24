@@ -2,6 +2,11 @@
 
 export default {
   "podcast": {
+    "transcript": "Transcript / notes",
+    "transcriptAvailable": "Platform transcript loaded ({{count}} lines)",
+    "noTranscript": "No transcript returned. Notes and chapters are not a verbatim transcript.",
+    "notes": "Show notes and chapters",
+
     "title": "Xiaoyuzhou podcasts",
     "description": "Listen to public shows without signing in. Sign in optionally for subscriptions and episode search.",
     "public": "Public shows",

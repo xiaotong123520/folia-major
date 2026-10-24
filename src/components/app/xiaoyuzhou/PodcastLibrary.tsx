@@ -6,6 +6,7 @@ import type { OmniCollection } from '../../../types/onlineMusic';
 import { omni } from '../../../services/onlineMusic/omni';
 import { useOnlineProviderAccountStore } from '../../../stores/useOnlineProviderAccountStore';
 import { openLoginWindow } from '../../login/loginWindowStore';
+import PodcastTranscript from './PodcastTranscript';
 
 // One podcast surface: public listening stays available regardless of account status.
 export default function PodcastLibrary({ onPlaySong, onLogin }: { onPlaySong: (song: UnifiedSong) => void; onLogin: () => void }) {
@@ -82,7 +83,7 @@ export default function PodcastLibrary({ onPlaySong, onLogin }: { onPlaySong: (s
             className="flex min-h-16 w-full items-center gap-3 rounded-xl border border-[var(--st-line)] p-3 text-left">
             {song.album.coverUrl && <img src={song.album.coverUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="h-12 w-12 shrink-0 rounded-lg object-cover"/>}
             <span className="min-w-0 flex-1"><span className="block text-sm font-medium">{song.name}</span><span className="mt-1 block text-xs text-[var(--st-t2)]">{song.album.name} · {Math.round(song.durationMs / 60000)} {t('podcast.minutes')}</span></span><Play size={18} className="shrink-0"/>
-        </button></li>)}</ul>}
+        </button><PodcastTranscript song={song} /></li>)}</ul>}
         {busy && <p role="status" className="flex items-center gap-2 text-sm"><LoaderCircle size={18} className="animate-spin"/>{t('podcast.loading')}</p>}
         {!busy && !error && (selected || submitted ? songs.length === 0 : collections.length === 0) && <p className="text-sm">{t('podcast.empty')}</p>}
         {hasMore && <button type="button" disabled={busy} onClick={() => void more()} className="min-h-11 rounded-xl border border-[var(--st-line)] px-4 disabled:opacity-50">{t('podcast.more')}</button>}
