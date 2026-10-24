@@ -340,7 +340,7 @@ async function readTranscript(req, res, id, probe = false) {
 		segmentCount: segments.length,
 		firstStartMs: segments[0]?.startMs,
 		lastStartMs: segments.at(-1)?.startMs,
-		firstText: segments[0]?.text?.slice(0, 240)
+		firstText: segments.find((item) => !/^\[.*\]$/.test(item.text))?.text?.slice(0, 240)
 	};
 	return {
 		status: segments.length ? "available" : "missing",

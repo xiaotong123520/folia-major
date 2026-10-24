@@ -43,6 +43,6 @@ export async function readTranscript(req: any, res: any, id: string, probe = fal
         publicNativeIdFound: Boolean(page?.transcriptMediaId || page?.transcript?.mediaId),
         nativeIdsAgree: !page?.transcriptMediaId || page.transcriptMediaId === ep?.transcriptMediaId,
         segmentCount: segments.length, firstStartMs: segments[0]?.startMs,
-        lastStartMs: segments.at(-1)?.startMs, firstText: segments[0]?.text?.slice(0, 240) };
+        lastStartMs: segments.at(-1)?.startMs, firstText: segments.find(item => !/^\[.*\]$/.test(item.text))?.text?.slice(0, 240) };
     return { status: segments.length ? 'available' : 'missing', segments };
 }
