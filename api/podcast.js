@@ -234,6 +234,15 @@ async function accountFetch(req, res, path, body, web = false) {
 			Market: "AppStore",
 			"x-jike-device-id": session.device,
 			"x-jike-access-token": session.access,
+			...path.startsWith("/v1/episode-transcript/") ? {
+				"User-Agent": "Xiaoyuzhou/2.99.1(android 28)",
+				OS: "android",
+				Manufacturer: "Xiaomi",
+				Model: "MI 6",
+				"App-Version": "2.99.1",
+				"App-BuildNo": "1362",
+				applicationid: "app.podcast.cosmos"
+			} : {},
 			...web ? {
 				Origin: "https://www.xiaoyuzhoufm.com",
 				Referer: "https://www.xiaoyuzhoufm.com/"

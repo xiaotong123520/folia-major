@@ -50,6 +50,10 @@ export async function accountFetch(req: any, res: any, path: string, body?: any,
             'User-Agent': 'Xiaoyuzhou/2.57.1 (build:1576; iOS 17.4.1)', OS: 'ios', Manufacturer: 'Apple',
             Model: 'iPhone14,2', BundleID: 'app.podcast.cosmos', 'App-Version': '2.57.1', 'App-BuildNo': '1576',
             Market: 'AppStore', 'x-jike-device-id': session.device, 'x-jike-access-token': session.access,
+            ...(path.startsWith('/v1/episode-transcript/') ? {
+                'User-Agent': 'Xiaoyuzhou/2.99.1(android 28)', OS: 'android', Manufacturer: 'Xiaomi',
+                Model: 'MI 6', 'App-Version': '2.99.1', 'App-BuildNo': '1362', applicationid: 'app.podcast.cosmos',
+            } : {}),
             ...(web ? { Origin: 'https://www.xiaoyuzhoufm.com', Referer: 'https://www.xiaoyuzhoufm.com/' } : {}) },
         body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(15000),
     });

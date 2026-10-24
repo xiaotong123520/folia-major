@@ -14,6 +14,9 @@ describe('podcast timed transcript', () => {
         const result = podcastTranscriptLyrics([{ startMs: 61020, text: '这一句\n继续' }]);
         expect(result.mainText).toBe('[01:01.02]这一句 继续');
         expect(result.lyrics?.lines.find(line => line.fullText === '这一句 继续')?.startTime).toBeCloseTo(61.02);
+        expect(result.lyrics?.isWordByWord).toBe(false);
+        expect(result.lyrics?.lines[0].words).toHaveLength(1);
+        expect(result.lyrics?.lines).toHaveLength(1);
     });
     it('returns no lyrics when the upstream has no transcript', () => {
         expect(podcastTranscriptLyrics([]).lyrics).toBeNull();

@@ -61,7 +61,7 @@ export const xiaoyuzhouProvider: OnlineMusicProvider = {
             const ref = song.sourceRef;
             if (ref?.kind !== 'online' || ref.providerId !== providerId) throw new OnlineProviderError('unsupported', 'Wrong podcast source', providerId);
             const result = await requestPodcast<{ status: string; segments: Array<{ startMs: number; text: string }> }>('transcript', { id: String(ref.mediaId) });
-            return podcastTranscriptLyrics(result.segments);
+            return podcastTranscriptLyrics(result.segments, song.durationMs);
         },
     },
     songMetadata: { getSongMetadata: createProviderSongMetadata },
