@@ -14,6 +14,17 @@ const request = (body: unknown, cookie = '') => ({ method: 'POST', url: '/api/po
     headers: { 'content-type': 'application/json', 'x-podcast-request': '1', origin: 'https://music.test', host: 'music.test', cookie } });
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 describe('podcast HTTP boundary', () => {
+    it('forwards a single audio range without forwarding any account cookie to the CDN', async () => {
+        const id = 'aaaaaaaaaaaaaaaaaaaaaaaa';
+        const fetcher = vi.fn(async (url, init) => String(url).includes('/episode/')
+            ? new Response(`<script id="__NEXT_DATA__" type="application/json">${JSON.stringify({ props: { pageProps: { episode: { eid: id, title: 'Range test', enclosure: { url: 'https://media.xyzcdn.net/test.m4a' } } } } })}</script>`)
+            : new Response(null, { status: 206, headers: { 'content-type': 'audio/mp4', 'content-range': 'bytes 0-9/100', 'content-length': '10', 'accept-ranges': 'bytes' } }));
+        vi.stubGlobal('fetch', fetcher);
+        const { res, headers } = response();
+        await handler({ method: 'HEAD', url: `/api/podcast?action=audio&id=${id}`, headers: { range: 'bytes=0-9', cookie: 'private-cookie=example' } }, res);
+        expect(res.code).toBe(206); expect(headers.get('content-range')).toBe('bytes 0-9/100');
+        expect(fetcher.mock.calls[1][1].headers).toEqual({ Range: 'bytes=0-9' });
+    });
     it('returns anonymous status without any upstream call or secret', async () => {
         const fetcher = vi.fn(); vi.stubGlobal('fetch', fetcher);
         const { res } = response(); await handler(request({ action: 'status' }), res);

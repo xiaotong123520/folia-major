@@ -62,6 +62,11 @@ const source = (patch: Partial<Parameters<typeof resolveHomeOnlineSource>[0]> = 
 });
 
 describe('resolveHomeOnlineSource', () => {
+    it('offers public recommendations before optional sign-in and account playlists afterwards', () => {
+        const publicProvider = summary({ requiresAccount: true, publicLibrary: true, status: 'anonymous', user: null });
+        expect(source({ provider: publicProvider })).toMatchObject({ accountView: 'public', canUsePlaylists: false, canUseRadio: true });
+        expect(source({ provider: { ...publicProvider, user: { id: 'user', nickname: 'Listener' } } })).toMatchObject({ accountView: 'authenticated', canUsePlaylists: true });
+    });
     it('prefers the provider summary: its user, collections and short name', () => {
         const user = { id: 7, nickname: 'U' };
         const owned = collection('owned');

@@ -36,7 +36,7 @@ async function audio(req: any, res: any, id: string) {
     const target = allowedAudio(value.audio);
     if (!target) throw new PodcastError(403, '该单集暂无可播放的音频，可能需要登录或在小宇宙内购买');
     const range = req.headers.range;
-    if (range && !/^bytes=\d*-\d*$/.test(range)) throw new PodcastError(416, '无效的音频范围');
+    if (range && !/^bytes=(?:\d+-\d*|-\d+)$/.test(range)) throw new PodcastError(416, '无效的音频范围');
     const upstream = await fetch(target, { method: req.method, redirect: 'error',
         headers: range ? { Range: range } : {}, signal: AbortSignal.timeout(60000) });
     if (upstream.status === 416) { res.status(416).end(); return; }

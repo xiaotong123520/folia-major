@@ -70,6 +70,7 @@ export const resolveHomeOnlineSource = ({
 }): LibraryHomeOnlineSource => {
     const isNetease = providerId === 'netease';
     const user = provider?.user || (isNetease ? fallbackUser : null);
+    const publicGuest = Boolean(provider?.publicLibrary && provider.requiresAccount !== false && !user);
     return {
         providerId,
         providerLabel: provider?.shortName || provider?.displayName || fallbackLabel,
@@ -80,7 +81,7 @@ export const resolveHomeOnlineSource = ({
         collections: provider?.collections || (isNetease
             ? [...fallbackPlaylists, ...(fallbackCloud ? [fallbackCloud] : [])]
             : []),
-        canUsePlaylists: capabilities.userLibrary && capabilities.playlists,
+        canUsePlaylists: capabilities.userLibrary && capabilities.playlists && !publicGuest,
         canUseAlbums: capabilities.userLibrary && Boolean(capabilities.userAlbums),
         canUseRadio: capabilities.recommendations,
         canUseExplore: Boolean(capabilities.explore),
