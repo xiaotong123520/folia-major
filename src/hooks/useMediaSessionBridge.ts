@@ -186,21 +186,34 @@ export const useMediaSessionBridge = ({
             }
         };
 
+        // Safari can acquire the native media session after firing `playing`.
+        // Publish once more after that handover, and when the browser regains visibility.
+        let pendingPublish: ReturnType<typeof setTimeout> | undefined;
+        const republish = () => {
+            publish();
+            clearTimeout(pendingPublish);
+            pendingPublish = setTimeout(publish, 250);
+        };
         audio.addEventListener('loadedmetadata', publish);
         audio.addEventListener('durationchange', publish);
         // Re-publish after playback starts in case Chromium delivered a late clear from the old source.
-        audio.addEventListener('playing', publish);
+        audio.addEventListener('playing', republish);
+        window.addEventListener('pageshow', republish);
+        document.addEventListener('visibilitychange', republish);
         publish();
         void prepareUnsupportedArtwork();
 
         return () => {
             disposed = true;
+            clearTimeout(pendingPublish);
             audio.removeEventListener('loadedmetadata', publish);
             audio.removeEventListener('durationchange', publish);
-            audio.removeEventListener('playing', publish);
+            audio.removeEventListener('playing', republish);
+            window.removeEventListener('pageshow', republish);
+            document.removeEventListener('visibilitychange', republish);
             if (disposableArtworkUrl) URL.revokeObjectURL(disposableArtworkUrl);
         };
-    }, [audioRef, audioSrc, cachedCoverUrl, currentSong, getDisplayAudioElement, unknownArtistLabel]);
+    }, [audioRef, audioSrc, cachedCoverUrl, currentSong, getDisplayAudioElement, unknownArtistLabel, playerState]);
 
     useEffect(() => {
         if (!('mediaSession' in navigator)) {
