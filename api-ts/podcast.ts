@@ -1,4 +1,5 @@
 import qr from 'qrcode';
+import { readTranscript } from './xiaoyuzhou/transcript.js';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { ID, PUBLIC_IDS, allowedAudio, episode, pageItems, parseLink, podcast, publicPage } from './xiaoyuzhou/content.js';
@@ -69,6 +70,7 @@ export default async function handler(req: any, res: any) {
         const { action, id, query, cursor } = body;
         let result: any;
         switch (action) {
+            case 'transcript': result = await readTranscript(req, res, validId(id)); break;
             case 'featured': result = await featured(); break;
             case 'status': {
                 if (!readCookie(req)?.access) { result = null; break; }

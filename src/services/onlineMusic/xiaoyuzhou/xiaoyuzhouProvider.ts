@@ -2,6 +2,7 @@ import type { UnifiedSong } from '../../../types';
 import { OnlineProviderError, type LoginState, type OnlineMusicProvider, type ProviderCollection, type ProviderPage, type ProviderUser } from '../../../types/onlineMusic';
 import { createProviderSongMetadata } from '../../../utils/songMetadata';
 import { podcastApi, podcastAvailable, requestPodcast } from './xiaoyuzhouTransport';
+import { podcastTranscriptLyrics } from './xiaoyuzhouLyrics';
 
 // Public share links and optional account subscriptions normalize into the same Omni source.
 type Episode = { id: string; title: string; duration: number; podcastId: string; podcastTitle: string; author: string; cover: string };
@@ -52,9 +53,17 @@ async function paged<T, U>(key: string, action: string, params: Record<string, u
 export const xiaoyuzhouProvider: OnlineMusicProvider = {
     id: providerId, displayName: '小宇宙播客', shortName: '小宇宙', mark: { letter: '宇', color: '#ec8542' },
     getAvailability: podcastAvailable,
-    capabilities: { search: true, playback: true, lyrics: false, auth: true, userLibrary: true, publicLibrary: true,
+    capabilities: { search: true, playback: true, lyrics: true, auth: true, userLibrary: true, publicLibrary: true,
         playlists: true, albums: false, artists: false, recommendations: true, mutations: false, wordByWordLyrics: false },
     normalizeSong: normalizePodcastEpisode,
+    lyrics: {
+        async getLyrics(song) {
+            const ref = song.sourceRef;
+            if (ref?.kind !== 'online' || ref.providerId !== providerId) throw new OnlineProviderError('unsupported', 'Wrong podcast source', providerId);
+            const result = await requestPodcast<{ status: string; segments: Array<{ startMs: number; text: string }> }>('transcript', { id: String(ref.mediaId) });
+            return podcastTranscriptLyrics(result.segments);
+        },
+    },
     songMetadata: { getSongMetadata: createProviderSongMetadata },
     getSongPageUrl: song => song.sourceRef?.kind === 'online' ? `https://www.xiaoyuzhoufm.com/episode/${song.sourceRef.mediaId}` : null,
     search: { searchSongs: (query, limit, offset, context) => paged(`search:${context?.session || ''}:${query}`, 'search', { query }, limit, offset, normalizePodcastEpisode) },

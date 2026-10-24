@@ -1,8 +1,53 @@
 import qr from "qrcode";
+import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from "node:crypto";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from "node:crypto";
 
+//#region api-ts/xiaoyuzhou/session.ts
+const SESSION = "__Secure-tingyu-podcast";
+const PENDING = "__Secure-tingyu-podcast-qr";
+function secret() {
+	const value = process.env.PODCAST_SESSION_SECRET || process.env.QQ_SESSION_SECRET;
+	if (!value || value.length < 32) throw new Error("Podcast login is not configured");
+	return createHash("sha256").update("tingyu-podcast-v1\0" + value).digest();
+}
+function seal(value, ttl) {
+	const nonce = randomBytes(12);
+	const cipher = createCipheriv("aes-256-gcm", secret(), nonce);
+	const encrypted = Buffer.concat([cipher.update(JSON.stringify({
+		value,
+		expires: Date.now() + ttl * 1e3
+	})), cipher.final()]);
+	return Buffer.concat([
+		nonce,
+		cipher.getAuthTag(),
+		encrypted
+	]).toString("base64url");
+}
+function unseal(value) {
+	try {
+		const packed = Buffer.from(value, "base64url");
+		const decipher = createDecipheriv("aes-256-gcm", secret(), packed.subarray(0, 12));
+		decipher.setAuthTag(packed.subarray(12, 28));
+		const data = JSON.parse(Buffer.concat([decipher.update(packed.subarray(28)), decipher.final()]).toString());
+		return data.expires > Date.now() ? data.value : null;
+	} catch {
+		return null;
+	}
+}
+function readCookie(req, pending = false) {
+	const name = pending ? PENDING : SESSION;
+	const value = String(req.headers.cookie || "").split(";").map((row) => row.trim()).find((row) => row.startsWith(name + "="));
+	return value ? unseal(value.slice(name.length + 1)) : null;
+}
+function setCookie(res, value, pending = false) {
+	const ttl = value ? pending ? 300 : 1209600 : 0;
+	const cookie = `${pending ? PENDING : SESSION}=${value ? seal(value, ttl) : ""}; Path=/api/podcast; Max-Age=${ttl}; HttpOnly; Secure; SameSite=Strict`;
+	const previous = res.getHeader("Set-Cookie");
+	res.setHeader("Set-Cookie", [...Array.isArray(previous) ? previous : previous ? [previous] : [], cookie]);
+}
+
+//#endregion
 //#region api-ts/xiaoyuzhou/content.ts
 const ID = /^[a-f0-9]{24}$/i;
 const WEB = "https://www.xiaoyuzhoufm.com";
@@ -100,51 +145,6 @@ function allowedAudio(value) {
 	} catch {
 		return null;
 	}
-}
-
-//#endregion
-//#region api-ts/xiaoyuzhou/session.ts
-const SESSION = "__Secure-tingyu-podcast";
-const PENDING = "__Secure-tingyu-podcast-qr";
-function secret() {
-	const value = process.env.PODCAST_SESSION_SECRET || process.env.QQ_SESSION_SECRET;
-	if (!value || value.length < 32) throw new Error("Podcast login is not configured");
-	return createHash("sha256").update("tingyu-podcast-v1\0" + value).digest();
-}
-function seal(value, ttl) {
-	const nonce = randomBytes(12);
-	const cipher = createCipheriv("aes-256-gcm", secret(), nonce);
-	const encrypted = Buffer.concat([cipher.update(JSON.stringify({
-		value,
-		expires: Date.now() + ttl * 1e3
-	})), cipher.final()]);
-	return Buffer.concat([
-		nonce,
-		cipher.getAuthTag(),
-		encrypted
-	]).toString("base64url");
-}
-function unseal(value) {
-	try {
-		const packed = Buffer.from(value, "base64url");
-		const decipher = createDecipheriv("aes-256-gcm", secret(), packed.subarray(0, 12));
-		decipher.setAuthTag(packed.subarray(12, 28));
-		const data = JSON.parse(Buffer.concat([decipher.update(packed.subarray(28)), decipher.final()]).toString());
-		return data.expires > Date.now() ? data.value : null;
-	} catch {
-		return null;
-	}
-}
-function readCookie(req, pending = false) {
-	const name = pending ? PENDING : SESSION;
-	const value = String(req.headers.cookie || "").split(";").map((row) => row.trim()).find((row) => row.startsWith(name + "="));
-	return value ? unseal(value.slice(name.length + 1)) : null;
-}
-function setCookie(res, value, pending = false) {
-	const ttl = value ? pending ? 300 : 1209600 : 0;
-	const cookie = `${pending ? PENDING : SESSION}=${value ? seal(value, ttl) : ""}; Path=/api/podcast; Max-Age=${ttl}; HttpOnly; Secure; SameSite=Strict`;
-	const previous = res.getHeader("Set-Cookie");
-	res.setHeader("Set-Cookie", [...Array.isArray(previous) ? previous : previous ? [previous] : [], cookie]);
 }
 
 //#endregion
@@ -274,6 +274,53 @@ async function accountFetch(req, res, path, body, web = false) {
 }
 
 //#endregion
+//#region api-ts/xiaoyuzhou/transcript.ts
+function normalizeTranscript(raw) {
+	if (!Array.isArray(raw)) throw new PodcastError(502, "字幕格式暂不支持");
+	return raw.flatMap((item) => {
+		const startMs = Number(item?.startMs);
+		const text = typeof item?.text === "string" ? item.text.trim() : "";
+		return Number.isFinite(startMs) && startMs >= 0 && text ? [{
+			startMs,
+			text
+		}] : [];
+	}).sort((a, b) => a.startMs - b.startMs);
+}
+async function readTranscript(req, res, id) {
+	if (!ID.test(id)) throw new PodcastError(400, "无效单集");
+	const ep = (await accountFetch(req, res, "/v1/episode/get?eid=" + id))?.data;
+	const mediaId = ep?.transcriptMediaId || ep?.transcript?.mediaId || ep?.media?.id;
+	if (!mediaId) return {
+		status: "missing",
+		segments: []
+	};
+	const response = await accountFetch(req, res, "/v1/episode-transcript/get", {
+		eid: id,
+		mediaId
+	});
+	const data = response?.data?.data || response?.data;
+	if (!data?.transcriptUrl) return {
+		status: "missing",
+		segments: []
+	};
+	const url = allowedAudio(data.transcriptUrl);
+	if (!url) throw new PodcastError(502, "字幕来源暂不支持");
+	const result = await fetch(url, {
+		redirect: "error",
+		headers: { "User-Agent": "Xiaoyuzhou/2.99.1(android 28)" },
+		signal: AbortSignal.timeout(15e3)
+	});
+	if (!result.ok) throw new PodcastError(502, `字幕读取失败（HTTP ${result.status}）`);
+	const text = await result.text();
+	if (text.length > 3e6) throw new PodcastError(502, "字幕过大");
+	const segments = normalizeTranscript(JSON.parse(text));
+	return {
+		status: segments.length ? "available" : "missing",
+		segments
+	};
+}
+
+//#endregion
 //#region api-ts/podcast.ts
 const publicCache = /* @__PURE__ */ new Map();
 async function readPublic(kind, id) {
@@ -366,6 +413,9 @@ async function handler(req, res) {
 		const { action, id, query, cursor } = body;
 		let result;
 		switch (action) {
+			case "transcript":
+				result = await readTranscript(req, res, validId(id));
+				break;
 			case "featured":
 				result = await featured();
 				break;

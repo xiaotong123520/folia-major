@@ -29,9 +29,9 @@ export interface PlatformNamePlace {
 }
 
 export const PLATFORM_NAME_PLACES: Record<string, PlatformNamePlace> = {
-    'api-ts/podcast.ts': { n: { xiaoyuzhou: 6 }, kind: 'main', why: 'same-origin podcast backend entry and known upstream hosts' },
+    'api-ts/podcast.ts': { n: { xiaoyuzhou: 7 }, kind: 'main', why: 'same-origin podcast backend entry and known upstream hosts' },
     'api-ts/xiaoyuzhou/session.ts': { n: { qq: 1 }, kind: 'stored', why: 'existing server secret is a fallback seed with a separate podcast purpose' },
-    'api/podcast.js': { n: { qq: 1, xiaoyuzhou: 18 }, kind: 'main', why: 'generated single serverless podcast entry' },
+    'api/podcast.js': { n: { qq: 1, xiaoyuzhou: 20 }, kind: 'main', why: 'generated single serverless podcast entry' },
     'src/components/app/PersonalMusicTools.tsx': { n: { xiaoyuzhou: 1 }, kind: 'list', why: 'lazy registration of the optional podcast surface' },
     'src/services/directPointSong.ts': { n: { netease: 5, qq: 12 }, kind: 'stored', why: 'three public point-song API endpoint hosts and source IDs for browser-only GitHub Pages; no provider login, entitlement or transport internals' },
     'src/components/app/MusicLinkImport.tsx': { n: { netease: 1, qq: 4 }, kind: 'text', why: 'three platform labels and direct import buttons in the user-selected browser-only point-song dialog' },
