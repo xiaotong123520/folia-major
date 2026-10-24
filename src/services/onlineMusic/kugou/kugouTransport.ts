@@ -475,7 +475,15 @@ export const requestKugou = async <T = unknown>(operation: KugouOperation, param
 
         const send = async (signal?: AbortSignal) => {
             const response = await fetch(`${base}${ENDPOINTS[targetOperation]}?${query}`, { credentials: 'include', ...(signal ? { signal } : {}) });
-            if (!response.ok) throw await toKugouWebHttpError(response);
+            if (!response.ok) {
+                // KuGouMusicApi sends device-registration requests as HTTP 502 too.
+                // Let the existing one-shot registration recovery inspect that protocol state.
+                if (response.status === 502 && targetOperation !== 'register_dev') {
+                    const failure = await response.clone().json().catch(() => undefined);
+                    if (isDeviceVerificationRequired(failure?.body ?? failure)) return failure;
+                }
+                throw await toKugouWebHttpError(response);
+            }
             try {
                 return await response.json();
             } catch (error) {

@@ -64,14 +64,14 @@ describe('KuGou Web transport', () => {
         );
     });
 
-    it('registers a fresh dfid and retries when an audio URL request requires verification', async () => {
+    it.each([200, 502])('registers a fresh dfid and retries when an audio URL request requires verification (HTTP %s)', async (status) => {
         vi.stubGlobal('window', undefined);
         const { requestKugou } = await import('@/services/onlineMusic/kugou/kugouTransport');
         storage.set('online_provider:kugou:dfid', 'stale-dfid');
         storage.set('online_provider:kugou:token', 'token');
         storage.set('online_provider:kugou:userid', '9');
         const fetchMock = vi.fn()
-            .mockResolvedValueOnce(Response.json({ status: 0, errcode: 20028, error: '本次请求需要验证' }))
+            .mockResolvedValueOnce(Response.json({ status: 0, errcode: 20028, error: '本次请求需要验证' }, { status }))
             .mockResolvedValueOnce(Response.json({ status: 1, data: { dfid: 'fresh-dfid' } }))
             .mockResolvedValueOnce(Response.json({ status: 1, url: ['https://example.test/song.mp3'] }));
         vi.stubGlobal('fetch', fetchMock);
