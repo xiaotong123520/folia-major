@@ -30,14 +30,14 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideo
     ];
     const runAndClose = (action: () => void) => { setOpen(false); action(); };
     return <>
-        <aside className="fixed left-[max(12px,env(safe-area-inset-left))] sm:left-auto sm:right-[max(12px,env(safe-area-inset-right))] bottom-[calc(176px+env(safe-area-inset-bottom))] z-[85] flex max-w-[calc(100vw-24px)] flex-col-reverse items-start gap-2 sm:items-end sm:bottom-auto sm:top-[max(12px,env(safe-area-inset-top))] sm:flex-col">
+        <aside className="fixed left-[max(12px,var(--app-control-left-inset,env(safe-area-inset-left)))] sm:left-auto sm:right-[max(12px,var(--app-control-right-inset,env(safe-area-inset-right)))] bottom-[calc(176px+var(--app-control-bottom-inset,env(safe-area-inset-bottom)))] z-[85] flex max-w-[calc(100vw-24px)] flex-col-reverse items-start gap-2 sm:items-end sm:bottom-auto sm:top-[max(12px,var(--app-control-top-inset,env(safe-area-inset-top)))] sm:flex-col">
             <button type="button" aria-label={t('personal.tools')} aria-expanded={open}
                 onClick={() => setOpen(value => !value)}
                 className="flex min-h-11 items-center gap-2 rounded-full border border-white/20 bg-[#17151f]/95 px-4 text-sm text-white shadow-xl backdrop-blur-xl">
                 {open ? <X size={18} /> : <AudioLines size={18} />}
                 <span className="sr-only sm:not-sr-only">{t('personal.brand')}</span>
             </button>
-            {open && <nav aria-label={t('personal.tools')} className="w-56 rounded-2xl border border-white/15 bg-[#17151f]/95 p-2 text-white shadow-2xl backdrop-blur-xl">
+            {open && <nav aria-label={t('personal.tools')} className="max-h-[min(60dvh,calc(100dvh-240px-env(safe-area-inset-top)-env(safe-area-inset-bottom)))] sm:max-h-[calc(100dvh-100px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] w-56 overflow-y-auto overscroll-contain rounded-2xl border border-white/15 bg-[#17151f]/95 p-2 text-white shadow-2xl backdrop-blur-xl">
                 {actions.map(({ icon: Icon, label, run }) => <button key={label} type="button"
                     onClick={() => runAndClose(run)}
                     className="flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-left text-sm hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-violet-200">
