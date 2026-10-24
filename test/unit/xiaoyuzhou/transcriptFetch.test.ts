@@ -15,7 +15,7 @@ it('blocks unverified live transcript content by default', async () => {
     expect(account).not.toHaveBeenCalled();
 });
 it('uses the native transcript id and never forwards account credentials to the CDN', async () => {
-    account.mockResolvedValueOnce({ data: { transcriptMediaId: 'native', media: { id: 'external' } } })
+    account.mockResolvedValueOnce({ data: { eid: '6021f949a789fca4eff4492c', transcriptMediaId: 'native', media: { id: 'external' } } })
         .mockResolvedValueOnce({ data: { transcriptUrl: 'https://media.xyzcdn.net/transcript.json?signature=test' } });
     const fetcher = vi.fn(async (_input: unknown, _init?: RequestInit) => Response.json([{ startMs: 1000, text: '句子' }]));
     vi.stubGlobal('fetch', fetcher);
@@ -27,13 +27,13 @@ it('uses the native transcript id and never forwards account credentials to the 
     expect(JSON.stringify(result)).not.toContain('signature');
 });
 it('returns missing without fetching an invented subtitle URL', async () => {
-    account.mockResolvedValueOnce({ data: { media: { id: 'media' } } }).mockResolvedValueOnce({ data: {} });
+    account.mockResolvedValueOnce({ data: { eid: '6021f949a789fca4eff4492c', transcriptMediaId: 'media' } }).mockResolvedValueOnce({ data: {} });
     const fetcher = vi.fn(); vi.stubGlobal('fetch', fetcher);
     expect(await readTranscript({}, {}, '6021f949a789fca4eff4492c')).toEqual({ status: 'missing', segments: [] });
     expect(fetcher).not.toHaveBeenCalled();
 });
 it('rejects an unrecognized transcript host before making any request', async () => {
-    account.mockResolvedValueOnce({ data: { media: { id: 'media' } } }).mockResolvedValueOnce({ data: { transcriptUrl: 'https://127.0.0.1/private' } });
+    account.mockResolvedValueOnce({ data: { eid: '6021f949a789fca4eff4492c', transcriptMediaId: 'media' } }).mockResolvedValueOnce({ data: { transcriptUrl: 'https://127.0.0.1/private' } });
     const fetcher = vi.fn(); vi.stubGlobal('fetch', fetcher);
     await expect(readTranscript({}, {}, '6021f949a789fca4eff4492c')).rejects.toThrow();
     expect(fetcher).not.toHaveBeenCalled();

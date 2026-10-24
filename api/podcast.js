@@ -290,11 +290,14 @@ function normalizeTranscript(raw) {
 	if (placeholders >= 2 && placeholders / segments.length >= .2) throw new PodcastError(502, "平台返回了片段或占位文稿，暂不能作为同步字幕；可先查看下方简介与章节");
 	return segments;
 }
-async function readTranscript(req, res, id) {
+async function readTranscript(req, res, id, probe = false) {
 	if (!ID.test(id)) throw new PodcastError(400, "无效单集");
-	if (process.env.PODCAST_TRANSCRIPT_VERIFIED !== "true") throw new PodcastError(503, "平台文稿尚未通过内容核对，暂不显示同步字幕；下方可查看节目简介与章节");
+	if (!probe && process.env.PODCAST_TRANSCRIPT_VERIFIED !== "true") throw new PodcastError(503, "平台文稿尚未通过内容核对，暂不显示同步字幕；下方可查看节目简介与章节");
 	const ep = (await accountFetch(req, res, "/v1/episode/get?eid=" + id))?.data;
-	const mediaId = ep?.transcriptMediaId || ep?.transcript?.mediaId || ep?.media?.id;
+	if (ep?.eid !== id) throw new PodcastError(502, "文稿单集身份不匹配，已停止读取");
+	const page = probe ? (await publicPage("episode", id)).episode : null;
+	if (page && page.eid !== id) throw new PodcastError(502, "分享页单集身份不匹配");
+	const mediaId = page?.transcriptMediaId || page?.transcript?.mediaId || ep?.transcriptMediaId || ep?.transcript?.mediaId;
 	if (!mediaId) return {
 		status: "missing",
 		segments: []
@@ -319,6 +322,17 @@ async function readTranscript(req, res, id) {
 	const text = await result.text();
 	if (text.length > 3e6) throw new PodcastError(502, "字幕过大");
 	const segments = normalizeTranscript(JSON.parse(text));
+	if (probe) return {
+		status: "unverified",
+		episodeId: id,
+		title: ep.title,
+		publicNativeIdFound: Boolean(page?.transcriptMediaId || page?.transcript?.mediaId),
+		nativeIdsAgree: !page?.transcriptMediaId || page.transcriptMediaId === ep?.transcriptMediaId,
+		segmentCount: segments.length,
+		firstStartMs: segments[0]?.startMs,
+		lastStartMs: segments.at(-1)?.startMs,
+		firstText: segments[0]?.text?.slice(0, 240)
+	};
 	return {
 		status: segments.length ? "available" : "missing",
 		segments
@@ -404,6 +418,7 @@ async function handler(req, res) {
 	res.setHeader("Referrer-Policy", "no-referrer");
 	try {
 		const url = new URL(req.url || "/", "https://localhost");
+		if (url.searchParams.get("action") === "transcript-test" && req.method === "GET") return res.status(200).json({ data: await readTranscript(req, res, validId(url.searchParams.get("id")), true) });
 		if (url.searchParams.get("action") === "audio" && ["GET", "HEAD"].includes(req.method)) return await audio(req, res, url.searchParams.get("id") || "");
 		if (req.method !== "POST") {
 			res.setHeader("Allow", "POST");

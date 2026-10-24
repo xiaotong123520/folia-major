@@ -1,5 +1,5 @@
 import { accountFetch, PodcastError } from './account.js';
-import { allowedAudio, ID } from './content.js';
+import { allowedAudio, ID, publicPage } from './content.js';
 
 // Read upstream timed text without exposing signed transcript URLs or account credentials.
 export function normalizeTranscript(raw: unknown) {
@@ -16,15 +16,18 @@ export function normalizeTranscript(raw: unknown) {
     }
     return segments;
 }
-export async function readTranscript(req: any, res: any, id: string) {
+export async function readTranscript(req: any, res: any, id: string, probe = false) {
     if (!ID.test(id)) throw new PodcastError(400, '无效单集');
     // Live samples failed content verification. Do not distribute them as subtitles until verified.
-    if (process.env.PODCAST_TRANSCRIPT_VERIFIED !== 'true') {
+    if (!probe && process.env.PODCAST_TRANSCRIPT_VERIFIED !== 'true') {
         throw new PodcastError(503, '平台文稿尚未通过内容核对，暂不显示同步字幕；下方可查看节目简介与章节');
     }
     const detail = await accountFetch(req, res, '/v1/episode/get?eid=' + id);
     const ep = detail?.data;
-    const mediaId = ep?.transcriptMediaId || ep?.transcript?.mediaId || ep?.media?.id;
+    if (ep?.eid !== id) throw new PodcastError(502, '文稿单集身份不匹配，已停止读取');
+    const page = probe ? (await publicPage('episode', id)).episode : null;
+    if (page && page.eid !== id) throw new PodcastError(502, '分享页单集身份不匹配');
+    const mediaId = page?.transcriptMediaId || page?.transcript?.mediaId || ep?.transcriptMediaId || ep?.transcript?.mediaId;
     if (!mediaId) return { status: 'missing', segments: [] };
     const response = await accountFetch(req, res, '/v1/episode-transcript/get', { eid: id, mediaId });
     const data = response?.data?.data || response?.data;
@@ -36,5 +39,10 @@ export async function readTranscript(req: any, res: any, id: string) {
     const text = await result.text();
     if (text.length > 3000000) throw new PodcastError(502, '字幕过大');
     const segments = normalizeTranscript(JSON.parse(text));
+    if (probe) return { status: 'unverified', episodeId: id, title: ep.title,
+        publicNativeIdFound: Boolean(page?.transcriptMediaId || page?.transcript?.mediaId),
+        nativeIdsAgree: !page?.transcriptMediaId || page.transcriptMediaId === ep?.transcriptMediaId,
+        segmentCount: segments.length, firstStartMs: segments[0]?.startMs,
+        lastStartMs: segments.at(-1)?.startMs, firstText: segments[0]?.text?.slice(0, 240) };
     return { status: segments.length ? 'available' : 'missing', segments };
 }

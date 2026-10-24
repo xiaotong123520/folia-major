@@ -57,6 +57,9 @@ export default async function handler(req: any, res: any) {
     res.setHeader('Referrer-Policy', 'no-referrer');
     try {
         const url = new URL(req.url || '/', 'https://localhost');
+        if (url.searchParams.get('action') === 'transcript-test' && req.method === 'GET') {
+            return res.status(200).json({ data: await readTranscript(req, res, validId(url.searchParams.get('id')), true) });
+        }
         if (url.searchParams.get('action') === 'audio' && ['GET', 'HEAD'].includes(req.method)) {
             return await audio(req, res, url.searchParams.get('id') || '');
         }
