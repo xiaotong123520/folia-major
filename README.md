@@ -11,6 +11,20 @@
 
 网页版扫码登录需配置真实的平台后端。Pages 构建读取仓库 Actions Variables 中的 `VITE_NETEASE_API_BASE`、`VITE_QQ_API_BASE`、`VITE_KUGOU_API_BASE`，分别填写对应服务的公开 HTTPS 根地址后重新发布。外部点歌接口不属于平台账户登录后端，且可用性与内容授权尚未经过验证。各平台可用登录方式由现有登录窗口显示；同一手机能否识别二维码取决于平台 App 支持。未配置后端时不能完成扫码登录。
 
+## iPhone App / 自签 IPA
+
+2026-10-25 已通过 GitHub macOS runner 的 Xcode 编译与 IPA 封装，产物为 **未签名 iPhone arm64 IPA**，不是只有源码的 ZIP。
+
+- [成功构建记录与下载入口](https://github.com/xiaotong123520/folia-major/actions/runs/40147711734)：在 Artifacts 下载 `TingyuFM-unsigned-self-sign`，解压后得到 `TingyuFM-unsigned.ipa`。下载 GitHub 构建产物可能需要登录；本次 IPA artifact 保留至 2026-11-08，过期后需重新构建。
+- [iOS 工程与详细说明](https://github.com/xiaotong123520/folia-major/blob/build/ios-self-sign/packaging/ios/README.md)位于独立的 `build/ios-self-sign` 分支，尚未合并到 main；本次仅更新主分支文档。
+- 最低系统为 iOS 16.0，应用标识为 `com.xiaotong123520.tingyufm`。已检查 IPA 内的 Payload、Info.plist 和 arm64 Mach-O 可执行文件；包内不含签名证书、私钥或描述文件。
+- 安装：将 IPA 保存到“文件”，导入支持普通 IPA 重签的工具，用适用于目标设备的有效签名材料签名后安装。全能签、轻松签等工具尚未逐款实测，不能保证全部版本兼容；巨魔还受其自身支持的设备及系统版本限制。
+- 未签名 IPA 不能直接点开安装，也不属于 TestFlight 分发包。免费 Personal Team 的 Xcode 真机安装与第三方工具重签是不同流程，具体有效期取决于使用的签名方式。
+
+**运行范围与待验收项**：当前是 UIKit + WKWebView 联网容器，加载现有 HTTPS 网站，不含离线前端资源。网页与 App 的本地数据和登录状态不保证共用。云端编译成功不等于真机功能全部通过：平台扫码登录、跳转、播放、封面、歌词 WebGL 和文件导入仍待 App 真机验收；原生后台音频服务、原生锁屏控制尚未实现。该构建没有修复网页端镜台在无 WebGL 环境下的黑屏问题。
+
+**公告与公众号更新弹窗**：目前仅讨论了功能方案，尚未实现；没有接入公告接口或公众号文章链接。后续实现后再更新说明。
+
 ## 小宇宙播客
 
 工具菜单新增“小宇宙播客”：默认免登录查看公开节目、打开完整分享链接并播放；可选扫码登录后读取账号订阅和搜索单集。后端与测试说明见 [docs/podcast.md](docs/podcast.md)。公开列表、单集和免登录播放已在 Vercel 浏览器实测，扫码二维码可生成；真实账户授权后的订阅读取及手机端仍需验收。
