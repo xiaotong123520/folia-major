@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { AnimatePresence, motion, useMotionValueEvent } from 'framer-motion';
+import { getBufferedAudioStreamUrl } from './services/mobileAudioBuffer';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import RadioAgent from './components/app/RadioAgent';
@@ -2429,6 +2430,7 @@ export default function App() {
             key={deck}
             ref={register}
             src={automix.deckSrc(deck)}
+            data-tingyu-stream-url={getBufferedAudioStreamUrl(automix.deckSrc(deck) || '')}
             preload="auto"
             crossOrigin="anonymous"
             loop={effectiveLoopMode === 'one' && automix.activeDeck === deck}

@@ -37,6 +37,18 @@ describe('browser playback audio session', () => {
         expect(host.context.resume).toHaveBeenCalledTimes(1);
         host.dispose();
     });
+
+    it('repairs the web audio graph after native playback restores the deck', async () => {
+        const host = fixture();
+        host.view.dispatchEvent(new Event('tingyu:native-audio-restored'));
+        await Promise.resolve();
+        expect(host.context.resume).toHaveBeenCalledTimes(1);
+        host.dispose();
+        host.context.resume.mockClear();
+        host.view.dispatchEvent(new Event('tingyu:native-audio-restored'));
+        await Promise.resolve();
+        expect(host.context.resume).not.toHaveBeenCalled();
+    });
     it.each(['paused', 'ended', 'hidden'])('does not restart %s playback', async condition => {
         const host = fixture();
         if (condition === 'hidden') host.page.visibilityState = 'hidden';

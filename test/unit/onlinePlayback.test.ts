@@ -19,6 +19,7 @@ const updatePrefetchedAudioUrlMock = vi.hoisted(() => vi.fn());
 vi.mock('@/services/mobileAudioBuffer', () => ({
     wantsMobileAudioBuffer: mobileBufferWantedMock,
     readMobileAudioBuffer: mobileBufferReadMock,
+    noteBufferedAudioStream: vi.fn(),
 }));
 vi.mock('@/services/audioCache', async importOriginal => ({
     ...await importOriginal<typeof import('@/services/audioCache')>(),

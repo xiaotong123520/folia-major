@@ -47,10 +47,12 @@ export function installPlaybackContextRecovery({ getContext, getAudio, page, vie
     page.addEventListener('visibilitychange', recover);
     view.addEventListener('pageshow', recover);
     view.addEventListener('focus', recover);
+    view.addEventListener('tingyu:native-audio-restored', recover);
     return () => {
         disposed = true;
         page.removeEventListener('visibilitychange', recover);
         view.removeEventListener('pageshow', recover);
         view.removeEventListener('focus', recover);
+        view.removeEventListener('tingyu:native-audio-restored', recover);
     };
 }

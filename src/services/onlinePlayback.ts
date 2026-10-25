@@ -23,7 +23,7 @@ import { useLyricSettingsStore } from '../stores/useLyricSettingsStore';
 import { useOnlineProviderAccountStore } from '../stores/useOnlineProviderAccountStore';
 import { saveLyricCacheSongMetadata } from './lyricExport/lyricCacheMetadata';
 import { errorFields } from '../utils/errorText';
-import { readMobileAudioBuffer, wantsMobileAudioBuffer } from './mobileAudioBuffer';
+import { noteBufferedAudioStream, readMobileAudioBuffer, wantsMobileAudioBuffer } from './mobileAudioBuffer';
 import { saveAudioBlob } from './audioCache';
 import { hasCachedSongAudio, saveSongAudioLevel, saveSongReplayGain } from './onlineMusic/resourceCache';
 import { useAudioSettingsStore } from '../stores/useAudioSettingsStore';
@@ -130,6 +130,7 @@ export async function loadOnlineSongAudioSource(
             const blob = await readMobileAudioBuffer(url, options.retry?.isCurrent);
             const blobUrl = blob && createSafeObjectUrl(blob);
             if (blob && blobUrl) {
+                noteBufferedAudioStream(blobUrl, url);
                 // Persist the very bytes downloaded for playback, rather than downloading them again at track end.
                 // Storage failure cannot prevent a fully buffered file from playing.
                 if (useAudioSettingsStore.getState().enableMediaCache && !options.bypassMediaCache) {

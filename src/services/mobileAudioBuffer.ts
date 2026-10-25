@@ -1,6 +1,14 @@
 // Bounded whole-file read-ahead for phone playback; never return a partial download as a song.
 const MAX_BYTES = 24 * 1024 * 1024;
 const MAX_WAIT_MS = 30000;
+const originalStreams = new Map<string, string>();
+
+// The iOS container may use the same authorised URL while a buffered file is copied to native storage.
+export function noteBufferedAudioStream(blobUrl: string, streamUrl: string) {
+    originalStreams.set(blobUrl, streamUrl);
+    if (originalStreams.size > 8) originalStreams.delete(originalStreams.keys().next().value!);
+}
+export const getBufferedAudioStreamUrl = (blobUrl: string) => originalStreams.get(blobUrl);
 
 export const wantsMobileAudioBuffer = (durationMs: number): boolean => (
     typeof window !== 'undefined'
