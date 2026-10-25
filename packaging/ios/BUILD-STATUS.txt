@@ -1,9 +1,13 @@
 2026-10-25
-交付物：Xcode 工程源码，不是 IPA 安装包。
-静态准备：已生成入口、WKWebView 容器、图标、Info.plist、scheme 和构建脚本。
-构建结果：未执行 iOS 编译；Linux 缺少 xcodebuild，build.sh 按预期退出 2。
-签名结果：未签名，无证书、私钥、描述文件。
-运行验收：未运行 iOS 模拟器或真机。
-付费会员不是免费真机开发测试的必要条件，但仍需 Mac/Xcode 和本人 Apple 账号。
-
-已添加 GitHub macOS 构建流程，云端运行结果以 Actions 为准；此文件不代表编译成功。
+交付物：真实编译的未签名 iPhone IPA，以及 Xcode 工程源码。
+构建结果：GitHub macOS runner 的 Xcode archive、IPA 封装与产物上传全部成功。
+构建记录：https://github.com/xiaotong123520/folia-major/actions/runs/40147711734
+构建源码提交：f69049f4c6d3d622a6ea5523847dda503ad4cb3f
+下载产物：TingyuFM-unsigned-self-sign，解压得到 TingyuFM-unsigned.ipa。
+IPA 校验：Payload/Info.plist、arm64 Mach-O 及应用标识已检查。
+签名结果：未签名，未附证书、私钥或描述文件，必须由用户签名后安装。
+运行验收：尚未运行 iOS 模拟器或真机；不能据此认定登录、播放、后台音频和歌词特效全部可用。
+最低系统：iOS 16.0；联网 WKWebView 容器，无离线前端资源。
+原生后台音频服务、原生锁屏控制尚未实现。
+公众号更新弹窗：仅讨论，尚未实现。
+main 分支仅增加说明；iOS 工程保留在 build/ios-self-sign 分支。
