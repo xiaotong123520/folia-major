@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { MutableRefObject } from 'react';
 import type { MotionValue } from 'framer-motion';
-import { findLatestActiveLineIndex } from '../../../../utils/appPlaybackHelpers';
+import { createActiveLineLookup } from '../../../../utils/lyrics/activeLineLookup';
 import { PlayerState } from '../../../../types';
 import type { AudioBands, LyricData } from '../../../../types';
 import { setCurrentLineIndex, setHandoffLineIndex, setPlayerState } from '../../../../stores/usePlaybackStore';
@@ -98,6 +98,7 @@ export function usePlaybackVisualizerBridge({
     const duration = usePlaybackStore(state => state.duration);
     // The lyrics on screen, matching the deck getDisplayElement points at.
     const lyrics = usePlaybackStore(selectDisplayLyrics);
+    const findActiveLine = useMemo(() => createActiveLineLookup(lyrics?.lines ?? []), [lyrics?.lines]);
     // The live lyrics, which during a blend are the incoming track's (null until they load).
     const incomingLyrics = usePlaybackStore(state => state.lyrics);
 
@@ -299,7 +300,7 @@ export function usePlaybackVisualizerBridge({
             showLyricTime(effectiveLyricTime);
 
             if (lyrics) {
-                showLine(findLatestActiveLineIndex(lyrics.lines, effectiveLyricTime));
+                showLine(findActiveLine(effectiveLyricTime));
             }
         } else if (isNowPlayingStageActive) {
             const nextTime = getNowPlayingDisplayTime();
@@ -309,14 +310,14 @@ export function usePlaybackVisualizerBridge({
 
             const effectiveLyricTime = nextTime - displayOffsetMsRef.current / 1000;
             showLyricTime(effectiveLyricTime);
-            showLine(lyrics ? findLatestActiveLineIndex(lyrics.lines, effectiveLyricTime) : -1);
+            showLine(lyrics ? findActiveLine(effectiveLyricTime) : -1);
 
             if (hasReachedEnd) {
                 if (effectiveLoopMode === 'one' || effectiveLoopMode === 'all') {
                     syncNowPlayingClock(0, duration, false);
                     currentTime.set(0);
                     if (lyrics) {
-                        showLine(findLatestActiveLineIndex(lyrics.lines, 0));
+                        showLine(findActiveLine(0));
                     }
                 } else {
                     syncNowPlayingClock(duration, duration, true);
@@ -330,7 +331,7 @@ export function usePlaybackVisualizerBridge({
 
             const effectiveLyricTime = nextTime - displayOffsetMsRef.current / 1000;
             showLyricTime(effectiveLyricTime);
-            showLine(lyrics ? findLatestActiveLineIndex(lyrics.lines, effectiveLyricTime) : -1);
+            showLine(lyrics ? findActiveLine(effectiveLyricTime) : -1);
         } else if (activePlaybackContext === 'stage' && stageActiveEntryKind === 'lyrics' && stageLyricsSession && lyrics) {
             const nextTime = getSyntheticStageLyricsTime();
             const clock = stageLyricsClockRef.current;
@@ -338,13 +339,13 @@ export function usePlaybackVisualizerBridge({
 
             currentTime.set(nextTime);
 
-            showLine(findLatestActiveLineIndex(lyrics.lines, nextTime));
+            showLine(findActiveLine(nextTime));
 
             if (hasReachedEnd) {
                 if (effectiveLoopMode === 'one' || effectiveLoopMode === 'all') {
                     syncStageLyricsClock(clock.startTimeSec, clock.endTimeSec, PlayerState.PLAYING, clock.startTimeSec);
                     currentTime.set(clock.startTimeSec);
-                    showLine(findLatestActiveLineIndex(lyrics.lines, clock.startTimeSec));
+                    showLine(findActiveLine(clock.startTimeSec));
                 } else {
                     syncStageLyricsClock(clock.endTimeSec, clock.endTimeSec, PlayerState.PAUSED, clock.startTimeSec);
                     setPlayerState(PlayerState.PAUSED);
@@ -388,6 +389,7 @@ export function usePlaybackVisualizerBridge({
         isNowPlayingStageActive,
         isPlayerCapStageActive,
         lyrics,
+        findActiveLine,
         incomingLyrics,
         playerState,
         setCurrentLineIndex,

@@ -6,6 +6,7 @@ import {
     resolveHarmonyAlternateText,
     resolveHarmonySnapshot,
     resolveHarmonySnapshotFromVocals,
+    createHarmonySnapshotReader,
 } from '@/components/visualizer/harmonyRuntime';
 
 // test/unit/visualizer/harmonyRuntime.test.ts
@@ -83,5 +84,24 @@ describe('harmony runtime', () => {
         expect(resolveHarmonyAlternateText(vocal, 'translation')).toBe('回声此刻');
         expect(resolveHarmonyAlternateText(vocal, 'romanization')).toBe('huí shēng cǐ kè');
         expect(resolveHarmonyAlternateText(vocal, 'none')).toBeNull();
+    });
+
+    it('cached frames match exact boundaries, nearby frames, gaps and reverse seeking', () => {
+        const vocals = [vocal, { ...vocal, startTime: 3.5, endTime: 7, text: 'echoes now!' }];
+        const read = createHarmonySnapshotReader(vocals);
+        const boundaries = vocals.flatMap(row => [row.startTime, row.endTime, ...row.words.flatMap(word => [word.startTime, word.endTime])]);
+        const times = boundaries.flatMap(time => [time - 0.00001, time, time + 0.00001]);
+        for (const time of [...times, ...times.reverse(), -1, 20, NaN, Infinity]) {
+            expect(read(time)).toEqual(resolveHarmonySnapshotFromVocals(vocals, time));
+        }
+    });
+
+    it('reuses the discrete snapshot while keeping continuous glow on its own clock', () => {
+        const read = createHarmonySnapshotReader([{ ...vocal, startTime: 1, endTime: 10, words: [] }]);
+        const first = read(2);
+        for (let i = 1; i < 240; i++) expect(read(2 + i / 120)).toBe(first);
+        expect(read(10).lines).toHaveLength(1);
+        expect(read(10.00001).lines).toHaveLength(0);
+        expect(read(2)).toEqual(first);
     });
 });

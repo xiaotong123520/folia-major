@@ -117,3 +117,29 @@ export const resolveHarmonySnapshot = (
     line: Line | null | undefined,
     currentTime: number,
 ): HarmonySnapshot => resolveHarmonySnapshotFromVocals(getLineBackgroundVocals(line), currentTime);
+
+// Token state changes only at a vocal/word boundary; continuous glow still reads the live clock.
+export const createHarmonySnapshotReader = (vocals: LyricBackgroundVocal[]) => {
+    const boundaries = [...new Set(vocals.flatMap(vocal => [
+        vocal.startTime, vocal.endTime,
+        ...vocal.words.flatMap(word => [word.startTime, word.endTime]),
+    ]).filter(Number.isFinite))].sort((left, right) => left - right);
+    let previousBucket = -1;
+    let previous: HarmonySnapshot | undefined;
+    return (time: number): HarmonySnapshot => {
+        if (!Number.isFinite(time)) return resolveHarmonySnapshotFromVocals(vocals, time);
+        let low = 0;
+        let high = boundaries.length;
+        while (low < high) {
+            const middle = (low + high) >>> 1;
+            if (boundaries[middle] < time) low = middle + 1;
+            else high = middle;
+        }
+        // The end itself is inclusive. Keep exact endpoints separate from the interval after them.
+        const bucket = low * 2 + (boundaries[low] === time ? 1 : 0);
+        if (previous && bucket === previousBucket) return previous;
+        previousBucket = bucket;
+        previous = resolveHarmonySnapshotFromVocals(vocals, time);
+        return previous;
+    };
+};

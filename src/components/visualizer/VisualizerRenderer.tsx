@@ -104,4 +104,4 @@ const VisualizerRenderer: React.FC<VisualizerRendererProps> = ({ mode, animateSt
     );
 };
 
-export default VisualizerRenderer;
+export default React.memo(VisualizerRenderer);

@@ -9,7 +9,7 @@ import { resolveWordColor } from './wordColoring';
 import {
     getLyricsBackgroundVocals,
     resolveHarmonyAlternateText,
-    resolveHarmonySnapshotFromVocals,
+    createHarmonySnapshotReader,
     type HarmonySnapshot,
 } from './harmonyRuntime';
 
@@ -186,11 +186,12 @@ const VisualizerHarmonyOverlay: React.FC<VisualizerHarmonyOverlayProps> = ({
     subtitleFontScale = 1,
 }) => {
     const backgroundVocals = useMemo(() => getLyricsBackgroundVocals(lines), [lines]);
+    const readSnapshot = useMemo(() => createHarmonySnapshotReader(backgroundVocals), [backgroundVocals]);
     const buildSnapshot = useCallback(
         (time: number) => showText && showHarmonySubtitle
-            ? resolveHarmonySnapshotFromVocals(backgroundVocals, time)
+            ? readSnapshot(time)
             : EMPTY_HARMONY_SNAPSHOT,
-        [backgroundVocals, showHarmonySubtitle, showText],
+        [readSnapshot, showHarmonySubtitle, showText],
     );
     const initialSnapshot = buildSnapshot(currentTime.get());
     const [snapshot, setSnapshot] = useState<HarmonySnapshot>(initialSnapshot);
