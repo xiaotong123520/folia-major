@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 app="$PWD/output/TingyuFM.xcarchive/Products/Applications/TingyuFM.app"
 test -f "$app/TingyuFM"
 /usr/bin/file "$app/TingyuFM" | /usr/bin/grep -q 'Mach-O'
-/usr/bin/lipo -verify_arch arm64 "$app/TingyuFM"
+/usr/bin/lipo "$app/TingyuFM" -verify_arch arm64
 stage="$(mktemp -d)"
 trap 'rm -rf "$stage"' EXIT
 mkdir "$stage/Payload"
