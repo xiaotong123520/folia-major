@@ -4,6 +4,7 @@ import { parseLRC } from '../../../utils/lyrics/parserCore';
 import { catalogSnapshot } from './catalogSnapshot';
 import { readSavedRadios } from '../../personalRadioStorage';
 import i18n from '../../../i18n/config';
+import { authorizeServerPlayback, authorizedServerAudio, serverAccessRequired } from '../../serverAccess/client';
 
 // Original server recordings enter the same Omni playback, artwork and lyric pipeline as every source.
 export const HEARTTRACE_ORIGIN = new URL('https://我爱南京.com').origin;
@@ -199,9 +200,11 @@ export const hearttraceProvider: OnlineMusicProvider = {
         },
     },
     playback: {
+        authorizePlayback: authorizeServerPlayback,
         async getSongDetail(id) { const entry = entries.get(String(id)); return entry ? toHearttraceSong(entry) : null; },
         async getAudioSource(song, quality) {
             const entry = entryFor(song);
+            if (serverAccessRequired()) return { url: await authorizedServerAudio(identity(entry)), quality, fetchedAt: Date.now() };
             const url = new URL('/api/audio.php', HEARTTRACE_ORIGIN);
             url.searchParams.set('path', identity(entry));
             return { url: url.href, quality, fetchedAt: Date.now() };

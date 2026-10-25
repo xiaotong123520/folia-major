@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const cachedAudioMock = vi.hoisted(() => vi.fn());
 const songCacheMock = vi.hoisted(() => vi.fn());
 const sourceMock = vi.hoisted(() => vi.fn());
+const authorizeMock = vi.hoisted(() => vi.fn(async () => {}));
 const lyricsMock = vi.hoisted(() => vi.fn());
 const otherArtistNameMock = vi.hoisted(() => vi.fn());
 const autoMatchMock = vi.hoisted(() => vi.fn());
@@ -19,6 +20,7 @@ vi.mock('@/services/onlineMusic/resourceCache', () => ({
 
 vi.mock('@/services/onlineMusic/omni', () => ({
     omni: {
+        authorizePlayback: authorizeMock,
         getAudioSource: sourceMock,
         getLyrics: lyricsMock,
         getAlternateArtistName: otherArtistNameMock,
@@ -80,9 +82,19 @@ const song: SongResult = {
 };
 
 describe('online audio ReplayGain plumbing', () => {
+    it('refuses cached and prefetched audio when play authorization is rejected', async () => {
+        authorizeMock.mockRejectedValueOnce(new Error('Authorization cancelled'));
+        cachedAudioMock.mockResolvedValueOnce(new Blob(['saved-audio']));
+        const result = await loadOnlineSongAudioSource(song, 'standard', null);
+        expect(result.kind).toBe('unavailable');
+        expect(cachedAudioMock).not.toHaveBeenCalled();
+        expect(sourceMock).not.toHaveBeenCalled();
+    });
+
     beforeEach(() => {
         vi.clearAllMocks();
-        cachedAudioMock.mockResolvedValue(null);
+        authorizeMock.mockResolvedValue(undefined);
+        cachedAudioMock.mockReset().mockResolvedValue(null);
         isUrlValidMock.mockReturnValue(true);
         resetOnlineRequestCooldowns();
         useOnlineProviderAccountStore.setState({ accounts: {} });
@@ -195,7 +207,7 @@ describe('online audio source failures', () => {
         vi.clearAllMocks();
         sourceMock.mockReset();
         cachedAudioMock.mockReset();
-        cachedAudioMock.mockResolvedValue(null);
+        cachedAudioMock.mockReset().mockResolvedValue(null);
         isUrlValidMock.mockReturnValue(true);
         resetOnlineRequestCooldowns();
         clearCachedSongAudioDistrust(song);

@@ -1,6 +1,29 @@
 
 
 export default {
+  "serverAccess": {
+    "title": "服务器音乐授权",
+    "description": "天天开心，听歌愉快。输入自己的邮箱，获取授权码后即可收听服务器音乐。",
+    "email": "你的邮箱",
+    "code": "6 位授权码",
+    "send": "发送授权码",
+    "sent": "授权码已发送，请查看收件箱或垃圾邮件。10 分钟内有效。",
+    "verify": "验证并继续播放",
+    "resend": "重新发送",
+    "resendIn": "{{seconds}} 秒后可重发",
+    "working": "正在处理…",
+    "close": "关闭",
+    "privacy": "授权有效期为 7 天，仅用于当前浏览器或 App。邮箱只用于发送授权码；网易云、QQ 和酷狗使用各自的登录。",
+    "errors": {
+        "invalid_email": "请输入有效的邮箱地址。",
+        "invalid_code": "授权码错误或已失效，请检查或重新发送。",
+        "rate_limited": "发送过于频繁，请稍后再试。",
+        "mail_unavailable": "邮件暂时发送失败，请稍后重试。",
+        "not_configured": "授权服务尚未配置完成，请联系管理员。",
+        "storage_unavailable": "授权服务暂时不可用，请稍后重试。",
+        "unavailable": "网络或授权服务暂时不可用，请重试。"
+    }
+},
   "podcast": {
     "followPlayback": "跟随播放",
     "transcript": "文稿 / 简介",

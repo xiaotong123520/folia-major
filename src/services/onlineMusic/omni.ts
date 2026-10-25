@@ -969,6 +969,10 @@ export const omni = {
         return applyOmniAudioHook(song, source);
     },
 
+    async authorizePlayback(song: SongResult): Promise<void> {
+        await providerForSong(song).playback?.authorizePlayback?.(song);
+    },
+
     // The level a URL handed out by `getAudioSource` was asked for at. Undefined for any other URL
     // (a local file, a Navidrome stream, a blob), and for one handed out too long ago to be remembered.
     levelOfAudioSource(url: string): AudioQualityPreference | undefined {

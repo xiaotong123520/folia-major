@@ -1,6 +1,29 @@
 
 
 export default {
+  "serverAccess": {
+    "title": "Server music access",
+    "description": "Happy listening! Enter your own email to receive an access code for server music.",
+    "email": "Your email",
+    "code": "6-digit code",
+    "send": "Send code",
+    "sent": "Code sent. Check your inbox or spam folder. It expires in 10 minutes.",
+    "verify": "Verify and continue playback",
+    "resend": "Resend code",
+    "resendIn": "Resend in {{seconds}}s",
+    "working": "Working…",
+    "close": "Close",
+    "privacy": "Access lasts 7 days in this browser or app. Your email is used only to send the code. Other music platforms use their own sign-in.",
+    "errors": {
+        "invalid_email": "Enter a valid email address.",
+        "invalid_code": "Incorrect or expired code. Check it or request a new one.",
+        "rate_limited": "Too many requests. Try again later.",
+        "mail_unavailable": "Could not send email. Try again later.",
+        "not_configured": "Access service is not configured. Contact the administrator.",
+        "storage_unavailable": "Access storage is temporarily unavailable. Try again later.",
+        "unavailable": "Network or access service unavailable. Please retry."
+    }
+},
   "podcast": {
     "followPlayback": "Follow playback",
     "transcript": "Transcript / notes",

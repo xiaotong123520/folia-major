@@ -1,6 +1,29 @@
 
 
 export default {
+  "serverAccess": {
+    "title": "Akses musik server",
+    "description": "Selamat mendengarkan! Masukkan email Anda untuk menerima kode akses musik server.",
+    "email": "Email Anda",
+    "code": "Kode 6 digit",
+    "send": "Kirim kode",
+    "sent": "Kode terkirim. Periksa kotak masuk atau spam. Berlaku 10 menit.",
+    "verify": "Verifikasi dan lanjutkan pemutaran",
+    "resend": "Kirim ulang",
+    "resendIn": "Kirim ulang dalam {{seconds}} dtk",
+    "working": "Memproses…",
+    "close": "Tutup",
+    "privacy": "Akses berlaku 7 hari di browser atau aplikasi ini. Email hanya digunakan untuk mengirim kode. Platform musik lain menggunakan login masing-masing.",
+    "errors": {
+        "invalid_email": "Masukkan alamat email yang valid.",
+        "invalid_code": "Kode salah atau kedaluwarsa. Periksa atau minta kode baru.",
+        "rate_limited": "Terlalu banyak permintaan. Coba lagi nanti.",
+        "mail_unavailable": "Email gagal dikirim. Coba lagi nanti.",
+        "not_configured": "Layanan akses belum dikonfigurasi. Hubungi administrator.",
+        "storage_unavailable": "Penyimpanan akses sementara tidak tersedia.",
+        "unavailable": "Jaringan atau layanan akses tidak tersedia. Coba lagi."
+    }
+},
   "podcast": {
     "followPlayback": "Ikuti pemutaran",
     "transcript": "Transkrip / catatan",

@@ -4,6 +4,9 @@ import { AudioLines, Film, LayoutGrid, Link2, Music2, Podcast, QrCode, Radio, Se
 import { useTranslation } from 'react-i18next';
 import { openLoginWindow } from '../login/loginWindowStore';
 import Sheet from '../shared/Sheet';
+import ServerAccessDialog from './serverAccess/ServerAccessDialog';
+import { serverAccessRequired } from '../../services/serverAccess/client';
+import { useServerAccessStore } from '../../services/serverAccess/store';
 
 // One toolbar and the original application surfaces on every viewport; no separate phone homepage.
 const HearttraceLibrary = lazy(() => import('./hearttraceLibrary/HearttraceLibrary'));
@@ -24,6 +27,7 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideo
         { icon: LayoutGrid, label: t('hearttraceLibrary.wall'), run: () => onOpenLibrary('albums') },
         { icon: Radio, label: t('radioAgent.savedWall'), run: () => onOpenLibrary('radio') },
         { icon: Server, label: t('hearttraceLibrary.title'), run: () => setServerOpen(true) },
+        ...(serverAccessRequired() ? [{ icon: Server, label: t('serverAccess.title'), run: () => useServerAccessStore.getState().setOpen(true) }] : []),
         { icon: Podcast, label: t('podcast.title'), run: () => setPodcastOpen(true) },
         { icon: QrCode, label: t('mobileAccess.accounts'), run: () => openLoginWindow() },
         { icon: Link2, label: t('personal.import'), run: onImport },
@@ -33,6 +37,7 @@ export default function PersonalMusicTools({ onImport, onRadio, onApple, onVideo
     ];
     const runAndClose = (action: () => void) => { setOpen(false); action(); };
     return <>
+        <ServerAccessDialog />
         <aside className="fixed left-[max(12px,var(--app-control-left-inset,env(safe-area-inset-left)))] sm:left-auto sm:right-[max(12px,var(--app-control-right-inset,env(safe-area-inset-right)))] bottom-[calc(176px+var(--app-control-bottom-inset,env(safe-area-inset-bottom)))] z-[85] flex max-w-[calc(100vw-24px)] flex-col-reverse items-start gap-2 sm:items-end sm:bottom-auto sm:top-[max(12px,var(--app-control-top-inset,env(safe-area-inset-top)))] sm:flex-col">
             <button type="button" aria-label={t('personal.tools')} aria-expanded={open}
                 onClick={() => setOpen(value => !value)}

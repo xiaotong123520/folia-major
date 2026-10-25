@@ -55,6 +55,11 @@ export async function loadOnlineSongAudioSource(
     prefetched: PrefetchedSongData | null,
     options: LoadOnlineAudioSourceOptions = {},
 ): Promise<OnlineAudioSourceResult> {
+    try {
+        await omni.authorizePlayback(song);
+    } catch (error) {
+        return { kind: 'unavailable', failure: onlineFailureOf({ operation: 'audio', providerId: getOnlineProviderIdForSong(song) ?? undefined }, { error }) };
+    }
     // The copy in the media cache is taken only where it was fetched at the level the option now
     // means for this song's provider, or at an unknown one. A copy of another level is passed
     // over for a URL of the level asked for: the option decides what plays, cached or not.

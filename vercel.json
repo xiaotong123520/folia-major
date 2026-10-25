@@ -1,10 +1,42 @@
 {
   "ignoreCommand": "git rev-parse --verify -q HEAD^ >/dev/null && git diff --quiet HEAD^ HEAD -- . ':(exclude)docs/CODEMAP.md'",
   "headers": [
-    { "source": "/", "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }] },
-    { "source": "/index.html", "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }] },
-    { "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }] },
-    { "source": "/registerSW.js", "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }] }
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/registerSW.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, max-age=0, must-revalidate"
+        }
+      ]
+    }
   ],
   "rewrites": [
     {
@@ -15,5 +47,12 @@
       "source": "/api/qq/:path*",
       "destination": "/api/qq?path=/:path*"
     }
-  ]
+  ],
+  "functions": {
+    "api/server-access.py": {
+      "maxDuration": 300,
+      "includeFiles": "src/services/onlineMusic/hearttrace/catalogSnapshot.ts",
+      "excludeFiles": "{node_modules,electron,models,build,public,dist,release,test,docs,packaging,.git}/**"
+    }
+  }
 }
