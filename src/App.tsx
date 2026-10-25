@@ -2431,6 +2431,7 @@ export default function App() {
             ref={register}
             src={automix.deckSrc(deck)}
             data-tingyu-stream-url={getBufferedAudioStreamUrl(automix.deckSrc(deck) || '')}
+            data-tingyu-volume={getTargetPlaybackVolume()}
             preload="auto"
             crossOrigin="anonymous"
             loop={effectiveLoopMode === 'one' && automix.activeDeck === deck}

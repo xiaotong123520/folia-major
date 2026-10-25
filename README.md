@@ -15,13 +15,13 @@
 
 2026-10-25 已通过 GitHub macOS runner 的 Xcode 编译与 IPA 封装，产物为 **未签名 iPhone arm64 IPA**，不是只有源码的 ZIP。
 
-- [成功构建记录与下载入口](https://github.com/xiaotong123520/folia-major/actions/runs/40152427190)：在 Artifacts 下载 `TingyuFM-unsigned-self-sign`，解压后得到 `TingyuFM-unsigned.ipa`。下载 GitHub 构建产物可能需要登录；本次 IPA artifact 保留至 2026-11-08，过期后需重新构建。
+- [成功构建记录与下载入口](https://github.com/xiaotong123520/folia-major/actions/runs/40171602619)：在 Artifacts 下载 `TingyuFM-unsigned-self-sign`，解压后得到 `TingyuFM-unsigned.ipa`。下载 GitHub 构建产物可能需要登录；本次 IPA artifact 保留至 2026-11-08，过期后需重新构建。
 - [iOS 工程与详细说明](https://github.com/xiaotong123520/folia-major/blob/build/ios-self-sign/packaging/ios/README.md)位于独立的 `build/ios-self-sign` 分支，尚未合并到 main；本次仅更新主分支文档。
 - 最低系统为 iOS 16.0，应用标识为 `com.xiaotong123520.tingyufm`。已检查 IPA 内的 Payload、Info.plist 和 arm64 Mach-O 可执行文件；包内不含签名证书、私钥或描述文件。
 - 安装：将 IPA 保存到“文件”，导入支持普通 IPA 重签的工具，用适用于目标设备的有效签名材料签名后安装。全能签、轻松签等工具尚未逐款实测，不能保证全部版本兼容；巨魔还受其自身支持的设备及系统版本限制。
 - 未签名 IPA 不能直接点开安装，也不属于 TestFlight 分发包。免费 Personal Team 的 Xcode 真机安装与第三方工具重签是不同流程，具体有效期取决于使用的签名方式。
 
-**运行范围与待验收项**：当前是 UIKit + WKWebView 联网容器，加载现有 HTTPS 网站，不含离线前端资源。网页与 App 的本地数据和登录状态不保证共用。云端编译成功不等于真机功能全部通过：平台扫码登录、跳转、播放、封面、歌词 WebGL 和文件导入仍待 App 真机验收；原生后台音频服务、原生锁屏控制尚未实现。该构建没有修复网页端镜台在无 WebGL 环境下的黑屏问题。
+**运行范围与待验收项**：当前是 UIKit + WKWebView 联网容器，加载现有 HTTPS 网站，不含离线前端资源。网页与 App 的本地数据和登录状态不保证共用。云端编译成功不等于真机功能全部通过：平台扫码登录、跳转、播放、封面、歌词 WebGL 和文件导入仍待 App 真机验收；1.1.0 已加入当前歌曲的原生后台接管与锁屏暂停/进度控制，仍待真机验收；后台队列自动切歌与网页音效尚未迁移。该构建没有修复网页端镜台在无 WebGL 环境下的黑屏问题。
 
 **公告**：iOS 1.0.3 已加入启动公告「天天开心，听歌愉快」，每次安装确认一次。它是原生本地公告，尚未接入远程公告或公众号文章链接。
 
@@ -140,6 +140,6 @@ GITHUB_PAGES=true npm run build
 
 ## App 1.1.0 原生后台接管与版本公告
 
-新的原生测试包把当前歌曲及单曲循环交给 AVPlayer 后台播放，返回前台同步进度，并恢复原网页音频图及歌词特效。新能力需要安装 1.1.0 IPA，仅刷新网页无法把原生播放器添加到旧包。编译成功仍不代表通过真机锁屏验收；后台整条队列自动切歌尚未实现。
+新的原生测试包把当前歌曲及单曲循环交给 AVPlayer 后台播放，返回前台同步进度，并恢复原网页音频图及歌词特效。新能力需要安装 1.1.0 IPA，仅刷新网页无法把原生播放器添加到旧包。编译成功仍不代表通过真机锁屏验收；后台整条队列自动切歌与网页均衡器 / 混音音效尚未迁移。
 
 首次安装的「天天开心，听歌愉快」公告及原存储键保持不变。1.1.0 起，在之后的打开 / 首页加载中读取 `public/app-updates.json` 的版本公告，列出实际更新并在确认后记为已读；它与首次欢迎记录独立。发布产品代码时需更新该清单的 id 和具体说明，`dev/verifyAppUpdates.mjs` 在构建中校验（浅克隆没有父版本时只检查字段）。
