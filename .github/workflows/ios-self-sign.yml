@@ -17,6 +17,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Check native audio handoff bridge
+        run: node --test packaging/ios/testNativeAudioBridge.cjs
       - name: Prepare app icon
         run: sips -z 1024 1024 public/icon-512.png --out packaging/ios/TingyuFM/Assets.xcassets/AppIcon.appiconset/AppIcon.png
       - name: Compile device archive without signing

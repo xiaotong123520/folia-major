@@ -7,6 +7,9 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
     private let startURL = URL(string: "https://folia-major-ai-radio-preview.vercel.app/")!
     private var browser: WKWebView!
     private let failure = UIStackView()
+    private let nativeAudio = NativeBackgroundAudio()
+    private var updateNotice: AppUpdateNotice?
+    private var firstWelcome = !UserDefaults.standard.bool(forKey: "tingyu.notice.happy-listening.v1")
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,6 +22,11 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
         // 不主动播放任何歌曲，播放选择仍由网页播放器处理。
         configuration.mediaTypesRequiringUserActionForPlayback = []
         configureAudioSession()
+        configuration.userContentController.addScriptMessageHandler(nativeAudio, contentWorld: .page, name: "tingyuNativeAudio")
+        if let scriptURL = Bundle.main.url(forResource: "NativeAudioBridge", withExtension: "js"),
+           let script = try? String(contentsOf: scriptURL, encoding: .utf8) {
+            configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        }
         configuration.userContentController.add(self, name: "tingyuPlayback")
         let playbackEvents = """
         document.addEventListener('play', function(event) {
@@ -31,6 +39,7 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
             source: playbackEvents, injectionTime: .atDocumentStart, forMainFrameOnly: true
         ))
         browser = WKWebView(frame: .zero, configuration: configuration)
+        nativeAudio.browser = browser
         browser.navigationDelegate = self
         browser.uiDelegate = self
         browser.isOpaque = false
@@ -67,6 +76,7 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
         ])
         failure.isHidden = true
         retryLoading()
+        fetchUpdateNotice()
     }
 
     private func configureAudioSession() {
@@ -93,7 +103,7 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
         super.viewDidAppear(animated)
         let noticeKey = "tingyu.notice.happy-listening.v1"
         guard !UserDefaults.standard.bool(forKey: noticeKey),
-              presentedViewController == nil else { return }
+              presentedViewController == nil else { showUpdateIfNeeded(); return }
         let notice = UIAlertController(
             title: "听屿 FM 公告",
             message: "天天开心，听歌愉快",
@@ -101,8 +111,48 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
         )
         notice.addAction(UIAlertAction(title: "开始听歌", style: .default) { _ in
             UserDefaults.standard.set(true, forKey: noticeKey)
+            // A fresh install keeps the original welcome; release details begin with the next update.
+            self.markFirstUpdateSeen()
         })
         present(notice, animated: true)
+    }
+
+    private struct AppUpdateNotice: Decodable {
+        let id: String
+        let version: String
+        let changes: [String]
+    }
+    private func fetchUpdateNotice() {
+        let url = startURL.appendingPathComponent("app-updates.json")
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
+        request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, _ in
+            guard let data = data, data.count <= 32768,
+                  (response as? HTTPURLResponse)?.statusCode == 200,
+                  let notice = try? JSONDecoder().decode(AppUpdateNotice.self, from: data),
+                  !notice.id.isEmpty, notice.id.count <= 100, notice.version.count <= 80,
+                  !notice.changes.isEmpty, notice.changes.count <= 12,
+                  notice.changes.allSatisfy({ !$0.isEmpty && $0.count <= 500 }) else { return }
+            DispatchQueue.main.async {
+                self?.updateNotice = notice
+                if self?.firstWelcome == true { self?.markFirstUpdateSeen() }
+                else { self?.showUpdateIfNeeded() }
+            }
+        }.resume()
+    }
+    private func markFirstUpdateSeen() {
+        if let notice = updateNotice { UserDefaults.standard.set(notice.id, forKey: "tingyu.notice.last-update.v1") }
+    }
+    private func showUpdateIfNeeded() {
+        guard !firstWelcome, presentedViewController == nil, view.window != nil,
+              let notice = updateNotice,
+              UserDefaults.standard.string(forKey: "tingyu.notice.last-update.v1") != notice.id else { return }
+        let alert = UIAlertController(title: "听屿 FM 更新公告 · \(notice.version)",
+            message: notice.changes.map { "• " + $0 }.joined(separator: "\n\n"), preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "知道了", style: .default) { _ in
+            UserDefaults.standard.set(notice.id, forKey: "tingyu.notice.last-update.v1")
+        })
+        present(alert, animated: true)
     }
 
     @objc private func retryLoading() {
@@ -113,6 +163,11 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         failure.isHidden = true
+        if webView === browser { fetchUpdateNotice() }
+    }
+
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        if webView === browser { nativeAudio.reset() }
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
