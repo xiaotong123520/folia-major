@@ -15,7 +15,8 @@
         return { action: 'state', id, time: Number.isFinite(audio?.currentTime) ? audio.currentTime : 0,
             playing: !!audio && !audio.paused && !audio.ended, rate: audio?.playbackRate || 1,
             loop: !!audio?.loop,
-            volume: audio?.muted ? 0 : audio?.volume ?? 1,
+            volume: audio?.muted ? 0 : Number.isFinite(Number(audio?.dataset?.tingyuVolume))
+                ? Number(audio.dataset.tingyuVolume) : audio?.volume ?? 1,
             title: metadata?.title || '听屿 FM', artist: metadata?.artist || '', album: metadata?.album || '',
             artwork: metadata?.artwork?.find(item => item.src?.startsWith('https://'))?.src || '' };
     };

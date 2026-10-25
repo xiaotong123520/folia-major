@@ -66,7 +66,7 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
                     guard let size = body["size"] as? Int, size > 0, size <= 64 * 1024 * 1024 else { throw AudioError.invalid }
                     expected = size
                     let mime = body["mime"] as? String ?? ""
-                    let ext = mime.contains("mp4") || mime.contains("aac") ? "m4a" : mime.contains("flac") ? "flac" : mime.contains("ogg") ? "ogg" : mime.contains("wav") ? "wav" : "mp3"
+                    let ext = mime.contains("mp4") ? "m4a" : mime.contains("aac") ? "aac" : mime.contains("flac") ? "flac" : mime.contains("ogg") ? "ogg" : mime.contains("wav") ? "wav" : "mp3"
                     let url = FileManager.default.temporaryDirectory.appendingPathComponent("tingyu-audio-\(UUID().uuidString).\(ext)")
                     FileManager.default.createFile(atPath: url.path, contents: nil)
                     transferURL = url
