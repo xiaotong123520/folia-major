@@ -1,8 +1,9 @@
 import UIKit
 import WebKit
+import AVFoundation
 
 // 使用持久化 WebKit 数据，避免嵌入本地页面后改变 API 与会话的来源。
-final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
+final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
     private let startURL = URL(string: "https://folia-major-ai-radio-preview.vercel.app/")!
     private var browser: WKWebView!
     private let failure = UIStackView()
@@ -14,8 +15,21 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
         configuration.websiteDataStore = .default()
         configuration.allowsInlineMediaPlayback = true
         configuration.allowsAirPlayForMediaPlayback = true
-        // 保留用户发起播放的要求，不注入自动播放脚本。
-        configuration.mediaTypesRequiringUserActionForPlayback = .all
+        // 歌曲地址经异步接口返回后仍允许播放，避免失去点击手势导致 NotAllowedError。
+        // 不主动播放任何歌曲，播放选择仍由网页播放器处理。
+        configuration.mediaTypesRequiringUserActionForPlayback = []
+        configureAudioSession()
+        configuration.userContentController.add(self, name: "tingyuPlayback")
+        let playbackEvents = """
+        document.addEventListener('play', function(event) {
+            if (event.target instanceof HTMLMediaElement) {
+                window.webkit.messageHandlers.tingyuPlayback.postMessage('play');
+            }
+        }, true);
+        """
+        configuration.userContentController.addUserScript(WKUserScript(
+            source: playbackEvents, injectionTime: .atDocumentStart, forMainFrameOnly: true
+        ))
         browser = WKWebView(frame: .zero, configuration: configuration)
         browser.navigationDelegate = self
         browser.uiDelegate = self
@@ -53,6 +67,26 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
         ])
         failure.isHidden = true
         retryLoading()
+    }
+
+    private func configureAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+        } catch {
+            NSLog("[TingyuAudio] Audio session category failed: %@", error.localizedDescription)
+        }
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        // 仅接受主页面的固定播放事件，不接收 Cookie、音源地址或账户信息。
+        guard message.frameInfo.isMainFrame,
+              message.frameInfo.request.url?.host == startURL.host,
+              message.body as? String == "play" else { return }
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            NSLog("[TingyuAudio] Audio session activation failed: %@", error.localizedDescription)
+        }
     }
 
     @objc private func retryLoading() {

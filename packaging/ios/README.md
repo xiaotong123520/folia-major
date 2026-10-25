@@ -52,3 +52,9 @@
 ## 云端自签 IPA
 
 `.github/workflows/ios-self-sign.yml` 在独立构建分支编译 iPhone arm64 archive，`packageUnsigned.sh` 检查真实 Mach-O 后生成 `TingyuFM-unsigned.ipa`。该产物必须由用户签名后安装；不是 TestFlight 或 App Store 分发包。下载 Actions 的 `TingyuFM-unsigned-self-sign` artifact。
+
+## 1.0.1 播放修正测试包
+
+针对真机反馈的 App 卡顿/不播放，将 WKWebView 媒体手势限制从 `.all` 改为 `[]`，允许用户选曲后异步解析的播放请求；不注入主动播放或恢复暂停的脚本。配置 AVAudioSession playback，在主页面实际发出媒体 play 事件时激活会话。版本升级为 1.0.1 (2)，保留应用标识；签名时请沿用设备上已安装版本的实际标识。
+
+这些是针对配置问题的修正，不代表已证明卡顿的唯一根因，也不代表网络缓冲、Web Audio 中断或歌词渲染负载均已解决。新包仍需真机复测前台播放、切歌、暂停与锁屏行为。
