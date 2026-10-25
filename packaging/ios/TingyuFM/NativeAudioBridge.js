@@ -50,7 +50,10 @@
         return preparing;
     }
     function sync(event) {
-        if (ownsNative) return;
+        if (ownsNative) {
+            if (event?.type === 'playing' && event.target === audio) audio.pause();
+            return;
+        }
         const target = event?.target;
         if (target instanceof HTMLMediaElement && event.type === 'playing') audio = target;
         if (!audio || (target instanceof HTMLMediaElement && target !== audio)) return;

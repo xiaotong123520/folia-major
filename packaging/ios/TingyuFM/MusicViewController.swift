@@ -163,7 +163,7 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         failure.isHidden = true
-        if webView === browser { fetchUpdateNotice() }
+        if webView === browser, webView.url?.host == startURL.host { fetchUpdateNotice() }
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {

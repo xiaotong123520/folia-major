@@ -21,8 +21,11 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
     private var ended = false
     private var started = false
     private var wantsPlay = false
+    private var interrupted = false
     private var task: UIBackgroundTaskIdentifier = .invalid
     private var commands: [(MPRemoteCommand, Any)] = []
+    private var nextWasEnabled = false
+    private var previousWasEnabled = false
     private var artwork: MPMediaItemArtwork?
     private var artworkURL = ""
 
@@ -85,7 +88,7 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
                     observation = nil; player?.pause()
                     if let observer = observer { player?.removeTimeObserver(observer) }; observer = nil
                     player = nil; owned = false
-                    for (command, target) in commands { command.removeTarget(target) }; commands = []
+                    releaseCommands()
                     startBackground()
                 }
             case "state":
@@ -116,7 +119,7 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
         player?.pause()
         if let observer = observer { player?.removeTimeObserver(observer) }; observer = nil
         player = nil
-        for (command, target) in commands { command.removeTarget(target) }; commands = []
+        releaseCommands()
         clearSource(); snapshot = [:]; sourceID = ""; endTask()
     }
     @objc private func willLeave() {
@@ -137,7 +140,7 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
         if task != .invalid { UIApplication.shared.endBackgroundTask(task); task = .invalid }
     }
     private func startBackground() {
-        guard background, let url = sourceURL, !owned else { return }
+        guard background, let url = sourceURL, !owned, !interrupted else { return }
         owned = true; ended = false; started = false; wantsPlay = true
         let token = sourceID
         let item = AVPlayerItem(url: url)
@@ -173,11 +176,11 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
         background = false
         guard owned, let engine = player else { endTask(); return }
         let time = engine.currentTime().seconds
-        let state: [String: Any] = ["id": sourceID, "time": started && time.isFinite ? time : (snapshot["time"] as? Double ?? 0), "playing": wantsPlay && !ended, "ended": ended]
+        let state: [String: Any] = ["id": sourceID, "time": started && time.isFinite ? time : (snapshot["time"] as? Double ?? 0), "playing": wantsPlay && !ended && !interrupted, "ended": ended]
         owned = false; engine.pause(); observation = nil
         if let observer = observer { engine.removeTimeObserver(observer) }; observer = nil
         player = nil
-        for (command, target) in commands { command.removeTarget(target) }; commands = []
+        releaseCommands()
         script("restore", state); endTask()
     }
     private func script(_ method: String, _ value: Any) {
@@ -212,8 +215,12 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
     }
     private func installCommands() {
         let center = MPRemoteCommandCenter.shared()
+        nextWasEnabled = center.nextTrackCommand.isEnabled
+        previousWasEnabled = center.previousTrackCommand.isEnabled
+        center.nextTrackCommand.isEnabled = false
+        center.previousTrackCommand.isEnabled = false
         let play = center.playCommand.addTarget { [weak self] _ in
-            guard let self = self, self.owned else { return .commandFailed }
+            guard let self = self, self.owned, !self.interrupted else { return .commandFailed }
             self.wantsPlay = true; try? AVAudioSession.sharedInstance().setActive(true); self.player?.play(); self.publish(); return .success
         }
         let pause = center.pauseCommand.addTarget { [weak self] _ in
@@ -226,6 +233,13 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
         }
         commands = [(center.playCommand, play), (center.pauseCommand, pause), (center.changePlaybackPositionCommand, seek)]
     }
+    private func releaseCommands() {
+        guard !commands.isEmpty else { return }
+        for (command, target) in commands { command.removeTarget(target) }; commands = []
+        let center = MPRemoteCommandCenter.shared()
+        center.nextTrackCommand.isEnabled = nextWasEnabled
+        center.previousTrackCommand.isEnabled = previousWasEnabled
+    }
     @objc private func finished(_ notification: Notification) {
         guard owned, let item = notification.object as? AVPlayerItem, item === player?.currentItem else { return }
         if snapshot["loop"] as? Bool == true, wantsPlay {
@@ -234,12 +248,15 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
         ended = true; wantsPlay = false; publish()
     }
     @objc private func interruption(_ notification: Notification) {
-        guard owned, let value = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+        guard let value = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: value) else { return }
-        if type == .began { player?.pause() }
-        else if wantsPlay, let options = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt,
-                AVAudioSession.InterruptionOptions(rawValue: options).contains(.shouldResume) {
-            try? AVAudioSession.sharedInstance().setActive(true); player?.play()
+        interrupted = type == .began
+        if interrupted { if owned { player?.pause() } }
+        else {
+            let options = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
+            let shouldResume = AVAudioSession.InterruptionOptions(rawValue: options).contains(.shouldResume)
+            if !shouldResume { wantsPlay = false }
+            if owned && wantsPlay && shouldResume { try? AVAudioSession.sharedInstance().setActive(true); player?.play() }
         }
     }
     @objc private func routeChanged(_ notification: Notification) {
