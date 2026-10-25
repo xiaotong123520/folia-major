@@ -89,6 +89,22 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
         }
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        let noticeKey = "tingyu.notice.happy-listening.v1"
+        guard !UserDefaults.standard.bool(forKey: noticeKey),
+              presentedViewController == nil else { return }
+        let notice = UIAlertController(
+            title: "听屿 FM 公告",
+            message: "天天开心，听歌愉快",
+            preferredStyle: .alert
+        )
+        notice.addAction(UIAlertAction(title: "开始听歌", style: .default) { _ in
+            UserDefaults.standard.set(true, forKey: noticeKey)
+        })
+        present(notice, animated: true)
+    }
+
     @objc private func retryLoading() {
         failure.isHidden = true
         browser.isHidden = false
