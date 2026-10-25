@@ -15,7 +15,7 @@
 
 2026-10-25 已通过 GitHub macOS runner 的 Xcode 编译与 IPA 封装，产物为 **未签名 iPhone arm64 IPA**，不是只有源码的 ZIP。
 
-- [成功构建记录与下载入口](https://github.com/xiaotong123520/folia-major/actions/runs/40147711734)：在 Artifacts 下载 `TingyuFM-unsigned-self-sign`，解压后得到 `TingyuFM-unsigned.ipa`。下载 GitHub 构建产物可能需要登录；本次 IPA artifact 保留至 2026-11-08，过期后需重新构建。
+- [成功构建记录与下载入口](https://github.com/xiaotong123520/folia-major/actions/runs/40152427190)：在 Artifacts 下载 `TingyuFM-unsigned-self-sign`，解压后得到 `TingyuFM-unsigned.ipa`。下载 GitHub 构建产物可能需要登录；本次 IPA artifact 保留至 2026-11-08，过期后需重新构建。
 - [iOS 工程与详细说明](https://github.com/xiaotong123520/folia-major/blob/build/ios-self-sign/packaging/ios/README.md)位于独立的 `build/ios-self-sign` 分支，尚未合并到 main；本次仅更新主分支文档。
 - 最低系统为 iOS 16.0，应用标识为 `com.xiaotong123520.tingyufm`。已检查 IPA 内的 Payload、Info.plist 和 arm64 Mach-O 可执行文件；包内不含签名证书、私钥或描述文件。
 - 安装：将 IPA 保存到“文件”，导入支持普通 IPA 重签的工具，用适用于目标设备的有效签名材料签名后安装。全能签、轻松签等工具尚未逐款实测，不能保证全部版本兼容；巨魔还受其自身支持的设备及系统版本限制。
@@ -25,7 +25,7 @@
 
 **公告**：iOS 1.0.3 已加入启动公告「天天开心，听歌愉快」，每次安装确认一次。它是原生本地公告，尚未接入远程公告或公众号文章链接。
 
-**服务器音乐邮箱授权**：授权接口与弹窗见 [配置及验收说明](docs/server-access.md)。开启前需配置 Gmail 应用专用密码、共享 Redis 和服务端密钥，并完成真实发信测试。该授权不替代其他音乐平台的登录。
+**服务器音乐邮箱授权**：授权接口与弹窗见 [配置及验收说明](docs/server-access.md)。Vercel 已配置 Gmail、共享 Redis 和服务端密钥，生产接口已通过真实 SMTP 发信测试（200）和未授权音频拒绝测试（401）；收件人输入验证码与真机授权播放仍待验收。该授权不替代其他音乐平台的登录。
 
 ## 小宇宙播客
 
