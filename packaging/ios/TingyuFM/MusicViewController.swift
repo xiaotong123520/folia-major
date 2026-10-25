@@ -141,7 +141,10 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
         }.resume()
     }
     private func markFirstUpdateSeen() {
-        if let notice = updateNotice { UserDefaults.standard.set(notice.id, forKey: "tingyu.notice.last-update.v1") }
+        guard firstWelcome, UserDefaults.standard.bool(forKey: "tingyu.notice.happy-listening.v1"),
+              let notice = updateNotice else { return }
+        UserDefaults.standard.set(notice.id, forKey: "tingyu.notice.last-update.v1")
+        firstWelcome = false
     }
     private func showUpdateIfNeeded() {
         guard !firstWelcome, presentedViewController == nil, view.window != nil,

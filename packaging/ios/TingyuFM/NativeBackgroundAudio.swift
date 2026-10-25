@@ -68,7 +68,8 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
                     let mime = body["mime"] as? String ?? ""
                     let ext = mime.contains("mp4") ? "m4a" : mime.contains("aac") ? "aac" : mime.contains("flac") ? "flac" : mime.contains("ogg") ? "ogg" : mime.contains("wav") ? "wav" : "mp3"
                     let url = FileManager.default.temporaryDirectory.appendingPathComponent("tingyu-audio-\(UUID().uuidString).\(ext)")
-                    FileManager.default.createFile(atPath: url.path, contents: nil)
+                    FileManager.default.createFile(atPath: url.path, contents: nil,
+                        attributes: [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication])
                     transferURL = url
                     transfer = try FileHandle(forWritingTo: url)
                     if let fallback = body["fallback"] as? String, fallback.count < 16384,
