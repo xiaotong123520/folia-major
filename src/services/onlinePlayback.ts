@@ -38,6 +38,8 @@ export type OnlineAudioSourceResult =
     | { kind: 'unavailable'; failure: OnlineFailure };
 
 export interface LoadOnlineAudioSourceOptions {
+    // A warmed deck is already playing the network source during an automix handover.
+    skipReadAhead?: boolean;
     // The media cache's copy is passed over: it is the copy that just failed to play.
     bypassMediaCache?: boolean;
     // Where the platform could not be reached, asks again by itself (`autoRetryDelaysMs`) as long as
@@ -124,7 +126,7 @@ export async function loadOnlineSongAudioSource(
 
     const prepareNetworkAudio = async (url: string, replayGain?: ReplayGainInfo): Promise<OnlineAudioSourceResult> => {
         const preview = omni.isPreviewAudioSource(url);
-        if (!preview && !options.bypassMediaCache && wantsMobileAudioBuffer(song.durationMs)) {
+        if (!preview && !options.skipReadAhead && !options.bypassMediaCache && wantsMobileAudioBuffer(song.durationMs)) {
             const blob = await readMobileAudioBuffer(url, options.retry?.isCurrent);
             const blobUrl = blob && createSafeObjectUrl(blob);
             if (blob && blobUrl) {

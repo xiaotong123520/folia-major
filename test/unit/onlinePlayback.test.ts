@@ -138,6 +138,13 @@ describe('online audio ReplayGain plumbing', () => {
         expect(await loadOnlineSongAudioSource(song, 'standard', null)).toMatchObject({ kind: 'ok', audioSrc: 'https://audio.test/full.mp3' });
     });
 
+    it('does not interrupt an already warmed automix stream to download another copy', async () => {
+        mobileBufferWantedMock.mockReturnValue(true);
+        sourceMock.mockResolvedValueOnce({ url: 'https://audio.test/warmed.mp3' });
+        expect(await loadOnlineSongAudioSource(song, 'standard', null, { skipReadAhead: true })).toMatchObject({ kind: 'ok', audioSrc: 'https://audio.test/warmed.mp3' });
+        expect(mobileBufferReadMock).not.toHaveBeenCalled();
+    });
+
     it('persists the buffered file at its requested quality without another download', async () => {
         mobileBufferWantedMock.mockReturnValue(true);
         const blob = new Blob([new Uint8Array(32768)], { type: 'audio/mpeg' });
