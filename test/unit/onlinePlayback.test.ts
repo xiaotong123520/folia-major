@@ -4,6 +4,10 @@ const cachedAudioMock = vi.hoisted(() => vi.fn());
 const songCacheMock = vi.hoisted(() => vi.fn());
 const sourceMock = vi.hoisted(() => vi.fn());
 const authorizeMock = vi.hoisted(() => vi.fn(async () => {}));
+const mobileBufferWantedMock = vi.hoisted(() => vi.fn(() => false));
+const mobileBufferReadMock = vi.hoisted(() => vi.fn(async (): Promise<Blob | null> => null));
+const saveBufferedAudioMock = vi.hoisted(() => vi.fn(async () => {}));
+const saveBufferedLevelMock = vi.hoisted(() => vi.fn(async () => {}));
 const lyricsMock = vi.hoisted(() => vi.fn());
 const otherArtistNameMock = vi.hoisted(() => vi.fn());
 const autoMatchMock = vi.hoisted(() => vi.fn());
@@ -12,10 +16,22 @@ const saveLyricsStateMock = vi.hoisted(() => vi.fn());
 const isUrlValidMock = vi.hoisted(() => vi.fn(() => true));
 const updatePrefetchedAudioUrlMock = vi.hoisted(() => vi.fn());
 
+vi.mock('@/services/mobileAudioBuffer', () => ({
+    wantsMobileAudioBuffer: mobileBufferWantedMock,
+    readMobileAudioBuffer: mobileBufferReadMock,
+}));
+vi.mock('@/services/audioCache', async importOriginal => ({
+    ...await importOriginal<typeof import('@/services/audioCache')>(),
+    saveAudioBlob: saveBufferedAudioMock,
+}));
+
 vi.mock('@/services/onlineMusic/resourceCache', () => ({
     getCachedSongAudioBlob: cachedAudioMock,
     getCachedSongReplayGain: vi.fn(async () => undefined),
     getSongCacheWithLegacyMigration: songCacheMock,
+    hasCachedSongAudio: vi.fn(async () => false),
+    saveSongAudioLevel: saveBufferedLevelMock,
+    saveSongReplayGain: vi.fn(async () => {}),
 }));
 
 vi.mock('@/services/onlineMusic/omni', () => ({
@@ -69,6 +85,7 @@ import { useOnlineProviderAccountStore } from '@/stores/useOnlineProviderAccount
 import { resetOnlineRequestCooldowns } from '@/services/onlineMusic/failure/onlineRequestCooldown';
 import { OnlineRequestTimeout } from '@/services/onlineMusic/failure/onlineRequestLimit';
 import { clearCachedSongAudioDistrust, distrustCachedSongAudio } from '@/services/playbackRecovery/mediaCacheGuard';
+import { useAudioSettingsStore } from '@/stores/useAudioSettingsStore';
 
 // test/unit/onlinePlayback.test.ts
 
@@ -94,10 +111,46 @@ describe('online audio ReplayGain plumbing', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         authorizeMock.mockResolvedValue(undefined);
+        mobileBufferWantedMock.mockReturnValue(false);
+        mobileBufferReadMock.mockResolvedValue(null);
         cachedAudioMock.mockReset().mockResolvedValue(null);
         isUrlValidMock.mockReturnValue(true);
         resetOnlineRequestCooldowns();
         useOnlineProviderAccountStore.setState({ accounts: {} });
+    });
+
+    it('plays complete mobile read-ahead bytes instead of the remote stream', async () => {
+        mobileBufferWantedMock.mockReturnValue(true);
+        mobileBufferReadMock.mockResolvedValue(new Blob([new Uint8Array(32768)], { type: 'audio/mpeg' }));
+        const wasEnabled = useAudioSettingsStore.getState().enableMediaCache;
+        useAudioSettingsStore.setState({ enableMediaCache: false });
+        sourceMock.mockResolvedValueOnce({ url: 'https://audio.test/full.mp3' });
+        try {
+            const result = await loadOnlineSongAudioSource(song, 'standard', null);
+            expect(result).toMatchObject({ kind: 'ok', audioSrc: 'blob:test', blobUrl: 'blob:test' });
+            expect(mobileBufferReadMock).toHaveBeenCalledWith('https://audio.test/full.mp3', undefined);
+        } finally { useAudioSettingsStore.setState({ enableMediaCache: wasEnabled }); }
+    });
+
+    it('keeps a playable stream when mobile buffering cannot finish', async () => {
+        mobileBufferWantedMock.mockReturnValue(true);
+        sourceMock.mockResolvedValueOnce({ url: 'https://audio.test/full.mp3' });
+        expect(await loadOnlineSongAudioSource(song, 'standard', null)).toMatchObject({ kind: 'ok', audioSrc: 'https://audio.test/full.mp3' });
+    });
+
+    it('persists the buffered file at its requested quality without another download', async () => {
+        mobileBufferWantedMock.mockReturnValue(true);
+        const blob = new Blob([new Uint8Array(32768)], { type: 'audio/mpeg' });
+        mobileBufferReadMock.mockResolvedValue(blob);
+        const wasEnabled = useAudioSettingsStore.getState().enableMediaCache;
+        useAudioSettingsStore.setState({ enableMediaCache: true });
+        sourceMock.mockResolvedValueOnce({ url: 'https://audio.test/full.mp3' });
+        try {
+            expect(await loadOnlineSongAudioSource(song, 'high', null)).toMatchObject({ kind: 'ok', audioSrc: 'blob:test' });
+            await vi.waitFor(() => expect(saveBufferedLevelMock).toHaveBeenCalledWith(song, 'high'));
+            expect(saveBufferedAudioMock).toHaveBeenCalledWith(expect.any(String), blob);
+            expect(mobileBufferReadMock).toHaveBeenCalledTimes(1);
+        } finally { useAudioSettingsStore.setState({ enableMediaCache: wasEnabled }); }
     });
 
     it.each([

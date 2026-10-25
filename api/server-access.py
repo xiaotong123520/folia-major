@@ -193,6 +193,7 @@ class handler(BaseHTTPRequestHandler):
         origin = self.headers.get('Origin')
         if origin in self.origins():
             self.send_header('Access-Control-Allow-Origin', origin)
+            self.send_header('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges')
             self.send_header('Vary', 'Origin')
 
     def reply(self, status, value):
@@ -267,7 +268,7 @@ class handler(BaseHTTPRequestHandler):
                 raise AccessError(404, 'not_found')
             origin = 'https://' + '我爱南京.com'.encode('idna').decode()
             target = origin + '/api/audio.php?' + urlencode({'path': value['id']})
-            headers = {}
+            headers = {'Accept-Encoding': 'identity'}
             range_value = self.headers.get('Range')
             if range_value:
                 if not re.fullmatch(r'bytes=(?:\d+-\d*|-\d+)', range_value):
@@ -284,7 +285,8 @@ class handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 started = True
                 if self.command != 'HEAD':
-                    while chunk := upstream.read(65536):
+                    # Forward available bytes immediately; read(n) can wait to fill a whole block.
+                    while chunk := upstream.read1(65536):
                         self.wfile.write(chunk)
                         self.wfile.flush()
         except AccessError as error:

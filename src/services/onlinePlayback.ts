@@ -14,8 +14,8 @@ import { autoRetryDelaysMs, logOnlineFailure, onlineFailureOf, type OnlineFailur
 import { noteOnlineRequestCooldown, onlineRequestCooldown } from './onlineMusic/failure/onlineRequestCooldown';
 import { getSongResourceCacheKey } from './onlineMusic/resourceKeys';
 import { deleteCachedSongAudio, getCachedSongAudioBlob, getCachedSongReplayGain, getSongCacheWithLegacyMigration } from './onlineMusic/resourceCache';
-import { measureSongAudio, notTheSongWhy } from './wholeSongCheck';
-import { isCachedSongAudioDistrusted } from './playbackRecovery/mediaCacheGuard';
+import { mayStoreSongAudio, measureSongAudio, notTheSongWhy } from './wholeSongCheck';
+import { clearCachedSongAudioDistrust, isCachedSongAudioDistrusted } from './playbackRecovery/mediaCacheGuard';
 import { toPlayableAudioUrl } from '../utils/appPlaybackHelpers';
 import { getOnlineProviderIdForSong } from '../utils/appPlaybackGuards';
 import { getProviderSongMetadata } from './onlineMusic/songMetadata';
@@ -23,6 +23,10 @@ import { useLyricSettingsStore } from '../stores/useLyricSettingsStore';
 import { useOnlineProviderAccountStore } from '../stores/useOnlineProviderAccountStore';
 import { saveLyricCacheSongMetadata } from './lyricExport/lyricCacheMetadata';
 import { errorFields } from '../utils/errorText';
+import { readMobileAudioBuffer, wantsMobileAudioBuffer } from './mobileAudioBuffer';
+import { saveAudioBlob } from './audioCache';
+import { hasCachedSongAudio, saveSongAudioLevel, saveSongReplayGain } from './onlineMusic/resourceCache';
+import { useAudioSettingsStore } from '../stores/useAudioSettingsStore';
 
 // How long playback waits for a stored copy's header to give its play length (`wholeCopy`). Past
 // it the copy plays untested: the check must not hold up a song that starts from the cache.
@@ -118,13 +122,34 @@ export async function loadOnlineSongAudioSource(
     const fromCopy = await playCopy(await readCopy(level));
     if (fromCopy) return fromCopy;
 
+    const prepareNetworkAudio = async (url: string, replayGain?: ReplayGainInfo): Promise<OnlineAudioSourceResult> => {
+        const preview = omni.isPreviewAudioSource(url);
+        if (!preview && !options.bypassMediaCache && wantsMobileAudioBuffer(song.durationMs)) {
+            const blob = await readMobileAudioBuffer(url, options.retry?.isCurrent);
+            const blobUrl = blob && createSafeObjectUrl(blob);
+            if (blob && blobUrl) {
+                // Persist the very bytes downloaded for playback, rather than downloading them again at track end.
+                // Storage failure cannot prevent a fully buffered file from playing.
+                if (useAudioSettingsStore.getState().enableMediaCache && !options.bypassMediaCache) {
+                    void (async () => {
+                        const writesOver = await hasCachedSongAudio(song);
+                        if (!(await mayStoreSongAudio(song, url, blob, writesOver)).store) return;
+                        if (writesOver) await saveSongAudioLevel(song, undefined);
+                        await saveAudioBlob(getSongResourceCacheKey('audio', song), blob);
+                        await saveSongAudioLevel(song, level);
+                        if (replayGain) await saveSongReplayGain(song, replayGain);
+                        clearCachedSongAudioDistrust(song);
+                    })().catch(error => console.warn('[AudioBuffer] Buffered audio plays without a persistent copy', error));
+                }
+                console.log('[AudioBuffer] Playing a fully buffered audio file', { bytes: blob.size });
+                return { kind: 'ok', audioSrc: blobUrl, blobUrl, replayGain, preview };
+            }
+        }
+        return { kind: 'ok', audioSrc: url, replayGain, preview };
+    };
+
     if (prefetched?.audioUrl && prefetched.audioUrl !== 'CACHED_IN_DB' && isUrlValid(prefetched.audioUrlFetchedAt)) {
-        return {
-            kind: 'ok',
-            audioSrc: prefetched.audioUrl,
-            replayGain: song.replayGain ?? prefetched.replayGain,
-            preview: omni.isPreviewAudioSource(prefetched.audioUrl),
-        };
+        return prepareNetworkAudio(prefetched.audioUrl, song.replayGain ?? prefetched.replayGain);
     }
 
     // No address: what went wrong is logged, also where a copy of another level then plays.
@@ -156,7 +181,7 @@ export async function loadOnlineSongAudioSource(
         if (url) {
             const replayGain = applyOnlineAudioSourceMetadata(song, source?.replayGain).replayGain;
             updatePrefetchedAudioUrl(song, url, audioQuality, replayGain);
-            return { kind: 'ok', audioSrc: url, replayGain, preview: omni.isPreviewAudioSource(url) };
+            return prepareNetworkAudio(url, replayGain);
         }
         const failure = thrown === undefined
             // A provider (a mod's) that answers null, or an address that may not be played.

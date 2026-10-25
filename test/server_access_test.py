@@ -1,9 +1,10 @@
 import importlib.util
 import json
 import os
+import io
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 # Exercise authorization boundaries without sending mail or touching production storage.
 spec = importlib.util.spec_from_file_location('server_access', Path(__file__).parents[1] / 'api/server-access.py')
@@ -65,6 +66,32 @@ class ServerAccessTests(unittest.TestCase):
             self.assertEqual(len(result['token']), 43)
             self.assertGreater(result['expiresAt'], api.time.time() * 1000)
             self.assertEqual(store.call_args.args[-2:], ('EX', 7 * 86400))
+
+    def test_audio_relay_streams_available_bytes_and_preserves_range_headers(self):
+        request = object.__new__(api.handler)
+        request.path = '/api/server-access?action=audio&ticket=' + 'a' * 43
+        request.command = 'GET'
+        request.headers = {'Range': 'bytes=0-3', 'Origin': 'https://folia-major-ai-radio-preview.vercel.app'}
+        request.wfile = io.BytesIO()
+        request.send_response = Mock()
+        request.send_header = Mock()
+        request.end_headers = Mock()
+        upstream = Mock()
+        upstream.status = 206
+        upstream.headers = {'Content-Type': 'audio/mpeg', 'Content-Length': '4', 'Content-Range': 'bytes 0-3/100', 'Accept-Ranges': 'bytes'}
+        upstream.read1.side_effect = [b'a', b'bcd', b'']
+        context = Mock()
+        context.__enter__ = Mock(return_value=upstream)
+        context.__exit__ = Mock(return_value=False)
+        opener = Mock()
+        opener.open.return_value = context
+        with patch.object(api, 'redis', side_effect=[json.dumps({'id': 'album/song.mp3', 'session': 'hashed'}), 'owner']), patch.object(api, 'recordings', return_value={'album/song.mp3'}), patch.object(api, 'build_opener', return_value=opener):
+            request.do_GET()
+        self.assertEqual(request.wfile.getvalue(), b'abcd')
+        request.send_response.assert_called_once_with(206)
+        request.send_header.assert_any_call('Content-Range', 'bytes 0-3/100')
+        self.assertEqual(opener.open.call_args.args[0].get_header('Range'), 'bytes=0-3')
+        upstream.read.assert_not_called()
 
 
 if __name__ == '__main__':
