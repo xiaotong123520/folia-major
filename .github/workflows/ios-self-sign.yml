@@ -1,0 +1,41 @@
+name: Build iOS IPA for self-signing
+
+on:
+  push:
+    branches: [build/ios-self-sign]
+    paths:
+      - 'packaging/ios/**'
+      - '.github/workflows/ios-self-sign.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare app icon
+        run: sips -z 1024 1024 public/icon-512.png --out packaging/ios/TingyuFM/Assets.xcassets/AppIcon.appiconset/AppIcon.png
+      - name: Compile device archive without signing
+        run: |
+          set -o pipefail
+          bash packaging/ios/build.sh 2>&1 | tee ios-build.log
+      - name: Package compiled app for self-signing
+        run: bash packaging/ios/packageUnsigned.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TingyuFM-unsigned-self-sign
+          path: |
+            packaging/ios/output/TingyuFM-unsigned.ipa
+            packaging/ios/output/SELF-SIGN.txt
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-build-log
+          path: ios-build.log
+          if-no-files-found: ignore

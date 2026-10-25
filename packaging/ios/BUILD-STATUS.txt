@@ -1,0 +1,9 @@
+2026-10-25
+交付物：Xcode 工程源码，不是 IPA 安装包。
+静态准备：已生成入口、WKWebView 容器、图标、Info.plist、scheme 和构建脚本。
+构建结果：未执行 iOS 编译；Linux 缺少 xcodebuild，build.sh 按预期退出 2。
+签名结果：未签名，无证书、私钥、描述文件。
+运行验收：未运行 iOS 模拟器或真机。
+付费会员不是免费真机开发测试的必要条件，但仍需 Mac/Xcode 和本人 Apple 账号。
+
+已添加 GitHub macOS 构建流程，云端运行结果以 Actions 为准；此文件不代表编译成功。
