@@ -15,6 +15,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Check server HTTPS entry
+        run: |
+          curl --fail --silent --show-error --location --max-redirs 3 --proto '=https' --proto-redir '=https' --connect-timeout 15 --max-time 45 --retry 1 'https://music.xn--1lqq7iexp1vp.com/' -o /tmp/tingyu-home.html
+          python3 -c "from pathlib import Path; p=Path('/tmp/tingyu-home.html'); s=p.read_text(); assert '<html' in s.lower() and len(s)>100, 'Expected an HTML website'; print('HTTPS entry returned HTML')"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -33,12 +37,12 @@ jobs:
           APK=packaging/android/app/build/outputs/apk/debug/app-debug.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           mkdir -p android-artifact
-          cp "$APK" android-artifact/TingyuFM-Android-1.0.0-test.apk
+          cp "$APK" android-artifact/TingyuFM-Android-1.0.1-server-test.apk
           cp packaging/android/README.md android-artifact/README.md
           sha256sum android-artifact/*.apk > android-artifact/SHA256SUMS
       - uses: actions/upload-artifact@v4
         with:
-          name: TingyuFM-Android-1.0.0-test
+          name: TingyuFM-Android-1.0.1-server-test
           path: android-artifact/
           retention-days: 30
 

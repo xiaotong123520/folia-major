@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 
 // HTTPS website shell; authorization stays in the existing website and API.
 public final class MainActivity extends Activity {
-    private static final String HOME = "https://folia-major-ai-radio-preview.vercel.app/";
+    private static final String HOME = "https://music.xn--1lqq7iexp1vp.com/";
     private static final int PICK_FILE = 41;
     private WebView web;
     private ValueCallback<Uri[]> files;
@@ -60,7 +60,7 @@ public final class MainActivity extends Activity {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 if (!request.isForMainFrame()) return false;
                 Uri uri = request.getUrl();
-                if ("https".equals(uri.getScheme()) && "folia-major-ai-radio-preview.vercel.app".equals(uri.getHost())) return false;
+                if ("https".equals(uri.getScheme()) && "music.xn--1lqq7iexp1vp.com".equals(uri.getHost())) return false;
                 openExternal(uri);
                 return true;
             }
@@ -87,7 +87,7 @@ public final class MainActivity extends Activity {
                 return true;
             }
         });
-        if (state == null || web.restoreState(state) == null) web.loadUrl(HOME);
+        if (state == null || web.restoreState(state) == null) web.loadUrl(HOME + "#player");
         firstWelcome = !getPreferences(MODE_PRIVATE).getBoolean("tingyu.notice.happy-listening.v1", false);
         if (firstWelcome) {
             noticeOpen = true;
