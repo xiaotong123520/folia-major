@@ -2,7 +2,7 @@
     'use strict';
     // Foreground sound/effects stay in the webpage; native playback owns only the background handoff.
     const channel = window.webkit?.messageHandlers?.tingyuNativeAudio;
-    if (!channel || window.location.origin !== 'https://folia-major-ai-radio-preview.vercel.app') return;
+    if (!channel || window.location.origin !== 'https://music.xn--1lqq7iexp1vp.com') return;
     let audio = null;
     let source = '';
     let id = '';

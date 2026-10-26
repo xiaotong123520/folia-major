@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 // Check ownership/clock handoff without a browser login, Apple account or live music source.
-function fixture(origin = 'https://folia-major-ai-radio-preview.vercel.app') {
+function fixture(origin = 'https://music.xn--1lqq7iexp1vp.com') {
     const listeners = new Map();
     const messages = [];
     const events = [];

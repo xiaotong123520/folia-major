@@ -45,7 +45,7 @@ final class NativeBackgroundAudio: NSObject, WKScriptMessageHandlerWithReply {
                                replyHandler: @escaping (Any?, String?) -> Void) {
         guard message.frameInfo.isMainFrame,
               message.frameInfo.request.url?.scheme == "https",
-              message.frameInfo.request.url?.host == "folia-major-ai-radio-preview.vercel.app",
+              message.frameInfo.request.url?.host == "music.xn--1lqq7iexp1vp.com",
               let body = message.body as? [String: Any], let action = body["action"] as? String,
               let id = body["id"] as? String, !id.isEmpty, id.count <= 20 else {
             replyHandler(nil, "Invalid audio message"); return

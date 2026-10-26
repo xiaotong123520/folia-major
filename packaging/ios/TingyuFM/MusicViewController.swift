@@ -4,7 +4,7 @@ import AVFoundation
 
 // 使用持久化 WebKit 数据，避免嵌入本地页面后改变 API 与会话的来源。
 final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
-    private let startURL = URL(string: "https://folia-major-ai-radio-preview.vercel.app/")!
+    private let startURL = URL(string: "https://music.xn--1lqq7iexp1vp.com/")!
     private var browser: WKWebView!
     private let failure = UIStackView()
     private let nativeAudio = NativeBackgroundAudio()
@@ -161,7 +161,7 @@ final class MusicViewController: UIViewController, WKNavigationDelegate, WKUIDel
     @objc private func retryLoading() {
         failure.isHidden = true
         browser.isHidden = false
-        browser.load(URLRequest(url: startURL))
+        browser.load(URLRequest(url: URL(string: "#player", relativeTo: startURL)!.absoluteURL))
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {

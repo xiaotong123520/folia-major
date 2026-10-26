@@ -17,6 +17,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Check server HTTPS entry
+        run: |
+          curl --fail --silent --show-error --location --max-redirs 3 --proto '=https' --proto-redir '=https' --connect-timeout 15 --max-time 45 --retry 1 'https://music.xn--1lqq7iexp1vp.com/' -o /tmp/tingyu-home.html
+          python3 -c "from pathlib import Path; p=Path('/tmp/tingyu-home.html'); s=p.read_text(); assert '<html' in s.lower() and len(s)>100, 'Expected an HTML website'; print('HTTPS entry returned HTML')"
       - name: Check native audio handoff bridge
         run: node --test packaging/ios/testNativeAudioBridge.cjs
       - name: Prepare app icon
@@ -29,7 +33,7 @@ jobs:
         run: bash packaging/ios/packageUnsigned.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: TingyuFM-unsigned-self-sign
+          name: TingyuFM-iOS-1.1.1-server-unsigned
           path: |
             packaging/ios/output/TingyuFM-unsigned.ipa
             packaging/ios/output/SELF-SIGN.txt
