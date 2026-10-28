@@ -12,6 +12,13 @@ import softFocus from './styleTransition/softFocus';
 import { alongProgress } from './styleTransition/layerTransition';
 import { holdTurns } from './preview/pictureTurns';
 import { useReducedMotionFor } from '../../hooks/useReducedMotionFor';
+import { supportsWebGL2 } from '../../utils/webglSupport';
+import VisualEffectBoundary from './VisualEffectBoundary';
+
+// Resolve incompatible effects without overwriting the user's saved style selection.
+const CompatibleStyle: React.FC<{ mode: VisualizerMode; props: VisualizerSharedProps }> = ({ mode, props }) => (
+    getVisualizerRegistryEntry(mode).render(props)
+);
 
 interface VisualizerRendererProps extends VisualizerSharedProps {
     mode: VisualizerMode;
@@ -29,7 +36,8 @@ const VisualizerRenderer: React.FC<VisualizerRendererProps> = ({ mode, animateSt
     // A style's code arrives the first time it is shown. The mode on screen moves to a new style in a
     // render React keeps off screen until that code has come, so the style before stays until then;
     // the style is switched here, in one place, with the props tuned for it.
-    const shownMode = useDeferredValue(mode);
+    const compatibleMode = mode === 'diorama' && !supportsWebGL2() ? 'classic' : mode;
+    const shownMode = useDeferredValue(compatibleMode);
     const entry = getVisualizerRegistryEntry(shownMode);
     const sharedProps = {
         ...props,
@@ -64,11 +72,15 @@ const VisualizerRenderer: React.FC<VisualizerRendererProps> = ({ mode, animateSt
     const styleSwitch = useStyleSwitch(shownMode, transition);
     // From the choice until the new style is mounted (its code may still be on its way), no small
     // picture starts either; from then on its style layer holds them back (pictureTurns).
-    const switchAsked = transition !== null && mode !== shownMode;
+    const switchAsked = transition !== null && compatibleMode !== shownMode;
     useLayoutEffect(() => (switchAsked ? holdTurns() : undefined), [switchAsked]);
     // A style still leaving after a switch is drawn with the props tuned for it.
-    const renderStyle = (styleMode: VisualizerMode) => getVisualizerRegistryEntry(styleMode).render(
-        styleMode === shownMode ? styleProps : applyVisualizerTuning(styleMode, sharedProps, props.visualizerTunings),
+    const renderStyle = (styleMode: VisualizerMode) => (
+        <VisualEffectBoundary key={styleMode} fallback={<CompatibleStyle mode="still" props={sharedProps} />}>
+            <CompatibleStyle mode={styleMode} props={
+                styleMode === shownMode ? styleProps : applyVisualizerTuning(styleMode, sharedProps, props.visualizerTunings)
+            } />
+        </VisualEffectBoundary>
     );
 
     return (
