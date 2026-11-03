@@ -61,6 +61,7 @@ jobs:
           VITE_QQ_API_BASE: ${{ vars.VITE_QQ_API_BASE }}
           VITE_KUGOU_API_BASE: ${{ vars.VITE_KUGOU_API_BASE }}
           VITE_AI_PROVIDER: google
+          VITE_RADIO_SPEECH_API_URL: ${{ vars.VITE_RADIO_SPEECH_API_URL || 'https://folia-major-ai-radio-preview.vercel.app/api/radio-speech' }}
           VITE_TONGSHENG_VIDEO_API_URL: ${{ vars.VITE_TONGSHENG_VIDEO_API_URL }}
           VITE_MUSIC_BACKEND_BASE_URL: ${{ vars.VITE_MUSIC_BACKEND_BASE_URL }}
           VITE_AUDIO_LIBRARY_BASE_URL: ${{ vars.VITE_AUDIO_LIBRARY_BASE_URL }}
