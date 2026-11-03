@@ -21,6 +21,7 @@ const env = vi.hoisted(() => ({
 vi.mock('react', async importOriginal => ({
     ...(await importOriginal<typeof import('react')>()),
     useCallback: (fn: unknown) => fn,
+    useMemo: (factory: () => unknown) => factory(),
     useRef: (value: unknown) => ({ current: value }),
     useEffect: (fn: () => unknown) => { env.effects.push(fn); },
 }));
