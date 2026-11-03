@@ -7,6 +7,7 @@ RUN npm ci
 
 COPY api-ts ./api-ts
 COPY shared ./shared
+COPY dev/buildPodcastApi.mjs ./dev/buildPodcastApi.mjs
 RUN npm run build:vercel-api
 
 FROM node:24-alpine AS runner
