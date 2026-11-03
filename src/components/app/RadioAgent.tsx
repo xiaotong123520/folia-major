@@ -1,3 +1,4 @@
+import FishRadioPreview from './radio/FishRadioPreview';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowLeft, AudioLines, Bot, Check, LayoutGrid, LoaderCircle, Mic, Music2, Pause, Play, Radio, Send, Settings2, Volume2, VolumeX, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +27,7 @@ type Props = {
     /** Use the main Folia queue, so station tracks and cover art appear on the Lattice wall. */
     onPlayOnline: (song: UnifiedSong, stationQueue: UnifiedSong[]) => void | Promise<void>;
     onPlayLocal: (song: LocalSong) => void;
+    onNarrationPlay: () => void;
     onOpenLibrary: (tab: 'albums' | 'radio') => void;
 };
 
@@ -74,7 +76,7 @@ const isBrief = (value: unknown): value is RadioBrief => {
 const localLabel = (song: LocalSong) => song.title || song.fileName.replace(/\.[^.]+$/, '');
 const localArtist = (song: LocalSong, fallback: string) => song.onlineMetadata?.artists?.map((artist) => typeof artist === 'string' ? artist : artist.name).filter(Boolean).join(', ') || song.importedMetadata?.artistNames?.join(', ') || fallback;
 
-export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, onPlayLocal, onOpenLibrary }: Props) {
+export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, onPlayLocal, onOpenLibrary, onNarrationPlay }: Props) {
     const { t } = useTranslation();
     const [message, setMessage] = useState('');
     const [brief, setBrief] = useState<RadioBrief | null>(null);
@@ -299,9 +301,10 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
         utterance.lang = /^zh/i.test(navigator.language) ? 'zh-CN' : navigator.language || 'en-US';
         utterance.onend = () => setPlayingIntro(false);
         utterance.onerror = () => setPlayingIntro(false);
+        onNarrationPlay();
         setPlayingIntro(true);
         window.speechSynthesis.speak(utterance);
-    }, [brief, playingIntro, t]);
+    }, [brief, playingIntro, t, onNarrationPlay]);
 
     if (!open) return null;
 
@@ -346,6 +349,9 @@ export default function RadioAgent({ open, onClose, localSongs, onPlayOnline, on
                             {shareError && <p role="alert" className="text-xs text-amber-200">{shareError}</p>}
                             {shareResolution?.access === 'official-embed' && shareResolution.normalizedUrl && <a href={shareResolution.normalizedUrl} target="_blank" rel="noopener noreferrer" className="inline-block text-xs text-violet-200 underline">{t('radioAgent.shareOfficialLink')}</a>}
                         </form>
+                        <FishRadioPreview pausePreview={playingIntro} text={brief?.narration || t('radioAgent.fishSample')} onPlay={() => {
+                            window.speechSynthesis?.cancel(); setPlayingIntro(false); onNarrationPlay();
+                        }} />
                         {voiceListening && <p className="mt-2 flex items-center gap-2 text-xs text-rose-200"><span className="h-2 w-2 animate-pulse rounded-full bg-rose-300" />{t('radioAgent.listening')}</p>}
                         {error && <p role="status" className="mt-3 rounded-xl border border-amber-200/15 bg-amber-200/5 px-3 py-2 text-xs leading-5 text-amber-100/80">{error}</p>}
                         {brief && <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.035] p-4">

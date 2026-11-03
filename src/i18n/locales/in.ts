@@ -168,6 +168,15 @@ export default {
     "disclaimer": "Hanya layanan musik yang tersedia dan API resmi yang digunakan. Pengenalan tautan tidak membuka lagu berlangganan atau membuat streaming tanpa izin. Atur server musik di pustaka server."
   },
   "radioAgent": {
+    "fishTitle": "Fish Audio · pratinjau suara gratis",
+    "fishGenerate": "Buat pratinjau gratis",
+    "fishGenerating": "Membuat suara…",
+    "fishHint": "Hanya memakai s2.1-pro-free, tanpa beralih ke model berbayar. Setelah dibuat, ketuk putar. Musik dijeda selama pratinjau.",
+    "fishNotConfigured": "Fish Audio belum dikonfigurasi. Tambahkan FISH_API_KEY hanya di server lalu deploy ulang.",
+    "fishFreeUnavailable": "Model gratis tidak tersedia. Model berbayar tidak digunakan.",
+    "fishFailed": "Pembuatan suara gagal. Coba lagi nanti atau gunakan narasi browser.",
+    "fishSample": "Selamat datang di radio Folia Anda. Tarik napas, dan nikmati musiknya.",
+
     "playStationWall": "Putar radio · Lihat dinding sampul",
     "serverFallback": "Tidak ada lagu daring yang cocok dengan deskripsi. Menampilkan lagu dari katalog server untuk Anda pilih.",
     "savedWall": "Dinding sampul radio saya",

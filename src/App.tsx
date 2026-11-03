@@ -2890,6 +2890,7 @@ export default function App() {
             />}
             {!isElectronWindow && isVideoLibraryOpen && <VideoLibrary onClose={() => setIsVideoLibraryOpen(false)} />}
             {!isElectronWindow && <RadioAgent
+                onNarrationPlay={pausePlayback}
                 onOpenLibrary={tab => { setIsRadioAgentOpen(false); void openPersonalLibrary(tab); }}
                 open={isRadioAgentOpen}
                 onClose={() => setIsRadioAgentOpen(false)}

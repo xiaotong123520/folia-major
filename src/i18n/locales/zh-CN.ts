@@ -168,6 +168,15 @@ export default {
     "disclaimer": "仅使用已有音乐服务与官方授权接口。链接识别不会解锁 VIP 曲目或生成未经授权的播放地址。服务器音乐请在现有服务器曲库中配置。"
   },
   "radioAgent": {
+    "fishTitle": "Fish Audio · 免费语音试听",
+    "fishGenerate": "生成免费试听",
+    "fishGenerating": "正在合成语音…",
+    "fishHint": "仅使用 s2.1-pro-free，不自动切换付费模型。生成后点击音频播放；试听会暂停音乐。",
+    "fishNotConfigured": "尚未配置 Fish Audio，请在服务端添加 FISH_API_KEY 后重新部署。",
+    "fishFreeUnavailable": "免费模型当前不可用，未调用任何付费模型。",
+    "fishFailed": "语音合成失败，请稍后重试，也可使用原有浏览器播报。",
+    "fishSample": "欢迎来到你的私人电台。放慢脚步，让音乐陪你度过这一刻。",
+
     "playStationWall": "播放整组电台 · 在封面墙查看",
     "serverFallback": "没有找到与描述匹配的在线曲目，先展示服务器曲库中的歌曲供你选择。",
     "savedWall": "我的电台封面墙",
